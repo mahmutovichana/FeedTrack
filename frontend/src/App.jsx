@@ -8,9 +8,16 @@ function App() {
   const [data, setData] = useState('stranger');
 
   async function getBackendData() {
-    const response = await fetch('http://localhost:3000/api/');
-    const body = await response.json();
-    setData(body.name);
+    try {
+      const response = await fetch('https://feedtrack-backend.vercel.app/api');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const body = await response.json();
+      setData(body.name);
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
   }
 
   return (
