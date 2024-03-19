@@ -1,0 +1,3 @@
+class TellerPositionAdmin extends Admin{
+
+}

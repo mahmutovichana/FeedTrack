@@ -1,0 +1,3 @@
+class SuperAdmin extends Admin{
+
+}

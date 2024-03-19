@@ -1,0 +1,3 @@
+class BranchAdmin extends Admin{
+
+}
