@@ -1,0 +1,3 @@
+class RegularReports extends Reports{
+
+}

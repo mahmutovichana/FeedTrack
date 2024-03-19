@@ -1,0 +1,3 @@
+function UserPanelController(id){
+
+}

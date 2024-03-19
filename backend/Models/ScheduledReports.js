@@ -1,0 +1,3 @@
+class ScheduledReports extends Reports{
+
+}
