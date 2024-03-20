@@ -5,6 +5,12 @@ import dotenv from 'dotenv';
 
 dotenv.config(); 
 
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+console.log('DB_DATABASE:', process.env.DB_DATABASE);
+console.log('DB_PORT:', process.env.DB_PORT);
+
 const app = express();
 
 app.use(cors());
@@ -41,6 +47,6 @@ app.get("/api/branches", (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
