@@ -1,10 +1,4 @@
-import express from "express";
-import cors from "cors";
 import mysql from 'mysql2';
-
-const app = express();
-
-app.use(cors());
 
 const connection = mysql.createConnection({
   host: 'hwc.h.filess.io',
@@ -19,21 +13,20 @@ connection.connect((error) => {
     console.error('Error connecting to MySQL database:', error);
   } else {
     console.log('Connected to MySQL database!');
+    fetchBranches();
   }
 });
 
-app.get("/api/branches", (req, res) => {
+function fetchBranches() {
     connection.query('SELECT * FROM Branch', (error, results) => {
       if (error) {
         console.error('Error fetching branches:', error);
-        res.status(500).json({ error: 'Error fetching branches' });
       } else {
-        console.log('Branches:', results);
-        res.json(results);
+        console.log('Branches:');
+        results.forEach((branch) => {
+          console.log(branch);
+        });
       }
+      connection.end(); // Zatvaramo konekciju nakon što dohvatimo podatke
     });
-});
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
+  }
