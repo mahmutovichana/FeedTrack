@@ -1,17 +1,20 @@
 import express from "express";
 import cors from "cors";
 import mysql from 'mysql2';
+import dotenv from 'dotenv';
+
+dotenv.config(); 
 
 const app = express();
 
 app.use(cors());
 
 const connection = mysql.createConnection({
-  host: 'hwc.h.filess.io',
-  user: 'FeedTrack_discoveris',
-  password: '70a72453d3a793635719488c8a2acf1abcc7aa19',
-  database: 'FeedTrack_discoveris',
-  port: 3307
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT
 });
 
 connection.connect((error) => {
@@ -20,6 +23,10 @@ connection.connect((error) => {
   } else {
     console.log('Connected to MySQL database!');
   }
+});
+
+app.get("/api", (req, res) => {
+    res.json({ name: "Hana" }); 
 });
 
 app.get("/api/branches", (req, res) => {
@@ -34,6 +41,6 @@ app.get("/api/branches", (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
