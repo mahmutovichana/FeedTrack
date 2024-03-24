@@ -1,3 +1,3 @@
 export function AdminPanelProfileView() {
-  return <></>;
+    return (<></>);
 }
