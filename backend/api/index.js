@@ -10,7 +10,10 @@ dotenv.config();
 // Development/production constants
 const PORT = process.env.PORT || 3000;
 const URL = process.env.BACKEND_URL || "http://localhost:3000";
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
+const ACCESS_TOKEN_SECRET =
+  process.env.ACCESS_TOKEN_SECRET || "FeedTrackAccessToken";
+const REFRESH_TOKEN_SECRET =
+  process.env.REFRESH_TOKEN_SECRET || "FeedTrackRefreshToken";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +35,33 @@ con.connect((error) => {
   }
 });
 
+let refreshTokens = [];
+
+app.post("/api/token", (req, res) => {
+  const refreshToken = req.body.token;
+
+  if (!refreshToken) {
+    return res.status(401).json("You are not authenticated!");
+  }
+
+  if (!refreshTokens.includes(refreshToken)) {
+    return res.status(403).json("Token is not valid!");
+  }
+
+  jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, userData) => {
+    if (err) return res.sendStatus(403);
+
+    const user = {
+      id: userData.id,
+      username: userData.username,
+      email: userData.email,
+    };
+    const accessToken = generateAccessToken(user);
+
+    res.status(200).json({ accessToken });
+  });
+});
+
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -41,20 +71,33 @@ app.post("/api/login", (req, res) => {
     (err, results) => {
       if (err) throw err;
 
-      if (results.length > 0) {
-        const user = results[0];
-        // Generate an access token
-        const accessToken = jwt.sign({ id: user.id }, JWT_SECRET);
-        res.json({ ...user, accessToken });
-      } else {
-        res.status(400).json("Email or password incorrect!");
+      if (results.length === 0) {
+        return res.status(400).json("Email or password incorrect!");
       }
+
+      const { id, username, email } = results[0];
+      const user = { id, username, email };
+      // Generate access and refresh tokens
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+      refreshTokens.push(refreshToken);
+
+      res.json({
+        ...user,
+        accessToken,
+        refreshToken,
+      });
     }
   );
 });
 
-app.get("/api", verify, (req, res) => {
-  res.json({ name: "Hana" });
+app.post("/api/logout", (req, res) => {
+  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
+  res.status(200).json("Logged out successfully.");
+});
+
+app.get("/api", authenticateToken, (req, res) => {
+  res.json(req.user);
 });
 
 app.get("/api/branches", (req, res) => {
@@ -69,23 +112,33 @@ app.get("/api/branches", (req, res) => {
   });
 });
 
-function verify(req, res, next) {
-  const authHeader = req.headers.authorization;
-  console.log(authHeader);
-  if (authHeader) {
-    const token = authHeader.split(" ")[1];
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        res.status(403).json("Token is not valid!");
-      }
-
-      req.user = user;
-      next();
-    });
-  } else {
+  if (!authHeader) {
     res.status(401).json("You are not authenticated!");
   }
+
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      res.status(403).json("Token is not valid!");
+    }
+
+    req.user = user;
+    next();
+  });
+}
+
+function generateAccessToken(user) {
+  return jwt.sign(user, ACCESS_TOKEN_SECRET, {
+    expiresIn: "30s",
+  });
+}
+
+function generateRefreshToken(user) {
+  return jwt.sign(user, REFRESH_TOKEN_SECRET);
 }
 
 app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
