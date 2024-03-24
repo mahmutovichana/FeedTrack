@@ -7,8 +7,10 @@ import jwt from "jsonwebtoken";
 const app = express();
 dotenv.config();
 
+// Development/production constants
 const PORT = process.env.PORT || 3000;
 const URL = process.env.BACKEND_URL || "http://localhost:3000";
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,7 +44,7 @@ app.post("/api/login", (req, res) => {
       if (results.length > 0) {
         const user = results[0];
         // Generate an access token
-        const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+        const accessToken = jwt.sign({ id: user.id }, JWT_SECRET);
         res.json({ ...user, accessToken });
       } else {
         res.status(400).json("Email or password incorrect!");
@@ -51,7 +53,7 @@ app.post("/api/login", (req, res) => {
   );
 });
 
-app.get("/api", (req, res) => {
+app.get("/api", verify, (req, res) => {
   res.json({ name: "Hana" });
 });
 
@@ -66,5 +68,24 @@ app.get("/api/branches", (req, res) => {
     }
   });
 });
+
+function verify(req, res, next) {
+  const authHeader = req.headers.authorization;
+  console.log(authHeader);
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+      if (err) {
+        res.status(403).json("Token is not valid!");
+      }
+
+      req.user = user;
+      next();
+    });
+  } else {
+    res.status(401).json("You are not authenticated!");
+  }
+}
 
 app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
