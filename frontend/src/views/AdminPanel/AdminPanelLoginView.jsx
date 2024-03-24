@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGooglePlusG } from '@fortawesome/free-brands-svg-icons';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
 import feedtrackLogo from './../../assets/feedtrackLogoBlack.svg';
 import '../../styles/AdminPanel/AdminPanelLoginView.css';
+import { Link } from 'react-router-dom';
+
+const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
+const YOUR_REDIRECT_URI = "https://feedtrack.vercel.app/";
 
 const Login = () => {
     const [loginWithEmail, setLoginWithEmail] = useState(true);
+
+    function handleCallbackResponse(response){
+        console.log("Encoded JWT ID token: "+response.credential);
+    }
+
+    useEffect(() => {
+        // global google
+        google.accounts.id.initialize({
+            client_id: YOUR_CLIENT_ID,
+            callback: handleCallbackResponse
+        });
+    }, []);
 
     useEffect(() => {
         const container = document.getElementById('container');
@@ -35,6 +51,18 @@ const Login = () => {
         setLoginWithEmail(prevState => !prevState);
     };
 
+    const handleGoogleSignIn = () => {
+        if (google && google.accounts && google.accounts.id) {
+            google.accounts.id.prompt();
+        } else {
+            console.error("Google SDK is not fully loaded.");
+        }
+    };
+    
+    const handleGoogleSignUp = () => {
+        window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${YOUR_CLIENT_ID}&redirect_uri=${YOUR_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline`;
+    };
+
     return (
         <div>
             <div className="logo">
@@ -46,18 +74,18 @@ const Login = () => {
                         <h1>Create Account</h1>
                         <div className="options">
                             <a href="#" className={`icon ${loginWithEmail ? 'active' : ''}`} onClick={() => setLoginWithEmail(true)}>
-                                <FontAwesomeIcon icon={faEnvelope} />{ }
+                                <FontAwesomeIcon icon={faEnvelope} />
                             </a>
                             <a href="#" className={`icon ${!loginWithEmail ? 'active' : ''}`} onClick={() => setLoginWithEmail(false)}>
-                                <FontAwesomeIcon icon={faPhone} />{ }
+                                <FontAwesomeIcon icon={faPhone} />
                             </a>
-                            <a href="#" className="icon">
-                                <FontAwesomeIcon icon={faGooglePlusG} /> { }
+                            <a href="#" className="icon" onClick={handleGoogleSignUp}>
+                                <FontAwesomeIcon icon={faGoogle} />
                             </a>
                         </div>
                         <span>or use your {loginWithEmail ? 'email' : 'phone number'} for registration</span>
                         <input type="text" placeholder="Name" />
-                        <input type={loginWithEmail ? 'email' : 'tel'} placeholder={loginWithEmail ? 'Email' : 'Phone Number'} /> {/* Promijenjen placeholder */}
+                        <input type={loginWithEmail ? 'email' : 'tel'} placeholder={loginWithEmail ? 'Email' : 'Phone Number'} />
                         <input type="password" placeholder="Password" />
                         <button>Sign Up</button>
                     </form>
@@ -67,19 +95,19 @@ const Login = () => {
                         <h1>Sign In</h1>
                         <div className="options">
                             <a href="#" className={`icon ${loginWithEmail ? 'active' : ''}`} onClick={() => setLoginWithEmail(true)}>
-                                <FontAwesomeIcon icon={faEnvelope} /> { }
+                                <FontAwesomeIcon icon={faEnvelope} />
                             </a>
                             <a href="#" className={`icon ${!loginWithEmail ? 'active' : ''}`} onClick={() => setLoginWithEmail(false)}>
-                                <FontAwesomeIcon icon={faPhone} /> { }
+                                <FontAwesomeIcon icon={faPhone} />
                             </a>
-                            <a href="#" className="icon">
-                                <FontAwesomeIcon icon={faGooglePlusG} /> { }
+                            <a href="#" className="icon" onClick={handleGoogleSignIn}>
+                                <FontAwesomeIcon icon={faGoogle} />
                             </a>
                         </div>
                         <input type={loginWithEmail ? 'email' : 'tel'} placeholder={loginWithEmail ? 'Email' : 'Phone Number'} /> {/* Promijenjen placeholder */}
                         <input type="password" placeholder="Password" />
                         <a href="#">Forget Your Password?</a>
-                        <button>Sign In</button>
+                        <Link to="/homePage">Sign In</Link>
                     </form>
                 </div>
                 <div className="toggle-container">
