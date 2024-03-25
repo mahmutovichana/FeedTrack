@@ -1,28 +1,16 @@
 const express = require("express");
 require("dotenv").config();
 const app = express();
-
 const cors = require("cors");
-const swaggerJsdoc = require("swagger-jsdoc");
+
 const swaggerUI = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 
 const authRouter = require("../routes/auth");
 const devRouter = require("../routes/dev");
 const userRouter = require("../routes/user");
 
-const options = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
-    info: {
-      title: "FeedTrack API",
-      version: "1.0.0",
-    },
-  },
-  apis: ["./api/*.js"],
-};
-
-const openapiSpecification = swaggerJsdoc(options);
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(openapiSpecification));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 3000;
 
