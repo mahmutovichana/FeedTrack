@@ -58,26 +58,34 @@ let refreshTokens = [];
  * /api/token:
  *  post:
  *    summary: Refresh JWT access token
+ *    description: Get a new access token by passing refresh token in the request body
  *    requestBody:
  *      content:
  *        application/json:
  *          schema:
  *            type: object
  *            properties:
- *              id:
+ *              refreshToken:
  *                type: string
  *            example:
- *              token: eyJhbGciOi...sOeF7OuJMZs
+ *              refreshToken: eyJhbGciOi...sOeF7OuJMZs
  *    responses:
  *      "200":
- *        description: A successful response
+ *        description: New access token
+ *        content:
+ *          application/json:
+ *            schema:
+ *              accessToken:
+ *                type: string
+ *            example:
+ *              accessToken: eyJhbGciOi...sOeF7OuJMZs
  *      "401":
  *        description: Not authenticated
  *      "403":
  *        description: Invalid refresh token
  */
 app.post("/api/token", (req, res) => {
-  const refreshToken = req.body.token;
+  const refreshToken = req.body.refreshToken;
 
   if (!refreshToken) {
     return res.status(401).json("You are not authenticated!");
@@ -106,6 +114,7 @@ app.post("/api/token", (req, res) => {
  * /api/login:
  *  post:
  *    summary: User login
+ *    description: Get new access and refresh tokens for successful login
  *    requestBody:
  *      content:
  *        application/json:
@@ -121,7 +130,7 @@ app.post("/api/token", (req, res) => {
  *              password: pass123
  *    responses:
  *      "200":
- *        description: A successful response
+ *        description: Logged in successfully
  *        content:
  *          application/json:
  *            schema:
@@ -159,6 +168,7 @@ app.post("/api/login", (req, res) => {
 
       const { id, username, email } = results[0];
       const user = { id, username, email };
+
       // Generate access and refresh tokens
       const accessToken = generateAccessToken(user);
       const refreshToken = generateRefreshToken(user);
@@ -178,26 +188,20 @@ app.post("/api/login", (req, res) => {
  * /api/logout:
  *  post:
  *    summary: User logout
+ *    description: Logout current user by providing access token in the request body
  *    requestBody:
  *       content:
  *        application/json:
  *          schema:
  *            type: object
  *            properties:
- *              token:
+ *              accessToken:
  *                type: string
  *            example:
- *              token: eyJhbGciOi...sOeF7OuJMZs
+ *              accessToken: eyJhbGciOi...sOeF7OuJMZs
  *    responses:
  *      "200":
- *        description: A successful response
- *        content:
- *          application/json:
- *            schema:
- *              message:
- *                type: string
- *            example:
- *              message: Logged out successfully.
+ *        description: Logged out successfully
  */
 app.post("/api/logout", (req, res) => {
   refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
@@ -209,11 +213,11 @@ app.post("/api/logout", (req, res) => {
  * /api:
  *  get:
  *    summary: User dashboard
+ *    description: Authenticated users can view the dashboard
  *    parameters:
  *    - in: header
  *      name: authorization
  *      schema:
- *        type: object
  *        properties:
  *        authorization:
  *          type: string
