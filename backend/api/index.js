@@ -56,6 +56,25 @@ let refreshTokens = [];
 /**
  * @swagger
  * /api/token:
+ *  post:
+ *    summary: Refresh JWT access token
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: string
+ *            example:
+ *              token: eyJhbGciOi...sOeF7OuJMZs
+ *    responses:
+ *      "200":
+ *        description: A successful response
+ *      "401":
+ *        description: Not authenticated
+ *      "403":
+ *        description: Invalid refresh token
  */
 app.post("/api/token", (req, res) => {
   const refreshToken = req.body.token;
@@ -82,6 +101,49 @@ app.post("/api/token", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /api/login:
+ *  post:
+ *    summary: User login
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *              password:
+ *                type: string
+ *            example:
+ *              email: example@etf.unsa.ba
+ *              password: pass123
+ *    responses:
+ *      "200":
+ *        description: A successful response
+ *        content:
+ *          application/json:
+ *            schema:
+ *              id:
+ *                type: number
+ *              username:
+ *                type: string
+ *              email:
+ *                type: string
+ *              accessToken:
+ *                type: string
+ *              refreshToken:
+ *                type: string
+ *            example:
+ *              id: 1
+ *              username: user123
+ *              email: example@etf.unsa.ba
+ *              accessToken: eyJhbGciOi...sOeF7OuJMZs
+ *              refreshToken: asdsadsad...sOeF7asduJMZs
+ *      "400":
+ *        description: Incorrect email or password
+ */
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -102,7 +164,7 @@ app.post("/api/login", (req, res) => {
       const refreshToken = generateRefreshToken(user);
       refreshTokens.push(refreshToken);
 
-      res.json({
+      res.status(200).json({
         ...user,
         accessToken,
         refreshToken,
@@ -111,13 +173,64 @@ app.post("/api/login", (req, res) => {
   );
 });
 
+/**
+ * @swagger
+ * /api/logout:
+ *  post:
+ *    summary: User logout
+ *    requestBody:
+ *       content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              token:
+ *                type: string
+ *            example:
+ *              token: eyJhbGciOi...sOeF7OuJMZs
+ *    responses:
+ *      "200":
+ *        description: A successful response
+ *        content:
+ *          application/json:
+ *            schema:
+ *              message:
+ *                type: string
+ *            example:
+ *              message: Logged out successfully.
+ */
 app.post("/api/logout", (req, res) => {
   refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
-  res.status(200).json("Logged out successfully.");
+  res.status(200).json({ message: "Logged out successfully." });
 });
 
+/**
+ * @swagger
+ * /api:
+ *  get:
+ *    summary: User dashboard
+ *    parameters:
+ *    - in: header
+ *      name: authorization
+ *      schema:
+ *        type: object
+ *        properties:
+ *        authorization:
+ *          type: string
+ *        required: true
+ *      description: Access token for user that's logged in
+ *      example:
+ *        authorization: Bearer eyJhbGciOi...sOeF7OuJMZs
+ *    responses:
+ *      "200":
+ *        description: A successful response
+ *      "401":
+ *        description: Not authenticated
+ *      "403":
+ *        description: Invalid refresh token
+ */
 app.get("/api", authenticateToken, (req, res) => {
-  res.json(req.user);
+  res.status(200).json(req.user);
 });
 
 app.get("/api/branches", (req, res) => {
