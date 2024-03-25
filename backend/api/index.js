@@ -1,11 +1,26 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import mysql from "mysql2";
-import jwt from "jsonwebtoken";
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql2");
+const jwt = require("jsonwebtoken");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
 
+require("dotenv").config();
 const app = express();
-dotenv.config();
+
+const options = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "FeedTrack API",
+      version: "1.0.0",
+    },
+  },
+  apis: ["./api/*.js"],
+};
+
+const openapiSpecification = swaggerJsdoc(options);
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(openapiSpecification));
 
 // Development/production constants
 const PORT = process.env.PORT || 3000;
@@ -38,6 +53,10 @@ con.connect((error) => {
 
 let refreshTokens = [];
 
+/**
+ * @swagger
+ * /api/token:
+ */
 app.post("/api/token", (req, res) => {
   const refreshToken = req.body.token;
 
