@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const con = require("../api/db");
+const con = require("../db");
 
 const ACCESS_TOKEN_SECRET =
   process.env.ACCESS_TOKEN_SECRET || "FeedTrackAccessToken";

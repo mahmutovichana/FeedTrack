@@ -8,9 +8,9 @@ const swaggerSpec = require("./swagger");
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 
-const authRouter = require("../routes/auth");
-const devRouter = require("../routes/dev");
-const userRouter = require("../routes/user");
+const authRouter = require("./routes/auth");
+const devRouter = require("./routes/dev");
+const userRouter = require("./routes/user");
 
 app.use(
   "/api-docs",

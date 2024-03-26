@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { authenticateToken } = require("../middlewares/authMiddleware");
-const con = require("../api/db");
+const con = require("../db");
 
 /**
  * @swagger
