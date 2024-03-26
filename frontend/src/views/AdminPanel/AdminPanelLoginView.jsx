@@ -68,6 +68,43 @@ const Login = () => {
     window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${YOUR_CLIENT_ID}&redirect_uri=${YOUR_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline`;
   };
 
+  const handleSignIn = async () => {
+    console.log('User signed in');
+    const emailOrPhone = document.getElementById('emailOrPhoneInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    if (loginWithEmail) {
+      // User entered an email
+      console.log('Email entered:', emailOrPhone);
+      console.log('password:', password);
+      try {
+        const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: emailOrPhone,
+            password: password
+          })
+        });
+        
+        if (response.ok) {
+          console.log('User authenticated successfully');
+        } else {
+          console.error('Authentication failed');
+          document.getElementById('emailOrPhoneInput').value = '';
+          document.getElementById('passwordInput').value = '';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    } else {
+      // User entered a phone number
+      console.log('Phone number entered:', emailOrPhone);
+      console.log('password:', password);
+    }
+  };
+
   return (
     <div>
       <div className="logo">
@@ -132,13 +169,14 @@ const Login = () => {
               </a>
             </div>
             <input
+              id="emailOrPhoneInput"
               type={loginWithEmail ? "email" : "tel"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />{" "}
             {/* Promijenjen placeholder */}
-            <input type="password" placeholder="Password" />
+            <input id="passwordInput" type="password" placeholder="Password" />
             <a href="#">Forget Your Password?</a>
-            <Link to="/homePage">Sign In</Link>
+            <Link to="/homePage" onClick={handleSignIn}>Sign In</Link>
           </form>
         </div>
         <div className="toggle-container">
