@@ -90,6 +90,18 @@ const Login = () => {
         
         if (response.ok) {
           console.log('User authenticated successfully');
+          const userData = await response.json();
+          const { secret } = userData;
+          // Call twofactorsetup route
+          fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            secret: secret
+          })
+          });
         } else {
           console.error('Authentication failed');
           document.getElementById('emailOrPhoneInput').value = '';
