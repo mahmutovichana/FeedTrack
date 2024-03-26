@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const con = require("../api/db");
+const con = require("../db");
 
 router.get("/tables", (req, res) => {
   const tables = ["Branch", "Feedback", "Person", "Report", "Teller"];

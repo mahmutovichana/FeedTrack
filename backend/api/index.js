@@ -1,28 +1,22 @@
 const express = require("express");
 require("dotenv").config();
 const app = express();
-
 const cors = require("cors");
-const swaggerJsdoc = require("swagger-jsdoc");
+
 const swaggerUI = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 
-const authRouter = require("../routes/auth");
-const devRouter = require("../routes/dev");
-const userRouter = require("../routes/user");
+const authRouter = require("./routes/auth");
+const devRouter = require("./routes/dev");
+const userRouter = require("./routes/user");
 
-const options = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
-    info: {
-      title: "FeedTrack API",
-      version: "1.0.0",
-    },
-  },
-  apis: ["./api/*.js"],
-};
-
-const openapiSpecification = swaggerJsdoc(options);
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(openapiSpecification));
+app.use(
+  "/api-docs",
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerSpec, { customCssUrl: CSS_URL })
+);
 
 const PORT = process.env.PORT || 3000;
 
