@@ -1,0 +1,204 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "FeedTrack API",
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    },
+    {
+      "url": "http://feedtrack-backend.vercel.app",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/api/token": {
+      "post": {
+        "summary": "Refresh JWT access token",
+        "description": "Get a new access token by passing refresh token in the request body",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshToken"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessToken"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          },
+          "403": {
+            "description": "Invalid refresh token"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "User login",
+        "description": "Get new access and refresh tokens for successful login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incorrect email or password"
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "User logout",
+        "description": "Logout current user by providing access token in the request body",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshToken"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          },
+          "401": {
+            "description": "Invalid refresh token"
+          },
+          "403": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "summary": "User dashboard",
+        "description": "Authenticated users can view the dashboard",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "description": "Access token for user that's logged in (\"Bearer eyJhbGciOi...sOeF7OuJMZs\")",
+            "required": true,
+            "schema": {
+              "properties": {
+                "authorization": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response"
+          },
+          "401": {
+            "description": "Not authenticated"
+          },
+          "403": {
+            "description": "Invalid refresh token"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RefreshToken": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOi...sOeF7OuJMZs"
+          }
+        }
+      },
+      "AccessToken": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOi...sOeF7OuJMZs"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "example@etf.unsa.ba"
+          },
+          "password": {
+            "type": "string",
+            "example": "pass123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "user123"
+          },
+          "email": {
+            "type": "string",
+            "example": "example@etf.unsa.ba"
+          },
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOi...sOeF7OuJMZs"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "asdsadsad...sOeF7asduJMZs"
+          }
+        }
+      }
+    }
+  }
+}
