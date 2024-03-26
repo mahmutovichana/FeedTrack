@@ -116,13 +116,12 @@
           {
             "in": "header",
             "name": "authorization",
-            "description": "Access token for user that's logged in",
+            "description": "Access token for user that's logged in (\"Bearer eyJhbGciOi...sOeF7OuJMZs\")",
             "required": true,
             "schema": {
               "properties": {
                 "authorization": {
-                  "type": "string",
-                  "example": "Bearer eyJhbGciOi...sOeF7OuJMZs"
+                  "type": "string"
                 }
               }
             }
