@@ -7,6 +7,7 @@ const swaggerUI = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const swaggerJson = require("./swagger.json");
 
 const authRouter = require("./routes/auth");
 const devRouter = require("./routes/dev");
@@ -14,8 +15,12 @@ const userRouter = require("./routes/user");
 
 app.use(
   "/api-docs",
-  swaggerUI.serve,
-  swaggerUI.setup(swaggerSpec, { customCssUrl: CSS_URL })
+  (req, res, next) => {
+    req.swaggerDoc = swaggerJson;
+    next();
+  },
+  swaggerUI.serveFiles(),
+  swaggerUI.setup()
 );
 
 const PORT = process.env.PORT || 3000;
