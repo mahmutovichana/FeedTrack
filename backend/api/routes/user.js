@@ -1,19 +1,15 @@
 const router = require("express").Router();
 const { authenticateToken } = require("../middlewares/authMiddleware");
-const con = require("../db");
+const db = require("../db");
 
 router.get("/dashboard", authenticateToken, (req, res) => {
   res.status(200).json(req.user);
 });
 
-router.get("/branches", (req, res) => {
-  con.query("SELECT * FROM Branch", (err, results) => {
-    if (err) {
-      return res.status(500).json({ err: "Error fetching branches" });
-    }
+router.get("/branches", async (req, res) => {
+  const result = await db.query('SELECT * FROM "Branch"');
 
-    res.status("200").json(results);
-  });
+  res.status("200").json(result.rows);
 });
 
 module.exports = router;

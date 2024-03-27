@@ -44,10 +44,34 @@
             }
           },
           "401": {
-            "description": "Not authenticated"
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authenticated!"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": "Invalid refresh token"
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token is not valid!"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -77,7 +101,19 @@
             }
           },
           "400": {
-            "description": "Incorrect email or password"
+            "description": "Incorrect email or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email or password incorrect!"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -97,13 +133,49 @@
         },
         "responses": {
           "200": {
-            "description": "Logged out successfully"
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logged out successfully."
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Invalid refresh token"
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authenticated!"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": "Not authenticated"
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token is not valid!"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -129,13 +201,57 @@
         ],
         "responses": {
           "200": {
-            "description": "A successful response"
+            "description": "A successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "user123"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "example@etf.unsa.ba"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Not authenticated"
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authenticated!"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": "Invalid refresh token"
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token is not valid!"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
