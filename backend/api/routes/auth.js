@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const con = require("../db");
+const db = require("../db");
 
 const ACCESS_TOKEN_SECRET =
   process.env.ACCESS_TOKEN_SECRET || "FeedTrackAccessToken";
@@ -34,34 +34,31 @@ router.post("/token", (req, res) => {
   });
 });
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  con.query(
-    "SELECT * FROM Person WHERE email = ? AND password = ?",
-    [email, password],
-    (err, results) => {
-      if (err) throw err;
-
-      if (results.length === 0) {
-        return res.status(400).json("Email or password incorrect!");
-      }
-
-      const { id, username, email } = results[0];
-      const user = { id, username, email };
-
-      // Generate access and refresh tokens
-      const accessToken = generateAccessToken(user);
-      const refreshToken = generateRefreshToken(user);
-      refreshTokens.push(refreshToken);
-
-      res.status(200).json({
-        ...user,
-        accessToken,
-        refreshToken,
-      });
-    }
+  const result = await db.query(
+    'SELECT * FROM "Person" WHERE email = $1 AND password = $2',
+    [email, password]
   );
+
+  if (result.rowCount === 0) {
+    return res.status(400).json({ message: "Email or password incorrect!" });
+  }
+
+  const { id, username, email: userEmail } = result.rows[0];
+  const user = { id, username, email: userEmail };
+
+  // Generate access and refresh tokens
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  refreshTokens.push(refreshToken);
+
+  res.status(200).json({
+    ...user,
+    accessToken,
+    refreshToken,
+  });
 });
 
 router.post("/logout", (req, res) => {
