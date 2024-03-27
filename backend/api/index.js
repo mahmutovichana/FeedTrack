@@ -27,8 +27,6 @@ app.use(
   })
 );
 
-const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -36,5 +34,7 @@ app.use(cors());
 app.use("/api", authRouter);
 app.use("/api", devRouter);
 app.use("/api", userRouter);
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
