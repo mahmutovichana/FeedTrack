@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const con = require("../db");
+const db = require("../db");
 const express = require('express');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode'); 
@@ -8,11 +8,6 @@ const QRCode = require('qrcode');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
-
-const ACCESS_TOKEN_SECRET =
-  process.env.ACCESS_TOKEN_SECRET || "FeedTrackAccessToken";
-const REFRESH_TOKEN_SECRET =
-  process.env.REFRESH_TOKEN_SECRET || "FeedTrackRefreshToken";
 
 let refreshTokens = [];
 
