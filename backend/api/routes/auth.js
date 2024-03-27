@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const db = require("../db");
 
 let refreshTokens = [];
@@ -38,12 +39,20 @@ router.post("/token", (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const result = await db.query(
-    'SELECT * FROM "Person" WHERE email = $1 AND password = $2',
-    [email, password]
-  );
+  const result = await db.query('SELECT * FROM "Person" WHERE email = $1', [
+    email,
+  ]);
 
   if (result.rowCount === 0) {
+    return res.status(400).json({ message: "Email or password incorrect!" });
+  }
+
+  const isValidPassword = await bcrypt.compare(
+    password,
+    result.rows[0].password
+  );
+
+  if (!isValidPassword) {
     return res.status(400).json({ message: "Email or password incorrect!" });
   }
 
