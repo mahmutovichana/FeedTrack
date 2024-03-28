@@ -63,7 +63,7 @@ const AdminHomePage = () => {
                 },
                 body: JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")})
             });
-            console.log("accessToken before",localStorage.getItem("accessToken"));
+            console.log("accessToken before refresh",localStorage.getItem("accessToken"));
             if (response.ok) {
                 // Handle successful login
                 console.log('Refresh successful');
@@ -71,7 +71,7 @@ const AdminHomePage = () => {
                 localStorage.setItem('accessToken', responseData.accessToken);
                 setAccessToken(responseData.accessToken);
                 console.log("accessToken is now valid for 30 minutes")
-                console.log("accessToken after",localStorage.getItem("accessToken"));
+                console.log("accessToken after refresh",localStorage.getItem("accessToken"));
                 //localStorage.removeItem("refreshToken")
                 //localStorage.removeItem("username")
                 //localStorage.removeItem("accessToken")
@@ -90,7 +90,8 @@ const AdminHomePage = () => {
             <h1>Testni naslov za {username}</h1>
             <button id="logout" onClick={logoutLogic}>Log Out</button>
             <button id="refresh" onClick={refreshLogic}>Refresh</button>
-            <p>Access token trenutni {accessToken}</p>
+            <p>After refresh new token will be valid for 30 minutes</p>
+            <p>Currently active access token {accessToken}</p>
         </div>
     );
 }
