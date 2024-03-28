@@ -133,9 +133,9 @@ router.post("/logout", (req, res) => {
   refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
 
   /*generate new value for ACCESS_TOKEN_SECRET*/
-  var token = crypto.randomBytes(64).toString('hex');
+  //var token = crypto.randomBytes(64).toString('hex');
   /*Change of the ACCESS_TOKEN_SECRET for safety*/
-  setEnvValue("ACCESS_TOKEN_SECRET", token);
+  //setEnvValue("ACCESS_TOKEN_SECRET", token);
 
   res.status(200).json({ message: "Logged out successfully." });
 });

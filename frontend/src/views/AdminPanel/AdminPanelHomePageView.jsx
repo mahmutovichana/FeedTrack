@@ -47,6 +47,7 @@ const AdminHomePage = () => {
             } else {
                 // Handle login error
                 console.error('Logout failed');
+                //localStorage.clear()
             }
         } catch (error) {
             console.error('Error logging out:', error);
