@@ -9,7 +9,7 @@ import { jwtDecode } from "jwt-decode";
 
 const YOUR_CLIENT_ID =
     "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
-const YOUR_REDIRECT_URI = "http://feedtrack.vercel.app/";
+const YOUR_REDIRECT_URI = "https://feedtrack.vercel.app/";
 
 const Login = () => {
   const [loginWithEmail, setLoginWithEmail] = useState(true);
@@ -144,7 +144,7 @@ const Login = () => {
     const pass = document.getElementById("password").value;
 
     try {
-      const response = await fetch('http://feedtrack-backend.vercel.app/api/login', {
+      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
