@@ -28,7 +28,7 @@ const AdminHomePage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.apps/api/logout', {
+            const response = await fetch('http://feedtrack-backend.vercel.app/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const AdminHomePage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/token', {
+            const response = await fetch('http://feedtrack-backend.vercel.app/api/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ const AdminHomePage = () => {
                 //localStorage.removeItem("refreshToken")
                 //localStorage.removeItem("username")
                 //localStorage.removeItem("accessToken")
-                //navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
+                navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
             } else {
                 // Handle login error
                 console.error('Refresh failed');

@@ -5,10 +5,11 @@ import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
 import {Link, useNavigate} from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const YOUR_CLIENT_ID =
     "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
-const YOUR_REDIRECT_URI = "https://feedtrack.vercel.app/";
+const YOUR_REDIRECT_URI = "http://feedtrack.vercel.app/";
 
 const Login = () => {
   const [loginWithEmail, setLoginWithEmail] = useState(true);
@@ -17,14 +18,77 @@ const Login = () => {
     console.log("Encoded JWT ID token: " + response.credential);
   }
 
-  useEffect(() => {
-    // global google
-    /*
-        google.accounts.id.initialize({
-            client_id: YOUR_CLIENT_ID,
-            callback: handleCallbackResponse
+  async function handleCallbackResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+    if (response.credential) {
+      try {
+        const decodedToken = jwtDecode(response.credential);
+
+        const userData = {
+          name: decodedToken.given_name,
+          lastName: decodedToken.family_name,
+          email: decodedToken.email,
+          image: decodedToken.picture,
+          username: "defaultUsername",
+          password: "defaultPassword",
+          mobileNumber: "123456789",
+          role: "defaultRole"
+        };
+
+        // Fetch maximum ID from the database
+        const maxIdResponse = await fetch('http://localhost:3000/api/getMaxUserId');
+        const maxIdData = await maxIdResponse.json();
+        const nextId = maxIdData.maxId + 1;
+        userData.id = nextId;
+
+        console.log(JSON.stringify(userData));
+
+        // Check if user exists in the database
+        const existingUserResponse = await fetch('http://localhost:3000/api/addUser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
         });
-        */
+
+        if (existingUserResponse.ok) {
+          const existingUserResult = await existingUserResponse.json();
+          if (existingUserResult.message === "User already exists") {
+            console.log('User already exists');
+          } else {
+            console.log('User added successfully');
+          }
+        } else if (existingUserResponse.status === 400) {
+          const errorData = await existingUserResponse.json();
+          console.error('Error adding user:', errorData.message);
+        } else {
+          console.error('Error adding user:', existingUserResponse.statusText);
+        }
+
+        navigate('/homePage', {
+          state: { "userData": userData }
+        });
+
+        console.log("Redirection completed successfully.");
+      } catch (error) {
+        console.error('Error decoding JWT token:', error);
+      }
+    } else {
+      console.log('Google login failed');
+    }
+  }
+
+  useEffect(() => {
+    // Ensuring that google is defined before using it
+    if (typeof window.google !== 'undefined' && window.google.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: YOUR_CLIENT_ID,
+        callback: handleCallbackResponse
+      });
+    } else {
+      console.log('Google Identity Services library not loaded.');
+    }
   }, []);
 
   const navigate = useNavigate();
@@ -63,13 +127,11 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    /*
-        if (google && google.accounts && google.accounts.id) {
-            google.accounts.id.prompt();
-        } else {
-            console.error("Google SDK is not fully loaded.");
-        }
-        */
+    if (typeof window.google !== 'undefined' && window.google.accounts) {
+      window.google.accounts.id.prompt();
+    } else {
+      console.log("Google SDK is not fully loaded.");
+    }
   };
 
   const handleGoogleSignUp = () => {
@@ -82,7 +144,7 @@ const Login = () => {
     const pass = document.getElementById("password").value;
 
     try {
-      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+      const response = await fetch('http://feedtrack-backend.vercel.app/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
