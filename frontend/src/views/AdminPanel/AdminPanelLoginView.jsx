@@ -57,6 +57,9 @@ const Login = () => {
           } else {
             console.log('User added successfully');
           }
+        } else if (existingUserResponse.status === 400) {
+          const errorData = await existingUserResponse.json();
+          console.error('Error adding user:', errorData.message);
         } else {
           console.error('Error adding user:', existingUserResponse.statusText);
         }
