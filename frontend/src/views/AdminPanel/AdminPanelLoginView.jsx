@@ -4,7 +4,7 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const YOUR_CLIENT_ID =
   "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
@@ -27,7 +27,15 @@ const Login = () => {
         */
   }, []);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
+      navigate('/homePage', { state:
+          { "username": localStorage.getItem("username"),
+            "refreshToken": localStorage.getItem("refreshToken"),
+            "accessToken": localStorage.getItem("accessToken")} })
+
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
     const loginBtn = document.getElementById("login");
@@ -36,7 +44,7 @@ const Login = () => {
       container.classList.add("active");
     };
 
-    const handleLoginClick = () => {
+    const handleLoginClick = () =>{
       container.classList.remove("active");
     };
 
@@ -67,6 +75,38 @@ const Login = () => {
   const handleGoogleSignUp = () => {
     window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${YOUR_CLIENT_ID}&redirect_uri=${YOUR_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline`;
   };
+
+  async function loginLogic(event){
+    event.preventDefault();
+    const name = document.getElementById(loginWithEmail ? "email" : "tel").value;
+    const pass = document.getElementById("password").value;
+
+    try {
+      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"email": name, "password": pass})
+      });
+
+      if (response.ok) {
+        // Handle successful login
+        console.log('Login successful');
+        let responseData = await response.json()
+        localStorage.setItem('refreshToken', responseData.refreshToken);
+        localStorage.setItem('accessToken', responseData.accessToken);
+        localStorage.setItem('username', responseData.username);
+        navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
+
+      } else {
+        // Handle login error
+        console.error('Login failed');
+      }
+    } catch (error) {
+      console.error('Error logging in:', error);
+    }
+  }
 
   return (
     <div>
@@ -103,14 +143,15 @@ const Login = () => {
             <input type="text" placeholder="Name" />
             <input
               type={loginWithEmail ? "email" : "tel"}
+              id={loginWithEmail ? "emailSU" : "telSU"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />
-            <input type="password" placeholder="Password" />
+            <input type="password" id="passwordSU" placeholder="Password" />
             <button>Sign Up</button>
           </form>
         </div>
         <div className="form-container sign-in">
-          <form>
+          <form onSubmit={loginLogic}>
             <h1>Sign In</h1>
             <div className="options">
               <a
@@ -133,12 +174,13 @@ const Login = () => {
             </div>
             <input
               type={loginWithEmail ? "email" : "tel"}
+              id={loginWithEmail ? "email" : "tel"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />{" "}
             {/* Promijenjen placeholder */}
-            <input type="password" placeholder="Password" />
+            <input type="password" id="password" placeholder="Password" />
             <a href="#">Forget Your Password?</a>
-            <Link to="/homePage">Sign In</Link>
+            <input type="submit" value="Sign In"/>
           </form>
         </div>
         <div className="toggle-container">
