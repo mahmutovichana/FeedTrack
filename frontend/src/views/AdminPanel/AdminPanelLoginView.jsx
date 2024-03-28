@@ -30,12 +30,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
-      navigate('/homePage', { state:
-          { "username": localStorage.getItem("username"),
-            "refreshToken": localStorage.getItem("refreshToken"),
-            "accessToken": localStorage.getItem("accessToken")} })
-
+    
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
     const loginBtn = document.getElementById("login");
@@ -229,7 +224,7 @@ const Login = () => {
           </form>
         </div>
         <div className="form-container sign-in">
-          <form onSubmit={loginLogic}>
+          <form>
             <h1>Sign In</h1>
             <div className="options">
               <a
@@ -253,7 +248,7 @@ const Login = () => {
             <input
               id="emailOrPhoneInput"
               type={loginWithEmail ? "email" : "tel"}
-              id={loginWithEmail ? "email" : "tel"}
+             // id={loginWithEmail ? "email" : "tel"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />{" "}
             {/* Promijenjen placeholder */}
