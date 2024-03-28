@@ -18,13 +18,15 @@ const Login = () => {
   }
 
   useEffect(() => {
-    // global google
-    /*
-        google.accounts.id.initialize({
-            client_id: YOUR_CLIENT_ID,
-            callback: handleCallbackResponse
-        });
-        */
+    // Ensuring that google is defined before using it
+    if (typeof window.google !== 'undefined' && window.google.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: YOUR_CLIENT_ID,
+        callback: handleCallbackResponse
+      });
+    } else {
+      console.log('Google Identity Services library not loaded.');
+    }
   }, []);
 
   const navigate = useNavigate();
@@ -63,13 +65,11 @@ const Login = () => {
   };
 
   const handleGoogleSignIn = () => {
-    /*
-        if (google && google.accounts && google.accounts.id) {
-            google.accounts.id.prompt();
-        } else {
-            console.error("Google SDK is not fully loaded.");
-        }
-        */
+    if (typeof window.google !== 'undefined' && window.google.accounts) {
+      window.google.accounts.id.prompt();
+    } else {
+      console.log("Google SDK is not fully loaded.");
+    }
   };
 
   const handleGoogleSignUp = () => {
