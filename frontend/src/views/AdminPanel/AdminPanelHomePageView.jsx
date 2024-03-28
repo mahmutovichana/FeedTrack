@@ -36,9 +36,10 @@ const AdminHomePage = () => {
             if (response.ok) {
                 // Handle successful login
                 console.log('Logout successful');
-                //localStorage.clear()
-                localStorage.removeItem("refreshToken")
-                localStorage.removeItem("username")
+                localStorage.clear()
+                //localStorage.removeItem("refreshToken")
+                //localStorage.removeItem("username")
+                //localStorage.removeItem("accessToken")
                 navigate('/');
             } else {
                 // Handle login error
