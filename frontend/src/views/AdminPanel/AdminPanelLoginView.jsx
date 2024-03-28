@@ -30,12 +30,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
-      navigate('/homePage', { state:
-          { "username": localStorage.getItem("username"),
-            "refreshToken": localStorage.getItem("refreshToken"),
-            "accessToken": localStorage.getItem("accessToken")} })
-
+    
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
     const loginBtn = document.getElementById("login");
@@ -76,39 +71,116 @@ const Login = () => {
     window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${YOUR_CLIENT_ID}&redirect_uri=${YOUR_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline`;
   };
 
-  async function loginLogic(event){
-    event.preventDefault();
-    const name = document.getElementById(loginWithEmail ? "email" : "tel").value;
-    const pass = document.getElementById("password").value;
+  const handleSignIn = async () => {
+    console.log('User signed in');
+    const emailOrPhone = document.getElementById('emailOrPhoneInput').value.trim();
+    const password = document.getElementById('password').value.trim();
+    if (loginWithEmail) {
+      // User entered an email
+      console.log('Email entered:', emailOrPhone);
+      console.log('password:', password);
+      try {
+        const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: emailOrPhone,
+            password: password
+          })
+        });
+        
+        if (response.ok) {
+          console.log('User authenticated successfully');
+          
+          const userData = await response.json();
+          const { username, refreshToken, accessToken, secret } = userData;
+          localStorage.setItem('username', username);
+          localStorage.setItem('refreshToken', refreshToken);
+          localStorage.setItem('accessToken', accessToken);
+          
+          // Call twofactorsetup route
+          const twofactorResponse = await fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              secret: secret
+            })
+          });
+  
+          if (twofactorResponse.ok) {
+            const twofactorData = await twofactorResponse.json();
+            const { dataUrl } = twofactorData;
+            
+            // Process the data URL (e.g., render QR code)
+            processQRCode(dataUrl, secret);
+          } else {
+            console.error('Failed to retrieve twofactorsetup data');
+          }
+        } else {
+          console.error('Authentication failed');
+          window.location.href = '/';
+          document.getElementById('emailOrPhoneInput').value = '';
+          document.getElementById('password').value = '';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    } else {
+      // User entered a phone number
+      console.log('Phone number entered:', emailOrPhone);
+      console.log('password:', password);
+    }
+  };
 
-    try {
-      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+  const processQRCode = (dataUrl, secret) => {
+    const template = `
+      <h1>Setup Authenticator</h1>
+      <h3>Use the QR code with your authenticator app</h3>
+      <img src="${dataUrl}" > <br>
+      <input type="text" id="tokenInput" placeholder="Enter token">
+      <button id="verifyButton">Verify</button>
+    `;
+    
+    const container = document.getElementById('qrCodeContainer');
+    container.innerHTML = template;
+  
+    // Define verifyToken globally
+    window.verifyToken = (secret) => {
+      const token = document.getElementById('tokenInput').value;
+      fetch('https://feedtrack-backend.vercel.app/api/verify', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({"email": name, "password": pass})
+        body: JSON.stringify({ userToken: token, secret: secret }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const username = localStorage.getItem('username');
+          const refreshToken = localStorage.getItem('refreshToken');
+          const accessToken = localStorage.getItem('accessToken');
+          navigate('/homePage', { state: { username, refreshToken, accessToken } });
+        } else {
+          document.getElementById('tokenInput').value = "Incorrect code";
+        }
+      })
+      .catch(error => {
+        console.error('Error verifying token:', error);
       });
-
-      if (response.ok) {
-        // Handle successful login
-        console.log('Login successful');
-        let responseData = await response.json()
-        localStorage.setItem('refreshToken', responseData.refreshToken);
-        localStorage.setItem('accessToken', responseData.accessToken);
-        localStorage.setItem('username', responseData.username);
-
-        navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
-
-      } else {
-        // Handle login error
-        console.error('Login failed');
-      }
-    } catch (error) {
-      console.error('Error logging in:', error);
-    }
-  }
-
+    };
+  
+    // Attach event listener to the Verify button
+    const verifyButton = document.getElementById('verifyButton');
+    verifyButton.addEventListener('click', () => {
+      verifyToken(secret);
+    });
+  };
+  
   return (
     <div>
       <div className="logo">
@@ -152,7 +224,7 @@ const Login = () => {
           </form>
         </div>
         <div className="form-container sign-in">
-          <form onSubmit={loginLogic}>
+          <form>
             <h1>Sign In</h1>
             <div className="options">
               <a
@@ -174,14 +246,17 @@ const Login = () => {
               </a>
             </div>
             <input
+              id="emailOrPhoneInput"
               type={loginWithEmail ? "email" : "tel"}
-              id={loginWithEmail ? "email" : "tel"}
+             // id={loginWithEmail ? "email" : "tel"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />{" "}
             {/* Promijenjen placeholder */}
-            <input type="password" id="password" placeholder="Password" />
+
+            <input id="password" type="password" placeholder="Password" />
             <a href="#">Forget Your Password?</a>
-            <input type="submit" value="Sign In"/>
+            <Link to="/authentication" onClick={handleSignIn}>Sign In</Link>
+
           </form>
         </div>
         <div className="toggle-container">
