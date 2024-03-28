@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
 
   // Generate secret for 2FA
   const secret = speakeasy.generateSecret();
-
+  console.log("secret generirani: " + secret.otpauth_url);
   res.status(200).json({
     ...user,
     accessToken,
@@ -102,33 +102,10 @@ router.post("/logout", (req, res) => {
 router.post('/twofactorsetup', (req, res) => {
   const secret  = req.body.secret;
   QRCode.toDataURL(secret.otpauth_url, (err, data_url) => {
-    res.send(
-      `<h1>Setup Authenticator</h1>
-      <h3>Use the QR code with your authenticator app</h3>
-      <img src=${data_url} > <br>
-      <input type="text" id="tokenInput" placeholder="Enter token">
-      <button onclick="verifyToken('${secret.base32}')">Verify</button>
-      <script>
-        function verifyToken(secret) {
-          const token = document.getElementById('tokenInput').value;
-          fetch('/verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userToken: token, secret: secret }),
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data);
-            // Handle response here
-          })
-          .catch(error => {
-            console.error('Error verifying token:', error);
-          });
-        }
-      </script>`
-    );
+    if (err) {
+      return res.status(500).json({ error: 'Error generating QR code' });
+    }
+    res.json({ dataUrl: data_url });
   });
 });
 
@@ -136,7 +113,6 @@ router.post('/twofactorsetup', (req, res) => {
 router.post('/verify', (req, res) => {
   const token = req.body.userToken;
   const secret = req.body.secret;
-  console.log(token);
   const verified = speakeasy.totp.verify({secret: secret.base32, encoding: 'base32', token: token});
   res.json({success: verified});
 })

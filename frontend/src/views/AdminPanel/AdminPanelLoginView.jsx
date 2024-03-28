@@ -77,7 +77,7 @@ const Login = () => {
       console.log('Email entered:', emailOrPhone);
       console.log('password:', password);
       try {
-        const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+        const response = await fetch('http://localhost:3000/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -92,16 +92,27 @@ const Login = () => {
           console.log('User authenticated successfully');
           const userData = await response.json();
           const { secret } = userData;
+          
           // Call twofactorsetup route
-          fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
-          method: 'POST',
-          headers: {
-          'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            secret: secret
-          })
+          const twofactorResponse = await fetch('http://localhost:3000/api/twofactorsetup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              secret: secret
+            })
           });
+  
+          if (twofactorResponse.ok) {
+            const twofactorData = await twofactorResponse.json();
+            const { dataUrl } = twofactorData;
+            
+            // Process the data URL (e.g., render QR code)
+            processQRCode(dataUrl, secret);
+          } else {
+            console.error('Failed to retrieve twofactorsetup data');
+          }
         } else {
           console.error('Authentication failed');
           document.getElementById('emailOrPhoneInput').value = '';
@@ -115,6 +126,48 @@ const Login = () => {
       console.log('Phone number entered:', emailOrPhone);
       console.log('password:', password);
     }
+  };
+
+  const processQRCode = (dataUrl, secret) => {
+    const template = `
+      <h1>Setup Authenticator</h1>
+      <h3>Use the QR code with your authenticator app</h3>
+      <img src="${dataUrl}" > <br>
+      <input type="text" id="tokenInput" placeholder="Enter token">
+      <button id="verifyButton">Verify</button>
+    `;
+    
+    const container = document.getElementById('qrCodeContainer');
+    container.innerHTML = template;
+  
+    // Define verifyToken globally
+    window.verifyToken = (secret) => {
+      const token = document.getElementById('tokenInput').value;
+      fetch('http://localhost:3000/api/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userToken: token, secret: secret }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/homePage';
+        } else {
+          document.getElementById('tokenInput').value = "Incorrect code";
+        }
+      })
+      .catch(error => {
+        console.error('Error verifying token:', error);
+      });
+    };
+  
+    // Attach event listener to the Verify button
+    const verifyButton = document.getElementById('verifyButton');
+    verifyButton.addEventListener('click', () => {
+      verifyToken(secret);
+    });
   };
 
   return (
@@ -188,7 +241,7 @@ const Login = () => {
             {/* Promijenjen placeholder */}
             <input id="passwordInput" type="password" placeholder="Password" />
             <a href="#">Forget Your Password?</a>
-            <Link to="/homePage" onClick={handleSignIn}>Sign In</Link>
+            <Link to="/authentication" onClick={handleSignIn}>Sign In</Link>
           </form>
         </div>
         <div className="toggle-container">
