@@ -97,6 +97,7 @@ const Login = () => {
         localStorage.setItem('refreshToken', responseData.refreshToken);
         localStorage.setItem('accessToken', responseData.accessToken);
         localStorage.setItem('username', responseData.username);
+
         navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
 
       } else {
