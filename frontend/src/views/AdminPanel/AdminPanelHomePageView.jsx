@@ -17,7 +17,7 @@ const AdminHomePage = () => {
             setUsername(state.username)
         }
 
-        if(localStorage.getItem("token") == null) navigate('/')
+        if(localStorage.getItem("refreshToken") == null) navigate('/')
 
     }, []);
 
@@ -36,7 +36,9 @@ const AdminHomePage = () => {
             if (response.ok) {
                 // Handle successful login
                 console.log('Logout successful');
-                localStorage.clear()
+                //localStorage.clear()
+                localStorage.removeItem("refreshToken")
+                localStorage.removeItem("username")
                 navigate('/');
             } else {
                 // Handle login error

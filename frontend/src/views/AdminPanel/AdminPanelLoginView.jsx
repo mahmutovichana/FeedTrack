@@ -30,10 +30,11 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(localStorage.getItem("username") != null && localStorage.getItem("token") != null)
+    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
       navigate('/homePage', { state:
-          { "username": localStorage.getItem("username"), "token":
-                localStorage.getItem("token") } })
+          { "username": localStorage.getItem("username"),
+            "refreshToken": localStorage.getItem("refreshToken"),
+            "accessToken": localStorage.getItem("accessToken")} })
 
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
@@ -93,9 +94,10 @@ const Login = () => {
         // Handle successful login
         console.log('Login successful');
         let responseData = await response.json()
-        localStorage.setItem('token', responseData.refreshToken);
+        localStorage.setItem('refreshToken', responseData.refreshToken);
+        localStorage.setItem('accessToken', responseData.accessToken);
         localStorage.setItem('username', responseData.username);
-        navigate('/homePage', { state: { "username": responseData.username, "token": responseData.refreshToken } });
+        navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
 
       } else {
         // Handle login error
