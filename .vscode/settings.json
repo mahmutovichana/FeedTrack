@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "FeedTrack PostgreSQL ",
+            "connectString": "postgres://postgres.gavgivgrmhhepowbdlxb:feedtrack_password@aws-0-eu-central-1.pooler.supabase.com:5432/postgres",
+            "connectionTimeout": 200000
+        }
+    ]
+}

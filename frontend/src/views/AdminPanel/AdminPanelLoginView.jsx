@@ -4,7 +4,8 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import {Link, useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const YOUR_CLIENT_ID =
   "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
@@ -13,8 +14,64 @@ const YOUR_REDIRECT_URI = "https://feedtrack.vercel.app/";
 const Login = () => {
   const [loginWithEmail, setLoginWithEmail] = useState(true);
 
-  function handleCallbackResponse(response) {
+  const navigate = useNavigate();
+
+  async function handleCallbackResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
+    if (response.credential) {
+      try {
+        const decodedToken = jwtDecode(response.credential);
+
+        const userData = {
+          name: decodedToken.given_name,
+          lastName: decodedToken.family_name,
+          email: decodedToken.email,
+          image: decodedToken.picture,
+          username: "defaultUsername",
+          password: "defaultPassword",
+          mobileNumber: "123456789",
+          role: "defaultRole"
+        };
+
+        // Fetch maximum ID from the database
+        const maxIdResponse = await fetch('http://localhost:3000/api/getMaxUserId');
+        const maxIdData = await maxIdResponse.json();
+        const nextId = maxIdData.maxId + 1;
+        userData.id = nextId;
+
+        console.log(JSON.stringify(userData));
+
+        // Check if user exists in the database
+        const existingUserResponse = await fetch('http://localhost:3000/api/addUser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        });
+
+        if (existingUserResponse.ok) {
+          const existingUserResult = await existingUserResponse.json();
+          if (existingUserResult.message === "User already exists") {
+            console.log('User already exists');
+          } else {
+            console.log('User added successfully');
+          }
+        } else {
+          console.error('Error adding user:', existingUserResponse.statusText);
+        }
+
+        navigate('/homePage', {
+          state: { "userData": userData }
+        });
+
+        console.log("Redirection completed successfully.");
+      } catch (error) {
+        console.error('Error decoding JWT token:', error);
+      }
+    } else {
+      console.log('Google login failed');
+    }
   }
 
   useEffect(() => {
@@ -29,14 +86,16 @@ const Login = () => {
     }
   }, []);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
-      navigate('/homePage', { state:
-          { "username": localStorage.getItem("username"),
-            "refreshToken": localStorage.getItem("refreshToken"),
-            "accessToken": localStorage.getItem("accessToken")} })
+    if (localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
+      navigate('/homePage', {
+        state:
+        {
+          "username": localStorage.getItem("username"),
+          "refreshToken": localStorage.getItem("refreshToken"),
+          "accessToken": localStorage.getItem("accessToken")
+        }
+      })
 
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
@@ -46,7 +105,7 @@ const Login = () => {
       container.classList.add("active");
     };
 
-    const handleLoginClick = () =>{
+    const handleLoginClick = () => {
       container.classList.remove("active");
     };
 
@@ -76,7 +135,7 @@ const Login = () => {
     window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${YOUR_CLIENT_ID}&redirect_uri=${YOUR_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline`;
   };
 
-  async function loginLogic(event){
+  async function loginLogic(event) {
     event.preventDefault();
     const name = document.getElementById(loginWithEmail ? "email" : "tel").value;
     const pass = document.getElementById("password").value;
@@ -87,7 +146,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({"email": name, "password": pass})
+        body: JSON.stringify({ "email": name, "password": pass })
       });
 
       if (response.ok) {
@@ -98,7 +157,6 @@ const Login = () => {
         localStorage.setItem('accessToken', responseData.accessToken);
         localStorage.setItem('username', responseData.username);
         navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
-
       } else {
         // Handle login error
         console.error('Login failed');
@@ -177,10 +235,9 @@ const Login = () => {
               id={loginWithEmail ? "email" : "tel"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />{" "}
-            {/* Promijenjen placeholder */}
             <input type="password" id="password" placeholder="Password" />
             <a href="#">Forget Your Password?</a>
-            <input type="submit" value="Sign In"/>
+            <button>Sign In</button>
           </form>
         </div>
         <div className="toggle-container">
@@ -188,18 +245,12 @@ const Login = () => {
             <div className="toggle-panel toggle-left">
               <h1>Welcome Back!</h1>
               <p>Enter your personal details to use all site features</p>
-              <button className="hidden" id="login">
-                Sign In
-              </button>
+              <button className="hidden" id="login">Sign In</button>
             </div>
             <div className="toggle-panel toggle-right">
               <h1>Hello there!</h1>
-              <p>
-                Register with your personal details to use all site features
-              </p>
-              <button className="hidden" id="register">
-                Sign Up
-              </button>
+              <p>Register with your personal details to use all site features</p>
+              <button className="hidden" id="register">Sign Up</button>
             </div>
           </div>
         </div>
