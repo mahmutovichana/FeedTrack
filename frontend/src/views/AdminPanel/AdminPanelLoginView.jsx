@@ -4,7 +4,7 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const YOUR_CLIENT_ID =
   "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
@@ -27,7 +27,15 @@ const Login = () => {
         */
   }, []);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
+      navigate('/homePage', { state:
+          { "username": localStorage.getItem("username"),
+            "refreshToken": localStorage.getItem("refreshToken"),
+            "accessToken": localStorage.getItem("accessToken")} })
+
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
     const loginBtn = document.getElementById("login");
@@ -36,7 +44,7 @@ const Login = () => {
       container.classList.add("active");
     };
 
-    const handleLoginClick = () => {
+    const handleLoginClick = () =>{
       container.classList.remove("active");
     };
 
@@ -71,7 +79,7 @@ const Login = () => {
   const handleSignIn = async () => {
     console.log('User signed in');
     const emailOrPhone = document.getElementById('emailOrPhoneInput').value.trim();
-    const password = document.getElementById('passwordInput').value.trim();
+    const password = document.getElementById('password').value.trim();
     if (loginWithEmail) {
       // User entered an email
       console.log('Email entered:', emailOrPhone);
@@ -90,8 +98,12 @@ const Login = () => {
         
         if (response.ok) {
           console.log('User authenticated successfully');
+          
           const userData = await response.json();
-          const { secret } = userData;
+          const { username, refreshToken, accessToken, secret } = userData;
+          localStorage.setItem('username', username);
+          localStorage.setItem('refreshToken', refreshToken);
+          localStorage.setItem('accessToken', accessToken);
           
           // Call twofactorsetup route
           const twofactorResponse = await fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
@@ -117,7 +129,7 @@ const Login = () => {
           console.error('Authentication failed');
           window.location.href = '/';
           document.getElementById('emailOrPhoneInput').value = '';
-          document.getElementById('passwordInput').value = '';
+          document.getElementById('password').value = '';
         }
       } catch (error) {
         console.error('Error:', error);
@@ -154,7 +166,10 @@ const Login = () => {
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          window.location.href = '/homePage';
+          const username = localStorage.getItem('username');
+          const refreshToken = localStorage.getItem('refreshToken');
+          const accessToken = localStorage.getItem('accessToken');
+          navigate('/homePage', { state: { username, refreshToken, accessToken } });
         } else {
           document.getElementById('tokenInput').value = "Incorrect code";
         }
@@ -206,14 +221,15 @@ const Login = () => {
             <input type="text" placeholder="Name" />
             <input
               type={loginWithEmail ? "email" : "tel"}
+              id={loginWithEmail ? "emailSU" : "telSU"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />
-            <input type="password" placeholder="Password" />
+            <input type="password" id="passwordSU" placeholder="Password" />
             <button>Sign Up</button>
           </form>
         </div>
         <div className="form-container sign-in">
-          <form>
+          <form onSubmit={loginLogic}>
             <h1>Sign In</h1>
             <div className="options">
               <a
@@ -237,12 +253,15 @@ const Login = () => {
             <input
               id="emailOrPhoneInput"
               type={loginWithEmail ? "email" : "tel"}
+              id={loginWithEmail ? "email" : "tel"}
               placeholder={loginWithEmail ? "Email" : "Phone Number"}
             />{" "}
             {/* Promijenjen placeholder */}
-            <input id="passwordInput" type="password" placeholder="Password" />
+
+            <input id="password" type="password" placeholder="Password" />
             <a href="#">Forget Your Password?</a>
             <Link to="/authentication" onClick={handleSignIn}>Sign In</Link>
+
           </form>
         </div>
         <div className="toggle-container">
