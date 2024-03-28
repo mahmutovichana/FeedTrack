@@ -28,7 +28,7 @@ const AdminHomePage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/logout', {
+            const response = await fetch('https://feedtrack-backend.vercel.apps/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -47,7 +47,7 @@ const AdminHomePage = () => {
             } else {
                 // Handle login error
                 console.error('Logout failed');
-                //localStorage.clear()
+                localStorage.clear()
             }
         } catch (error) {
             console.error('Error logging out:', error);
