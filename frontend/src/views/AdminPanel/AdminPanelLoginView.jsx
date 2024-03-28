@@ -115,6 +115,7 @@ const Login = () => {
           }
         } else {
           console.error('Authentication failed');
+          window.location.href = '/';
           document.getElementById('emailOrPhoneInput').value = '';
           document.getElementById('passwordInput').value = '';
         }
