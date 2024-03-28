@@ -77,7 +77,7 @@ const Login = () => {
       console.log('Email entered:', emailOrPhone);
       console.log('password:', password);
       try {
-        const response = await fetch('http://localhost:3000/api/login', {
+        const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const Login = () => {
           const { secret } = userData;
           
           // Call twofactorsetup route
-          const twofactorResponse = await fetch('http://localhost:3000/api/twofactorsetup', {
+          const twofactorResponse = await fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -144,7 +144,7 @@ const Login = () => {
     // Define verifyToken globally
     window.verifyToken = (secret) => {
       const token = document.getElementById('tokenInput').value;
-      fetch('http://localhost:3000/api/verify', {
+      fetch('https://feedtrack-backend.vercel.app/api/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
