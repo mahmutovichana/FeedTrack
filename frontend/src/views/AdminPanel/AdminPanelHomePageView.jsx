@@ -30,7 +30,7 @@ const AdminHomePage = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"refreshToken": localStorage.getItem("token")})
+                body: JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")})
             });
 
             if (response.ok) {
