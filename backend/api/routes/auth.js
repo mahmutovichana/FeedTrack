@@ -35,16 +35,27 @@ router.post("/token", (req, res) => {
     }
   );
 });
-
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  let { email, mobileNumber, password } = req.body;
 
-  const result = await db.query('SELECT * FROM "Person" WHERE email = $1', [
-    email,
-  ]);
+  if (!email && !mobileNumber) {
+    return res.status(400).json({ message: "Email or mobile number is required!" });
+  }
+
+  let query;
+  let queryValues;
+  if (email) {
+    query = 'SELECT * FROM "Person" WHERE "email" = $1';
+    queryValues = [email];
+  } else {
+    query = 'SELECT * FROM "Person" WHERE "mobileNumber" = $1';
+    queryValues = [mobileNumber];
+  }
+
+  const result = await db.query(query, queryValues);
 
   if (result.rowCount === 0) {
-    return res.status(400).json({ message: "Email or password incorrect!" });
+    return res.status(400).json({ message: "Email or mobile number incorrect!" });
   }
 
   const isValidPassword = await bcrypt.compare(
@@ -53,7 +64,7 @@ router.post("/login", async (req, res) => {
   );
 
   if (!isValidPassword) {
-    return res.status(400).json({ message: "Email or password incorrect!" });
+    return res.status(400).json({ message: "Password incorrect!" });
   }
 
   const { id, username, email: userEmail } = result.rows[0];
@@ -70,6 +81,7 @@ router.post("/login", async (req, res) => {
     refreshToken,
   });
 });
+
 
 router.post("/logout", (req, res) => {
   const { refreshToken } = req.body;
