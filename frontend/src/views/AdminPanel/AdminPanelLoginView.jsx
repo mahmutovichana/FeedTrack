@@ -139,7 +139,7 @@ const Login = () => {
     
     event.preventDefault();
 
-    const inputType = loginWithEmail ? "email" : "mobileNumber";
+    const inputType = loginWithEmail ? "email" : "number";
     const name = document.getElementById(inputType).value;
     const pass = document.getElementById("password").value;
 
@@ -154,8 +154,10 @@ const Login = () => {
 
     try {
       const requestBody = {};
-      requestBody[inputType] = name;
+      requestBody["email"] = inputType=="email" ? name : " ";
       requestBody["password"] = pass;
+      requestBody["number"] = inputType=="email" ? " " : name;
+
       console.log(JSON.stringify(requestBody));
       const response = await fetch('http://localhost:3000/api/login', {
         method: 'POST',
@@ -257,8 +259,8 @@ const Login = () => {
                 </a>
               </div>
               <input
-                type={loginWithEmail ? "email" : "mobileNumber"}
-                id={loginWithEmail ? "email" : "mobileNumber"}
+                type={loginWithEmail ? "email" : "number"}
+                id={loginWithEmail ? "email" : "number"}
                 placeholder={loginWithEmail ? "Email" : "Phone Number"}
               />{" "}
               <input type="password" id="password" placeholder="Password" />

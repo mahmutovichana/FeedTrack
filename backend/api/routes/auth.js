@@ -120,6 +120,36 @@ router.post("/googlelogin", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+
+  let { email, number, password } = req.body;
+
+  if (!email && !number) {
+    return res.status(400).json({ message: "Email or mobile number is required!" });
+  }
+
+  let query;
+  let queryValues;
+  if (email!=" ") {
+    query = 'SELECT * FROM "Person" WHERE "email" = $1';
+    queryValues = [email];
+  } else {
+    query = 'SELECT * FROM "Person" WHERE "mobileNumber" = $1';
+    queryValues = [number];
+  }
+
+  console.log(query);
+  console.log(queryValues);
+
+  const result = await db.query(query, queryValues);
+
+  console.log(result);
+
+  if (result.rowCount === 0) {
+    return res.status(400).json({ message: "Email or mobile number incorrect!" });
+  }
+
+
+  /*
   const { email, password } = req.body;
 
   const result = await db.query(
@@ -128,7 +158,7 @@ router.post("/login", async (req, res) => {
 
   if (result.rowCount === 0) {
     return res.status(400).json({ message: "Email or password incorrect!" });
-  }
+  }*/
 
   const isValidPassword = await bcrypt.compare(
       password,
@@ -136,7 +166,7 @@ router.post("/login", async (req, res) => {
   );
 
   if (!isValidPassword) {
-    return res.status(400).json({ message: "Email or password incorrect!" });
+    return res.status(400).json({ message: "Password incorrect!" });
   }
 
   const { id, username, email: userEmail } = result.rows[0];
@@ -150,7 +180,7 @@ router.post("/login", async (req, res) => {
   res.status(200).json({
     ...user,
     accessToken,
-    refreshToken,
+    refreshToken
   });
 });
 
