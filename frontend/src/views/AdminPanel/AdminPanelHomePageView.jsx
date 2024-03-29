@@ -24,7 +24,7 @@ const AdminHomePage = () => {
         event.preventDefault();
         console.log(JSON.stringify({"token": localStorage.getItem("token")}));
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.appp/api/logout', {
+            const response = await fetch('https://feedtrack-backend.vercel.app/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
