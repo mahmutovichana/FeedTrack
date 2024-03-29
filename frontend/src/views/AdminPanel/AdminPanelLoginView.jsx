@@ -4,29 +4,24 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
-const YOUR_CLIENT_ID =
-    "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
+const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
 const YOUR_REDIRECT_URI = "https://feedtrack.vercel.app/";
 
 const Login = () => {
+
   const [loginWithEmail, setLoginWithEmail] = useState(true);
 
-  /*
-  function handleCallbackResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
-  }
-  */
-
+  const navigate = useNavigate();
 
   async function handleCallbackResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
     if (response.credential) {
       try {
         const decodedToken = jwtDecode(response.credential);
-
+        console.log(decodedToken);
         const userData = {
           name: decodedToken.given_name,
           lastName: decodedToken.family_name,
@@ -35,11 +30,14 @@ const Login = () => {
           username: "defaultUsername",
           password: "defaultPassword",
           mobileNumber: "123456789",
-          role: "defaultRole"
+          role: "defaultRole",
+          jti: decodedToken.jti
         };
 
+        localStorage.email = userData.email;
+
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch('https://feedtrack-backend.vercel.app/api/getMaxUserId');
+        const maxIdResponse = await fetch('http://localhost:3000/api/getMaxUserId');
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
         userData.id = nextId;
@@ -47,7 +45,7 @@ const Login = () => {
         console.log(JSON.stringify(userData));
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch('https://feedtrack-backend.vercel.app/api/addUser', {
+        const existingUserResponse = await fetch('http://localhost:3000/api/addUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -69,9 +67,7 @@ const Login = () => {
           console.error('Error adding user:', existingUserResponse.statusText);
         }
 
-        navigate('/homePage', {
-          state: { "userData": userData }
-        });
+        navigate('/homePage', { state: { "username": localStorage.getItem("email"), "refreshToken": localStorage.getItem("refreshToken") } });
 
         console.log("Redirection completed successfully.");
       } catch (error) {
@@ -82,32 +78,7 @@ const Login = () => {
     }
   }
 
-
-
-  const navigate = useNavigate();
-
   useEffect(() => {
-    if(localStorage.getItem("username") != null && localStorage.getItem("refreshToken") != null)
-      navigate('/homePage', { state:
-            { "username": localStorage.getItem("username"),
-              "refreshToken": localStorage.getItem("refreshToken"),
-              "accessToken": localStorage.getItem("accessToken")} })
-
-    const container = document.getElementById("container");
-    const registerBtn = document.getElementById("register");
-    const loginBtn = document.getElementById("login");
-
-    const handleRegisterClick = () => {
-      container.classList.add("active");
-    };
-
-    const handleLoginClick = () =>{
-      container.classList.remove("active");
-    };
-
-    registerBtn.addEventListener("click", handleRegisterClick);
-    loginBtn.addEventListener("click", handleLoginClick);
-
     // Ensuring that google is defined before using it
     if (typeof window.google !== 'undefined' && window.google.accounts) {
       window.google.accounts.id.initialize({
@@ -117,6 +88,31 @@ const Login = () => {
     } else {
       console.log('Google Identity Services library not loaded.');
     }
+
+    if (localStorage.getItem("username") != null && localStorage.getItem("refreshToken") != null)
+      navigate('/homePage', {
+        state:
+        {
+          "username": localStorage.getItem("username"),
+          "refreshToken": localStorage.getItem("refreshToken"),
+          "accessToken": localStorage.getItem("accessToken")
+        }
+      })
+
+    const container = document.getElementById("container");
+    const registerBtn = document.getElementById("register");
+    const loginBtn = document.getElementById("login");
+
+    const handleRegisterClick = () => {
+      container.classList.add("active");
+    };
+
+    const handleLoginClick = () => {
+      container.classList.remove("active");
+    };
+
+    registerBtn.addEventListener("click", handleRegisterClick);
+    loginBtn.addEventListener("click", handleLoginClick);
 
     // Cleanup event listeners when component unmounts
     return () => {
@@ -137,23 +133,45 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    window.location.href = `https://accounts.google.com/o/oauth2/auth?client_id=${YOUR_CLIENT_ID}&redirect_uri=${YOUR_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline`;
-  };
+  const [error, setError] = useState("");
 
-  async function loginLogic(event){
+  async function loginLogic(event) {
+    
     event.preventDefault();
-    const name = document.getElementById(loginWithEmail ? "email" : "tel").value;
+
+    const inputType = loginWithEmail ? "email" : "mobileNumber";
+    const name = document.getElementById(inputType).value;
     const pass = document.getElementById("password").value;
 
+    // Error message reset
+    setError("");
+
+    // Validation
+    if (!name || !pass) {
+      setError(!name ? "Email or phone number is required!" : "Password is required!");
+      return;
+    }
+
     try {
-      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+      const requestBody = {};
+      requestBody[inputType] = name;
+      requestBody["password"] = pass;
+      console.log(JSON.stringify(requestBody));
+      const response = await fetch('http://localhost:3000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({"email": name, "password": pass})
+        body: JSON.stringify(requestBody)
       });
+/*
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "email": name, "password": pass })
+      });*/
 
       if (response.ok) {
         // Handle successful login
@@ -174,7 +192,7 @@ const Login = () => {
     }
   }
 
-  return (
+    return (
       <div>
         <div className="logo">
           <img src={feedtrackLogo} className="logo" alt="FeedTrack logo" />
@@ -185,32 +203,32 @@ const Login = () => {
               <h1>Create Account</h1>
               <div className="options">
                 <a
-                    href="#"
-                    className={`icon ${loginWithEmail ? "active" : ""}`}
-                    onClick={() => setLoginWithEmail(true)}
+                  href="#"
+                  className={`icon ${loginWithEmail ? "active" : ""}`}
+                  onClick={() => setLoginWithEmail(true)}
                 >
                   <FontAwesomeIcon icon={faEnvelope} />
                 </a>
                 <a
-                    href="#"
-                    className={`icon ${!loginWithEmail ? "active" : ""}`}
-                    onClick={() => setLoginWithEmail(false)}
+                  href="#"
+                  className={`icon ${!loginWithEmail ? "active" : ""}`}
+                  onClick={() => setLoginWithEmail(false)}
                 >
                   <FontAwesomeIcon icon={faPhone} />
                 </a>
-                <a href="#" className="icon" onClick={handleGoogleSignUp}>
+                <a href="#" className="icon" onClick={handleGoogleSignIn}>
                   <FontAwesomeIcon icon={faGoogle} />
                 </a>
               </div>
               <span>
-              or use your {loginWithEmail ? "email" : "phone number"} for
-              registration
-            </span>
+                or use your {loginWithEmail ? "email" : "phone number"} for
+                registration
+              </span>
               <input type="text" placeholder="Name" />
               <input
-                  type={loginWithEmail ? "email" : "tel"}
-                  id={loginWithEmail ? "emailSU" : "telSU"}
-                  placeholder={loginWithEmail ? "Email" : "Phone Number"}
+                type={loginWithEmail ? "email" : "mobileNumberSU"}
+                id={loginWithEmail ? "emailSU" : "mobileNumberSU"}
+                placeholder={loginWithEmail ? "Email" : "Phone Number"}
               />
               <input type="password" id="passwordSU" placeholder="Password" />
               <button>Sign Up</button>
@@ -221,32 +239,32 @@ const Login = () => {
               <h1>Sign In</h1>
               <div className="options">
                 <a
-                    href="#"
-                    className={`icon ${loginWithEmail ? "active" : ""}`}
-                    onClick={() => setLoginWithEmail(true)}
+                  href="#"
+                  className={`icon ${loginWithEmail ? "active" : ""}`}
+                  onClick={() => setLoginWithEmail(true)}
                 >
                   <FontAwesomeIcon icon={faEnvelope} />
                 </a>
                 <a
-                    href="#"
-                    className={`icon ${!loginWithEmail ? "active" : ""}`}
-                    onClick={() => setLoginWithEmail(false)}
+                  href="#"
+                  className={`icon ${!loginWithEmail ? "active" : ""}`}
+                  onClick={() => setLoginWithEmail(false)}
                 >
                   <FontAwesomeIcon icon={faPhone} />
                 </a>
-                <a href="#" className="icon" onClick={handleGoogleSignUp}>
+                <a href="#" className="icon" onClick={handleGoogleSignIn}>
                   <FontAwesomeIcon icon={faGoogle} />
                 </a>
               </div>
               <input
-                  type={loginWithEmail ? "email" : "tel"}
-                  id={loginWithEmail ? "email" : "tel"}
-                  placeholder={loginWithEmail ? "Email" : "Phone Number"}
+                type={loginWithEmail ? "email" : "mobileNumber"}
+                id={loginWithEmail ? "email" : "mobileNumber"}
+                placeholder={loginWithEmail ? "Email" : "Phone Number"}
               />{" "}
-              {/* Promijenjen placeholder */}
               <input type="password" id="password" placeholder="Password" />
-              <a href="#">Forget Your Password?</a>
-              <input type="submit" value="Sign In"/>
+              <a href="#">Forgot Your Password?</a>
+              <button>Sign In</button>
+              {error && <p>{error}</p>}
             </form>
           </div>
           <div className="toggle-container">
@@ -271,7 +289,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-  );
-};
+    );
+  };
 
-export default Login;
+  export default Login;

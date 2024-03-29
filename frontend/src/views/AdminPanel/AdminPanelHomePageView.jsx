@@ -3,9 +3,6 @@ import {useLocation, useNavigate} from "react-router-dom";
 
 
 const AdminHomePage = () => {
-    function handleCallbackResponse(response) {
-        console.log("Encoded JWT ID token: " + response.credential);
-    }
 
     const { state } = useLocation();
     const [username, setUsername] = useState();
@@ -26,9 +23,9 @@ const AdminHomePage = () => {
 
     async function logoutLogic(event){
         event.preventDefault();
-
+        console.log(JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")}));
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/logout', {
+            const response = await fetch('http://localhost:3000/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -46,8 +43,8 @@ const AdminHomePage = () => {
                 navigate('/');
             } else {
                 // Handle login error
+                console.log(response);
                 console.error('Logout failed');
-                //localStorage.clear()
             }
         } catch (error) {
             console.error('Error logging out:', error);
@@ -57,7 +54,7 @@ const AdminHomePage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/token', {
+            const response = await fetch('http://localhost:3000/api/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
