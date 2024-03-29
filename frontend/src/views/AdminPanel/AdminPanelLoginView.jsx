@@ -4,7 +4,7 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
@@ -36,7 +36,7 @@ const Login = () => {
         localStorage.email = userData.email;
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch('https://feedback-backend.vercel.app/api/getMaxUserId');
+        const maxIdResponse = await fetch('https://feedback.vercel.app/api/getMaxUserId');
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
         userData.id = nextId;
@@ -44,7 +44,7 @@ const Login = () => {
         console.log(JSON.stringify(userData));
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch('https://feedback-backend.vercel.app/api/addUser', {
+        const existingUserResponse = await fetch('https://feedback.vercel.app/api/addUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -160,7 +160,7 @@ const Login = () => {
       requestBody["number"] = inputType=="email" ? " " : name;
 
       console.log(JSON.stringify(requestBody));
-      const response = await fetch('https://feedback-backend.vercel.app/api/login', {
+      const response = await fetch('https://feedback.vercel.app/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -168,7 +168,7 @@ const Login = () => {
         body: JSON.stringify(requestBody)
       });
 /*
-      const response = await fetch('http://feedback-backend.vercel.app/api/login', {
+      const response = await fetch('https://feedback-backend.vercel.app/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
