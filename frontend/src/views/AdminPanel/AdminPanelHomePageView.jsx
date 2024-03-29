@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 
-
 const AdminHomePage = () => {
 
     const { state } = useLocation();
@@ -23,14 +22,14 @@ const AdminHomePage = () => {
 
     async function logoutLogic(event){
         event.preventDefault();
-        console.log(JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")}));
+        console.log(JSON.stringify({"token": localStorage.getItem("token")}));
         try {
             const response = await fetch('http://localhost:3000/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")})
+                body: JSON.stringify({"token": localStorage.getItem("token")})
             });
 
             if (response.ok) {

@@ -67,7 +67,9 @@ const Login = () => {
           console.error('Error adding user:', existingUserResponse.statusText);
         }
 
-        navigate('/homePage', { state: { "username": localStorage.getItem("email"), "refreshToken": localStorage.getItem("refreshToken") } });
+        localStorage.setItem("token", existingUserResponse.token);
+
+        navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
 
         console.log("Redirection completed successfully.");
       } catch (error) {
@@ -179,11 +181,10 @@ const Login = () => {
         // Handle successful login
         console.log('Login successful');
         let responseData = await response.json()
-        localStorage.setItem('refreshToken', responseData.refreshToken);
-        localStorage.setItem('accessToken', responseData.accessToken);
+        localStorage.setItem('token', responseData.token);
         localStorage.setItem('username', responseData.username);
 
-        navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
+        navigate('/homePage', { state: { "username": responseData.username, "token": responseData.token}});
 
       } else {
         // Handle login error
