@@ -24,7 +24,7 @@ const AdminHomePage = () => {
         event.preventDefault();
         console.log(JSON.stringify({"token": localStorage.getItem("token")}));
         try {
-            const response = await fetch('http://feedback-backend.vercel.app/api/logout', {
+            const response = await fetch('https://feedback-backend.vercel.app/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -53,7 +53,7 @@ const AdminHomePage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('http://feedback-backend.vercel.app/api/token', {
+            const response = await fetch('https://feedback-backend.vercel.app/api/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
