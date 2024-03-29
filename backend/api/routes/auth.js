@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const db = require("../db");
 const fs= require("fs");
 const os= require("os");
+const { generateUserJwtToken } = require("./../middlewares/authMiddleware");
+const { authenticateToken } = require("./../middlewares/authMiddleware");
 
 let refreshTokens = [];
 
@@ -77,14 +79,44 @@ router.post("/token", (req, res) => {
           username: userData.username,
           email: userData.email,
         };
-        const accessToken = generateAccessToken(user);
+        const token = generateUserJwtToken(user);
 
-        res.status(200).json({ accessToken });
+        res.status(200).json({ token });
       }
   );
 });
 
 router.post("/login", async (req, res) => {
+
+  let { email, number, password } = req.body;
+
+  if (!email && !number) {
+    return res.status(400).json({ message: "Email or mobile number is required!" });
+  }
+
+  let query;
+  let queryValues;
+  if (email!=" ") {
+    query = 'SELECT * FROM "Person" WHERE "email" = $1';
+    queryValues = [email];
+  } else {
+    query = 'SELECT * FROM "Person" WHERE "mobileNumber" = $1';
+    queryValues = [number];
+  }
+
+  console.log(query);
+  console.log(queryValues);
+
+  const result = await db.query(query, queryValues);
+
+  console.log(result);
+
+  if (result.rowCount === 0) {
+    return res.status(400).json({ message: "Email or mobile number incorrect!" });
+  }
+
+
+  /*
   const { email, password } = req.body;
 
   const result = await db.query(
@@ -93,7 +125,7 @@ router.post("/login", async (req, res) => {
 
   if (result.rowCount === 0) {
     return res.status(400).json({ message: "Email or password incorrect!" });
-  }
+  }*/
 
   const isValidPassword = await bcrypt.compare(
       password,
@@ -101,45 +133,48 @@ router.post("/login", async (req, res) => {
   );
 
   if (!isValidPassword) {
-    return res.status(400).json({ message: "Email or password incorrect!" });
+    return res.status(400).json({ message: "Password incorrect!" });
   }
 
   const { id, username, email: userEmail } = result.rows[0];
   const user = { id, username, email: userEmail };
 
+  const token = generateUserJwtToken(user); 
+
   // Generate access and refresh tokens
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
-  refreshTokens.push(refreshToken);
+  // const accessToken = generateAccessToken(user);
+  // const refreshToken = generateRefreshToken(user);
+  refreshTokens.push(token);
+
+  console.log(token);
 
   res.status(200).json({
     ...user,
-    accessToken,
-    refreshToken,
+    token
   });
 });
 
 router.post("/logout", (req, res) => {
-  const { refreshToken } = req.body;
+  const { token } = req.body;
 
-  if (!refreshToken) {
+  if (!token) {
     return res.status(401).json({ message: "You are not authenticated!" });
   }
 
-  if (!refreshTokens.includes(refreshToken)) {
+  if (!refreshTokens.includes(token)) {
     return res.status(403).json({ message: "Token is not valid!" });
   }
 
-  refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+  refreshTokens = refreshTokens.filter((checkToken) => checkToken !== token);
 
   /*generate new value for ACCESS_TOKEN_SECRET*/
-  var token = crypto.randomBytes(64).toString('hex');
+  //var token = crypto.randomBytes(64).toString('hex');
   /*Change of the ACCESS_TOKEN_SECRET for safety*/
-  setEnvValue("ACCESS_TOKEN_SECRET", token);
+  //setEnvValue("ACCESS_TOKEN_SECRET", token);
 
   res.status(200).json({ message: "Logged out successfully." });
 });
-
+/*
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "30m",
@@ -149,6 +184,7 @@ function generateAccessToken(user) {
 function generateRefreshToken(user) {
   return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 }
+*/
 
 /*function that changes value of variable in .env file*/
 /*example setEnvValue("VAR1", "SOMETHING") -> VAR1 = SOMETHING*/

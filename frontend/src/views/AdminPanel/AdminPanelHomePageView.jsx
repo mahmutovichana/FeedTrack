@@ -1,11 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 
-
 const AdminHomePage = () => {
-    function handleCallbackResponse(response) {
-        console.log("Encoded JWT ID token: " + response.credential);
-    }
 
     const { state } = useLocation();
     const [username, setUsername] = useState();
@@ -20,20 +16,20 @@ const AdminHomePage = () => {
             setAccessToken(state.accessToken)
         }
 
-        if(localStorage.getItem("refreshToken") == null) navigate('/')
+        //if(localStorage.getItem("refreshToken") == null) navigate('/')
 
     }, []);
 
     async function logoutLogic(event){
         event.preventDefault();
-
+        console.log(JSON.stringify({"token": localStorage.getItem("token")}));
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/logout', {
+            const response = await fetch('http://feedback-backend.vercel.app/api/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")})
+                body: JSON.stringify({"token": localStorage.getItem("token")})
             });
 
             if (response.ok) {
@@ -46,6 +42,7 @@ const AdminHomePage = () => {
                 navigate('/');
             } else {
                 // Handle login error
+                console.log(response);
                 console.error('Logout failed');
             }
         } catch (error) {
@@ -56,7 +53,7 @@ const AdminHomePage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/token', {
+            const response = await fetch('http://feedback-backend.vercel.app/api/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -70,12 +67,12 @@ const AdminHomePage = () => {
                 let responseData = await response.json()
                 localStorage.setItem('accessToken', responseData.accessToken);
                 setAccessToken(responseData.accessToken);
-                console.log("accessToken is now valid for 30 minutes")
+                console.log("accessToken is now valid for 30 minutes");
                 console.log("accessToken after refresh",localStorage.getItem("accessToken"));
                 //localStorage.removeItem("refreshToken")
                 //localStorage.removeItem("username")
                 //localStorage.removeItem("accessToken")
-                //navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
+                navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
             } else {
                 // Handle login error
                 console.error('Refresh failed');
