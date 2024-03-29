@@ -20,7 +20,7 @@ const AdminHomePage = () => {
             setAccessToken(state.accessToken)
         }
 
-        if(localStorage.getItem("refreshToken") == null) navigate('/')
+        //if(localStorage.getItem("refreshToken") == null) navigate('/')
 
     }, []);
 
@@ -47,7 +47,7 @@ const AdminHomePage = () => {
             } else {
                 // Handle login error
                 console.error('Logout failed');
-                localStorage.clear()
+                //localStorage.clear()
             }
         } catch (error) {
             console.error('Error logging out:', error);
@@ -71,7 +71,7 @@ const AdminHomePage = () => {
                 let responseData = await response.json()
                 localStorage.setItem('accessToken', responseData.accessToken);
                 setAccessToken(responseData.accessToken);
-                console.log("accessToken is now valid for 30 minutes")
+                console.log("accessToken is now valid for 30 minutes");
                 console.log("accessToken after refresh",localStorage.getItem("accessToken"));
                 //localStorage.removeItem("refreshToken")
                 //localStorage.removeItem("username")
