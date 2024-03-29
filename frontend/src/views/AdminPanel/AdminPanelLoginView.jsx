@@ -9,14 +9,17 @@ import { jwtDecode } from "jwt-decode";
 
 const YOUR_CLIENT_ID =
     "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
-const YOUR_REDIRECT_URI = "http://feedtrack.vercel.app/";
+const YOUR_REDIRECT_URI = "https://feedtrack.vercel.app/";
 
 const Login = () => {
   const [loginWithEmail, setLoginWithEmail] = useState(true);
 
+  /*
   function handleCallbackResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
   }
+  */
+
 
   async function handleCallbackResponse(response) {
     console.log("Encoded JWT ID token: " + response.credential);
@@ -36,7 +39,7 @@ const Login = () => {
         };
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch('http://localhost:3000/api/getMaxUserId');
+        const maxIdResponse = await fetch('https://feedtrack-backend.vercel.app/api/getMaxUserId');
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
         userData.id = nextId;
@@ -44,7 +47,7 @@ const Login = () => {
         console.log(JSON.stringify(userData));
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch('http://localhost:3000/api/addUser', {
+        const existingUserResponse = await fetch('https://feedtrack-backend.vercel.app/api/addUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -79,22 +82,12 @@ const Login = () => {
     }
   }
 
-  useEffect(() => {
-    // Ensuring that google is defined before using it
-    if (typeof window.google !== 'undefined' && window.google.accounts) {
-      window.google.accounts.id.initialize({
-        client_id: YOUR_CLIENT_ID,
-        callback: handleCallbackResponse
-      });
-    } else {
-      console.log('Google Identity Services library not loaded.');
-    }
-  }, []);
+
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(localStorage.getItem("username") != null && localStorage.getItem("accessToken") != null)
+    if(localStorage.getItem("username") != null && localStorage.getItem("refreshToken") != null)
       navigate('/homePage', { state:
             { "username": localStorage.getItem("username"),
               "refreshToken": localStorage.getItem("refreshToken"),
@@ -114,6 +107,16 @@ const Login = () => {
 
     registerBtn.addEventListener("click", handleRegisterClick);
     loginBtn.addEventListener("click", handleLoginClick);
+
+    // Ensuring that google is defined before using it
+    if (typeof window.google !== 'undefined' && window.google.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: YOUR_CLIENT_ID,
+        callback: handleCallbackResponse
+      });
+    } else {
+      console.log('Google Identity Services library not loaded.');
+    }
 
     // Cleanup event listeners when component unmounts
     return () => {
@@ -144,7 +147,7 @@ const Login = () => {
     const pass = document.getElementById("password").value;
 
     try {
-      const response = await fetch('http://feedtrack-backend.vercel.app/api/login', {
+      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -231,7 +234,7 @@ const Login = () => {
                 >
                   <FontAwesomeIcon icon={faPhone} />
                 </a>
-                <a href="#" className="icon" onClick={handleGoogleSignIn}>
+                <a href="#" className="icon" onClick={handleGoogleSignUp}>
                   <FontAwesomeIcon icon={faGoogle} />
                 </a>
               </div>
