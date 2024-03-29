@@ -84,6 +84,41 @@ router.post("/token", (req, res) => {
   );
 });
 
+router.post("/googlelogin", async (req, res) => {
+  const { email, password } = req.body;
+
+  const result = await db.query(
+      'SELECT * FROM "Person" WHERE email = $1' ,[email,]
+  );
+
+  if (result.rowCount === 0) {
+    return res.status(400).json({ message: "Email or password incorrect!" });
+  }
+
+  const isValidPassword = await bcrypt.compare(
+      password,
+      result.rows[0].password
+  );
+
+  if (!isValidPassword) {
+    return res.status(400).json({ message: "Email or password incorrect!" });
+  }
+
+  const { id, username, email: userEmail } = result.rows[0];
+  const user = { id, username, email: userEmail };
+
+  // Generate access and refresh tokens
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  refreshTokens.push(refreshToken);
+
+  res.status(200).json({
+    ...user,
+    accessToken,
+    refreshToken,
+  });
+});
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
