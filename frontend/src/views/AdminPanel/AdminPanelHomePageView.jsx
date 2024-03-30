@@ -5,7 +5,7 @@ const AdminHomePage = () => {
 
     const { state } = useLocation();
     const [username, setUsername] = useState();
-    const [accessToken, setAccessToken] = useState();
+    const [token, setToken] = useState();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,7 +13,7 @@ const AdminHomePage = () => {
         const refreshBtn = document.getElementById("refresh");
         if (state != null) {
             setUsername(state.username)
-            setAccessToken(state.accessToken)
+            setToken(state.token)
         }
 
         //if(localStorage.getItem("refreshToken") == null) navigate('/')
@@ -49,6 +49,7 @@ const AdminHomePage = () => {
             console.error('Error logging out:', error);
         }
     }
+    /*
     async function refreshLogic(event){
         event.preventDefault();
 
@@ -58,21 +59,21 @@ const AdminHomePage = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"refreshToken": localStorage.getItem("refreshToken")})
+                body: JSON.stringify({"token": localStorage.getItem("token")})
             });
-            console.log("accessToken before refresh",localStorage.getItem("accessToken"));
+            console.log("token before refresh",localStorage.getItem("token"));
             if (response.ok) {
                 // Handle successful login
                 console.log('Refresh successful');
                 let responseData = await response.json()
-                localStorage.setItem('accessToken', responseData.accessToken);
-                setAccessToken(responseData.accessToken);
-                console.log("accessToken is now valid for 30 minutes");
-                console.log("accessToken after refresh",localStorage.getItem("accessToken"));
+                localStorage.setItem('token', responseData.token);
+                setToken(responseData.token);
+                console.log("token is now valid for 30 minutes");
+                console.log("token after refresh",localStorage.getItem("token"));
                 //localStorage.removeItem("refreshToken")
                 //localStorage.removeItem("username")
                 //localStorage.removeItem("accessToken")
-                navigate('/homePage', { state: { "username": responseData.username, "refreshToken": responseData.refreshToken, "accessToken": responseData.accessToken } });
+                navigate('/homePage', { state: { "username": responseData.username, "token": responseData.token} });
             } else {
                 // Handle login error
                 console.error('Refresh failed');
@@ -82,13 +83,14 @@ const AdminHomePage = () => {
         }
     }
 
+     */
+
     return (
         <div>
             <h1>Testni naslov za {username}</h1>
             <button id="logout" onClick={logoutLogic}>Log Out</button>
-            <button id="refresh" onClick={refreshLogic}>Refresh</button>
             <p>After refresh new token will be valid for 30 minutes</p>
-            <p>Currently active access token {accessToken}</p>
+            <p>Currently active access token {token}</p>
         </div>
     );
 }

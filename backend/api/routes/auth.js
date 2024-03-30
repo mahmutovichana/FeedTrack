@@ -6,6 +6,8 @@ const fs= require("fs");
 const os= require("os");
 const { generateUserJwtToken } = require("./../middlewares/authMiddleware");
 const { authenticateToken } = require("./../middlewares/authMiddleware");
+const speakeasy = require('speakeasy');
+const QRCode = require('qrcode');
 
 let refreshTokens = [];
 
@@ -146,11 +148,15 @@ router.post("/login", async (req, res) => {
   // const refreshToken = generateRefreshToken(user);
   refreshTokens.push(token);
 
-  console.log(token);
+  // Generate secret for 2FA
+  const secret = speakeasy.generateSecret();
+  console.log("secret generirani: " + secret.otpauth_url);
+
 
   res.status(200).json({
     ...user,
-    token
+    token,
+    secret
   });
 });
 
@@ -185,6 +191,24 @@ function generateRefreshToken(user) {
   return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 }
 */
+
+router.post('/twofactorsetup', (req, res) => {
+  const secret  = req.body.secret;
+  QRCode.toDataURL(secret.otpauth_url, (err, data_url) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error generating QR code' });
+    }
+    res.json({ dataUrl: data_url });
+  });
+});
+
+// verify 2fa
+router.post('/verify', (req, res) => {
+  const token = req.body.userToken;
+  const secret = req.body.secret;
+  const verified = speakeasy.totp.verify({secret: secret.base32, encoding: 'base32', token: token});
+  res.json({success: verified});
+})
 
 /*function that changes value of variable in .env file*/
 /*example setEnvValue("VAR1", "SOMETHING") -> VAR1 = SOMETHING*/
