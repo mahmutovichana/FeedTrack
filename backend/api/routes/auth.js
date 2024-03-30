@@ -2,12 +2,12 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const db = require("../db");
-const fs= require("fs");
-const os= require("os");
+const fs = require("fs");
+const os = require("os");
 const { generateUserJwtToken } = require("./../middlewares/authMiddleware");
 const { authenticateToken } = require("./../middlewares/authMiddleware");
 const speakeasy = require('speakeasy');
-const QRCode = require('qrcode');
+var QRCode = require('qrcode');
 
 let refreshTokens = [];
 
@@ -69,22 +69,22 @@ router.post("/token", (req, res) => {
   */
 
   jwt.verify(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET,
-      (err, userData) => {
-        if (err) {
-          return res.status(403).json({ message: "Token is not valid!" });
-        }
-
-        const user = {
-          id: userData.id,
-          username: userData.username,
-          email: userData.email,
-        };
-        const token = generateUserJwtToken(user);
-
-        res.status(200).json({ token });
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    (err, userData) => {
+      if (err) {
+        return res.status(403).json({ message: "Token is not valid!" });
       }
+
+      const user = {
+        id: userData.id,
+        username: userData.username,
+        email: userData.email,
+      };
+      const token = generateUserJwtToken(user);
+
+      res.status(200).json({ token });
+    }
   );
 });
 
@@ -98,7 +98,7 @@ router.post("/login", async (req, res) => {
 
   let query;
   let queryValues;
-  if (email!=" ") {
+  if (email != " ") {
     query = 'SELECT * FROM "Person" WHERE "email" = $1';
     queryValues = [email];
   } else {
@@ -117,21 +117,9 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Email or mobile number incorrect!" });
   }
 
-
-  /*
-  const { email, password } = req.body;
-
-  const result = await db.query(
-      'SELECT * FROM "Person" WHERE email = $1' ,[email,]
-  );
-
-  if (result.rowCount === 0) {
-    return res.status(400).json({ message: "Email or password incorrect!" });
-  }*/
-
   const isValidPassword = await bcrypt.compare(
-      password,
-      result.rows[0].password
+    password,
+    result.rows[0].password
   );
 
   if (!isValidPassword) {
@@ -141,23 +129,60 @@ router.post("/login", async (req, res) => {
   const { id, username, email: userEmail } = result.rows[0];
   const user = { id, username, email: userEmail };
 
-  const token = generateUserJwtToken(user); 
+  const token = generateUserJwtToken(user);
 
-  // Generate access and refresh tokens
-  // const accessToken = generateAccessToken(user);
-  // const refreshToken = generateRefreshToken(user);
   refreshTokens.push(token);
 
   // Generate secret for 2FA
-  const secret = speakeasy.generateSecret();
+  var secret = speakeasy.generateSecret();
+  console.log("citav secret je objekat koji izgleda ovako: "+ secret);
   console.log("secret generirani: " + secret.otpauth_url);
-
 
   res.status(200).json({
     ...user,
     token,
     secret
   });
+});
+
+// Route for adding a new user to the database
+router.post("/addUser", async (req, res) => {
+  try {
+
+    const { id, name, lastName, email, username, password, mobileNumber, role } = req.body;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return res.status(400).json({ message: "Invalid email address" });
+
+    const existingUser = await db.query('SELECT * FROM "Person" WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      const token = generateUserJwtToken(JSON.stringify(existingUser.rows[0]));
+      console.log("ovo je za existing user token: "+token);
+      refreshTokens.push(token);
+      return res.status(400).json({ message: "User already exists", token: token });
+    }
+    console.log(password);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await db.query(
+      'INSERT INTO "Person" ("id", "name", "lastName", "username", "password", "email", "mobileNumber", "role") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [id, name, lastName, username, hashedPassword, email, mobileNumber, role || "superAdmin"]
+    );
+
+    console.log("OVO JE REZULTAT: " + newUser.rows[0]);
+    const token = generateUserJwtToken(JSON.stringify(newUser.rows[0]));
+    refreshTokens.push(token);
+
+    // Generate secret for 2FA
+    const secret = speakeasy.generateSecret();
+    console.log("secret generirani: " + secret.otpauth_url);
+    console.log(token);
+
+    res.status(201).json({ message: "User added successfully", user: newUser.rows[0], token: token, secret: secret });
+  } catch (error) {
+    console.error("Error adding user:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 router.post("/logout", (req, res) => {
@@ -180,21 +205,13 @@ router.post("/logout", (req, res) => {
 
   res.status(200).json({ message: "Logged out successfully." });
 });
-/*
-function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30m",
-  });
-}
-
-function generateRefreshToken(user) {
-  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
-}
-*/
 
 router.post('/twofactorsetup', (req, res) => {
-  const secret  = req.body.secret;
-  QRCode.toDataURL(secret.otpauth_url, (err, data_url) => {
+  const secret = req.body;
+console.log("u sklopu rute 2fa je ovo secret: " + JSON.stringify(secret.secret));
+
+  console.log("ovo je secret.otpauth_url: "+secret);
+  QRCode.toDataURL(secret.secret, (err, data_url) => {
     if (err) {
       return res.status(500).json({ error: 'Error generating QR code' });
     }
@@ -204,10 +221,12 @@ router.post('/twofactorsetup', (req, res) => {
 
 // verify 2fa
 router.post('/verify', (req, res) => {
+  console.log(req.body.secret);
   const token = req.body.userToken;
   const secret = req.body.secret;
-  const verified = speakeasy.totp.verify({secret: secret.base32, encoding: 'base32', token: token});
-  res.json({success: verified});
+  const baseSecret = secret.base32;
+  var verified = speakeasy.totp.verify({ secret: baseSecret, encoding: 'base32', token: token });
+  res.json({ success: verified });
 })
 
 /*function that changes value of variable in .env file*/
