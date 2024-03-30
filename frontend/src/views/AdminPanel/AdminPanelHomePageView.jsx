@@ -14,7 +14,7 @@ const AdminHomePage = () => {
             setUsername(state.username)
             setToken(state.token)
         }
-        if(localStorage.getItem(token)==null) navigate('/');
+        // if(localStorage.getItem(token)==null) navigate('/');
     }, []);
 
     async function logoutLogic(event){
