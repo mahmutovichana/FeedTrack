@@ -10,6 +10,7 @@ const AdminHomePage = () => {
 
     useEffect(() => {
         if (state != null) {
+            console.log("state je razlicit od null");
             setUsername(state.username)
             setToken(state.token)
         }

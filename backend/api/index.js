@@ -29,12 +29,12 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
-/*
+// app.use(cors());
+
 app.use(cors({
     origin: 'https://feedtrack.vercel.app',
   }));
-*/
+
 app.use("/api", authRouter);
 app.use("/api", devRouter);
 app.use("/api", userRouter);
