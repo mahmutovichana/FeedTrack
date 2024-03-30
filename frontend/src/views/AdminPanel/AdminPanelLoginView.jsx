@@ -245,7 +245,8 @@ const Login = () => {
         .then(response => response.json())
         .then(data => {
           if (data.success) {
-            window.location.href = 'https://feedtrack.vercel.app/homePage';
+            navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
+            // window.location.href = 'https://feedtrack.vercel.app/homePage';
           } else {
             document.getElementById('tokenInput').value = "Incorrect code";
           }
