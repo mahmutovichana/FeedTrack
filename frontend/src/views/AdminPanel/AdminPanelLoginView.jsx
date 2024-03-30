@@ -26,7 +26,7 @@ const Login = () => {
         localStorage.image = decodedToken.picture;
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch('https://feedtrack-backend.vercel.app/api/getMaxUserId');
+        const maxIdResponse = await fetch('http://localhost:3000/api/getMaxUserId');
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
 
@@ -45,7 +45,7 @@ const Login = () => {
         console.log(JSON.stringify(userData));
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch('https://feedtrack-backend.vercel.app/api/addUser', {
+        const existingUserResponse = await fetch('http://localhost:3000/api/addUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -160,7 +160,7 @@ const Login = () => {
       requestBody["number"] = inputType == "email" ? " " : name;
 
       console.log(JSON.stringify(requestBody));
-      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+      const response = await fetch('http://localhost:3000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -188,7 +188,7 @@ const Login = () => {
       localStorage.setItem('secret', responseData.secret);
       console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
       // Pozivanje twofactorsetup rute
-      const twofactorResponse = await fetch('https://feedtrack-backend.vercel.app/api/twofactorsetup', {
+      const twofactorResponse = await fetch('http://localhost:3000/api/twofactorsetup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -235,7 +235,7 @@ const Login = () => {
     // Define verifyToken globally
     window.verifyToken = (secret) => {
       const token = document.getElementById('tokenInput').value;
-      fetch('https://feedtrack-backend.vercel.app/api/verify', {
+      fetch('http://localhost:3000/api/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
