@@ -17,7 +17,7 @@ const AdminHomePage = () => {
     }, []);
 
     async function logoutLogic(event){
-        event.preventDefault();
+        // event.preventDefault();
         console.log(JSON.stringify({"token": localStorage.getItem("token")}));
         try {
             const response = await fetch('https://feedtrack-backend.vercel.app/api/logout', {
@@ -29,12 +29,12 @@ const AdminHomePage = () => {
             });
 
             if (response.ok) {
-                // Handle successful login
+                // Handle successful logout
                 console.log('Logout successful');
                 localStorage.clear()
                 navigate('/');
             } else {
-                // Handle login error
+                // Handle logout error
                 console.log(response);
                 console.error('Logout failed');
             }
