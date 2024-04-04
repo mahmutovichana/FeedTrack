@@ -6,8 +6,8 @@ const Navbar = () => {
     return (
         <div className="navbar">
             <div className="logo">
-                <img src="logo.svg" alt="" />
-                <span>lamadmin</span>
+                <img src="feedtrackLogo.png" alt="" />
+                <h1>Admin Dashboard</h1>
             </div>
             <div className="icons">
                 <img src="/search.svg" alt="" className="icon" />

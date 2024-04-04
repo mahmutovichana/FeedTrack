@@ -3,16 +3,16 @@ import "./pieChartBox.scss";
 import React from "react";
 
 const data = [
-  { name: "Mobile", value: 400, color: "#0088FE" },
-  { name: "Desktop", value: 300, color: "#00C49F" },
-  { name: "Laptop", value: 300, color: "#FFBB28" },
-  { name: "Tablet", value: 200, color: "#FF8042" },
+  { name: "Sarajevo", value: 400, color: "#0088FE" },
+  { name: "Tuzla", value: 300, color: "#00C49F" },
+  { name: "Zenica", value: 300, color: "#FFBB28" },
+  { name: "Mostar", value: 200, color: "#FF8042" },
 ];
 
 const PieChartBox = () => {
   return (
     <div className="pieChartBox">
-      <h1>Leads by Source</h1>
+      <h1>Numbers of employees</h1>
       <div className="chart">
         <ResponsiveContainer width="99%" height={300}>
           <PieChart>

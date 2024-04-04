@@ -41,6 +41,8 @@
   color: #888;
 }*/
 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 html {
   margin: 0px;
   height: 100%;
@@ -52,11 +54,11 @@ body {
   min-height: 100%;
   width: 100%;
 }
-
+/*
 #root, .main {
   height: 100vh;
   width: 100vw;
-}
+}*/
 
 .main{
   font-family: 'Montserrat', sans-serif;

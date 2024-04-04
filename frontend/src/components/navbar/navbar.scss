@@ -1,5 +1,4 @@
 .navbar {
-  width: 100%;
   padding: 20px;
   display: flex;
   align-items: center;
@@ -10,11 +9,6 @@
     align-items: center;
     gap: 10px;
   }
-
-  a .listItem {
-    color: white;
-  }
-
   .icons {
     display: flex;
     align-items: center;

@@ -5,7 +5,6 @@ import AdminHomePage from './views/AdminPanel/AdminPanelHomePageView.jsx';
 import AdminDashboardPage from './views/AdminPanel/AdminPanelUserView.tsx';
 import Users from './views/AdminPanel/Users.tsx';
 import Tellers from './views/AdminPanel/Tellers.tsx';
-import MyProfile from './views/AdminPanel/MyProfile.tsx';
 import Branches from './views/AdminPanel/Branches.tsx';
 import Navbar from "./components/navbar/Navbar.tsx";
 import Footer from "./components/footer/Footer.tsx";
@@ -51,10 +50,6 @@ function App() {
           element:<AdminHomePage/>
         },
         {
-          path:"/myProfile",
-          element:<MyProfile/>
-        },
-        {
           path:"/branches",
           element:<Branches/>
         },
@@ -67,19 +62,5 @@ function App() {
   ]);
 
   return <RouterProvider router={router} />;
-  
-  {/*return (
-    <BrowserRouter>
-     <Routes>
-      <Route path='/login' element={<Login />}/>
-      <Route path='/' element={<AdminDashboardPage />}/>
-      <Route path='/homePage' element={<AdminHomePage />}/>
-      <Route path='/users' element={<Users />}/>
-      <Route path='/tellers' element={<Tellers />}/>
-      <Route path='/myProfile' element={<MyProfile />}/>
-      <Route path='/branches' element={<Branches />}/>
-     </Routes>
-    </BrowserRouter>
-  );*/}
 }
 export default App;

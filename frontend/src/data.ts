@@ -7,13 +7,13 @@ export const menu = [
           id: 1,
           title: "Homepage",
           url: "/",
-          icon: "home.svg",
+          icon: "house-chimney.png",
         },
         {
           id: 2,
           title: "Profile",
           url: "/users/1",
-          icon: "user.svg",
+          icon: "user.png",
         },
       ],
     },
@@ -25,26 +25,20 @@ export const menu = [
           id: 1,
           title: "Users",
           url: "/users",
-          icon: "user.svg",
+          icon: "users.png",
         },
         {
           id: 2,
           title: "Branches",
           url: "/branches",
-          icon: "product.svg",
+          icon: "bank.png",
         },
         {
           id: 3,
           title: "Tellers",
           url: "/tellers",
-          icon: "order.svg",
-        },
-        {
-          id: 4,
-          title: "MyProfile",
-          url: "/myProfile",
-          icon: "post2.svg",
-        },
+          icon: "concierge-bell.png",
+        }
       ],
     },
     {
@@ -170,8 +164,8 @@ export const menu = [
   export const chartBoxUser = {
     color: "#8884d8",
     icon: "/userIcon.svg",
-    title: "Total Users",
-    number: "11.238",
+    title: "Total Tellers",
+    number: "238",
     dataKey: "users",
     percentage: 45,
     chartData: [
@@ -188,8 +182,8 @@ export const menu = [
   export const chartBoxProduct = {
     color: "skyblue",
     icon: "/productIcon.svg",
-    title: "Total Products",
-    number: "238",
+    title: "Total Branches",
+    number: "520",
     dataKey: "products",
     percentage: 21,
     chartData: [
@@ -205,10 +199,10 @@ export const menu = [
   export const chartBoxRevenue = {
     color: "teal",
     icon: "/revenueIcon.svg",
-    title: "Total Revenue",
-    number: "$56.432",
+    title: "Satisfaction Levels by Branches",
+    number: "4.432",
     dataKey: "revenue",
-    percentage: -12,
+    percentage: 20,
     chartData: [
       { name: "Sun", revenue: 400 },
       { name: "Mon", revenue: 600 },
@@ -222,8 +216,8 @@ export const menu = [
   export const chartBoxConversion = {
     color: "gold",
     icon: "/conversionIcon.svg",
-    title: "Total Ratio",
-    number: "2.6",
+    title: "Satisfaction Levels by Tellers",
+    number: "4.6",
     dataKey: "ratio",
     percentage: 12,
     chartData: [
@@ -238,7 +232,7 @@ export const menu = [
   };
   
   export const barChartBoxRevenue = {
-    title: "Profit Earned",
+    title: "Customer Feedback Distribution ",
     color: "#8884d8",
     dataKey: "profit",
     chartData: [
@@ -274,7 +268,7 @@ export const menu = [
   };
   
   export const barChartBoxVisit = {
-    title: "Total Visit",
+    title: "Trends in satisfaction levels over time",
     color: "#FF8042",
     dataKey: "visit",
     chartData: [
