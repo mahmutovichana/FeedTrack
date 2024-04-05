@@ -16,7 +16,7 @@ const Tellers = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`https://feedtrack-backend.vercel.app/api/teller`)
+        fetch(`https://feedtrack-backend.vercel.app/api/tellers`)
             .then((response) => response.json())
             .then((data: Teller[]) => {
                 if (data.length > 0) {
@@ -38,7 +38,7 @@ const Tellers = () => {
     }, []);
 
     const deleteTeller = (id: number) => {
-        fetch(`https://feedtrack-backend.vercel.app/api/teller/${id}`, {
+        fetch(`https://feedtrack-backend.vercel.app/api/tellers/${id}`, {
             method: 'DELETE'
         })
             .then((response) => {
