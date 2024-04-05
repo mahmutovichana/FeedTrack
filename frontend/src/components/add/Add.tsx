@@ -15,7 +15,7 @@ const Add = (props: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Provera validnosti podataka
+    // Provjera validnosti podataka
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
     const validRoles = ["superAdmin", "tellerAdmin", "branchAdmin"];
