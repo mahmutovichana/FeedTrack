@@ -1,7 +1,6 @@
 import "./navbar.scss"
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
-import { deployURLs } from "../../../public/constants.js";
 
 const Navbar = () => {
 
@@ -21,7 +20,7 @@ const Navbar = () => {
 
     async function logoutLogic(event) {
         try {
-            const response = await fetch(`${deployURLs.backendURL}/api/logout`, {
+            const response = await fetch("https://feedtrack-backend.vercel.app/api/logout", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

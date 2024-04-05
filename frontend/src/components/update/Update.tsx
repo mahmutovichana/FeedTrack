@@ -6,7 +6,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { deployURLs } from "./../../../public/constants.js";
 
 type Props = {
   slug: string;
@@ -27,7 +26,7 @@ const Update = (props: Props) => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    fetch(`${deployURLs.backendURL}/api/users`)
+    fetch("https://feedtrack-backend.vercel.app/api/users")
       .then((response) => response.json())
       .then((data) => {
         if (data.length > 0) {
@@ -71,7 +70,7 @@ const Update = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-    fetch(`${deployURLs.backendURL}/api/users/${selectedUserId}`, {
+    fetch(`https://feedtrack-backend.vercel.app/api/users/${selectedUserId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
