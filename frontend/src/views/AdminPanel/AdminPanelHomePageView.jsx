@@ -1,32 +1,30 @@
-import React, {useEffect, useState} from 'react';
-import {useLocation, useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
+import { deployURLs } from "./../../../public/constants.js";
 
 const AdminHomePage = () => {
 
     const { state } = useLocation();
-    const [username, setUsername] = useState();
+    const [name, setName] = useState();
     const [token, setToken] = useState();
     const navigate = useNavigate();
 
     useEffect(() => {
         if (state != null) {
             console.log("state je razlicit od null");
-            setUsername(state.username)
+            setName(state.name)
             setToken(state.token)
         }
-        // if(localStorage.getItem(token)==null) navigate('/');
     }, []);
 
-    async function logoutLogic(event){
-        // event.preventDefault();
-        console.log(JSON.stringify({"token": localStorage.getItem("token")}));
+    async function logoutLogic(event) {
         try {
-            const response = await fetch('https://feedtrack-backend.vercel.app/api/logout', {
+            const response = await fetch(`${deployURLs.backendURL}/api/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({"token": localStorage.getItem("token")})
+                body: JSON.stringify({ "token": localStorage.getItem("token") })
             });
 
             if (response.ok) {

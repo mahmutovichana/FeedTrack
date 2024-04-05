@@ -1,16 +1,42 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './views/AdminPanel/AdminPanelLoginView.jsx';
-import AdminHomePage from './views/AdminPanel/AdminPanelHomePageView.jsx';
+import AdminDashboardPage from './views/AdminPanel/AdminDashboard.tsx';
+import Users from './views/AdminPanel/Users.tsx';
+import Tellers from './views/AdminPanel/Tellers.tsx';
+import Branches from './views/AdminPanel/Branches.tsx';
+import Layout from './Layout.tsx';
 
 function App() {
-  return (
-    <BrowserRouter>
-     <Routes>
-      <Route path='/' element={<Login />}/>
-      <Route path='/homePage' element={<AdminHomePage />}/>
-     </Routes>
-    </BrowserRouter>
-  );
+
+  const router = createBrowserRouter([
+    {
+      path:"/",
+      element:<Login/> 
+    },
+    {
+      path: "/",
+      element: <Layout />, 
+      children: [
+        {
+          path:"/home",
+          element:<AdminDashboardPage/>
+        },
+        {
+          path:"/users",
+          element:<Users/>
+        },
+        {
+          path:"/tellers",
+          element:<Tellers/>
+        },
+        {
+          path:"/branches",
+          element:<Branches/>
+        },
+      ]
+    }
+  ]);
+  
+  return <RouterProvider router={router} />;
 }
 export default App;
