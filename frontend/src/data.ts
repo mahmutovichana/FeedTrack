@@ -6,13 +6,13 @@ export const menu = [
         {
           id: 1,
           title: "Homepage",
-          url: "/",
+          url: "/home",
           icon: "house-chimney.png",
         },
         {
           id: 2,
           title: "Profile",
-          url: "/users/1",
+          url: "/profile",
           icon: "user.png",
         },
       ],
@@ -48,25 +48,25 @@ export const menu = [
         {
           id: 1,
           title: "Elements",
-          url: "/",
+          url: "/home",
           icon: "element.svg",
         },
         {
           id: 2,
           title: "Notes",
-          url: "/",
+          url: "/home",
           icon: "note.svg",
         },
         {
           id: 3,
           title: "Forms",
-          url: "/",
+          url: "/home",
           icon: "form.svg",
         },
         {
           id: 4,
           title: "Calendar",
-          url: "/",
+          url: "/home",
           icon: "calendar.svg",
         },
       ],
@@ -78,13 +78,13 @@ export const menu = [
         {
           id: 1,
           title: "Settings",
-          url: "/",
+          url: "/home",
           icon: "setting.svg",
         },
         {
           id: 2,
           title: "Backups",
-          url: "/",
+          url: "/home",
           icon: "backup.svg",
         },
       ],
@@ -96,13 +96,13 @@ export const menu = [
         {
           id: 1,
           title: "Charts",
-          url: "/",
+          url: "/home",
           icon: "chart.svg",
         },
         {
           id: 2,
           title: "Logs",
-          url: "/",
+          url: "/home",
           icon: "log.svg",
         },
       ],
@@ -165,7 +165,7 @@ export const menu = [
     color: "#8884d8",
     icon: "/userIcon.svg",
     title: "Total Tellers",
-    number: "238",
+    number: "1238",
     dataKey: "users",
     percentage: 45,
     chartData: [
@@ -547,10 +547,7 @@ export const menu = [
       createdAt: "01.02.2023",
       inStock: true,
     },
-  ];
-  
-  
-  
+  ];  
   export const singleUser = {
     id: 1,
     title: "John Doe",

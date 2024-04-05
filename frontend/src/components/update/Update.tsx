@@ -1,6 +1,11 @@
 import { GridColDef } from "@mui/x-data-grid";
-import "./add.scss";
-import React, { useState } from "react";
+import "./update.scss";
+import React, { useState, useEffect } from "react";
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deployURLs } from "./../../../public/constants.js";
 
 type Props = {
@@ -9,9 +14,30 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Add = (props: Props) => {
+
+interface User {
+  id: number;
+  [key: string]: any;
+}
+
+const Update = (props: Props) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    fetch(`${deployURLs.backendURL}/api/users`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.length > 0) {
+          setSelectedUserId(data[0].id);
+          console.log(data[0].id);
+          setUsers(data);
+        }
+      })
+      .catch((error) => console.error("Error fetching users:", error));
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,8 +71,8 @@ const Add = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-    fetch(`${deployURLs.backendURL}/api/users`, {
-      method: 'POST',
+    fetch(`${deployURLs.backendURL}/api/users/${selectedUserId}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -63,20 +89,42 @@ const Add = (props: Props) => {
     .catch(error => console.error('Error sending data:', error));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
+  const handleUserChange = (event: SelectChangeEvent<string>) => {
+    setSelectedUserId(event.target.value);
+  };
+
   return (
-    <div className="add">
+    <div className="update">
       <div className="modal">
         <span className="close" onClick={() => props.setOpen(false)}>
           X
         </span>
-        <h1>Add new {props.slug}</h1>
+        <h1>Update {props.slug}</h1>
+        <Box sx={{ minWidth: 120 }}>
+        <FormControl fullWidth>
+          <Select
+            value={selectedUserId || ""}
+            onChange={handleUserChange}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              Select user
+            </MenuItem>
+            {users.map((user) => (
+              <MenuItem key={user.id} value={user.id.toString()}>
+                {user.id}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+    </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
             .filter((item) => item.field !== "id" && item.field !== "img")
@@ -87,7 +135,7 @@ const Add = (props: Props) => {
                   type={column.type} 
                   name={column.field} 
                   placeholder={column.field} 
-                  onChange={handleChange} 
+                  onChange={handleChange2} 
                   required
                 />
                 {errors[column.field] && <span className="error">{errors[column.field]}</span>}
@@ -100,4 +148,4 @@ const Add = (props: Props) => {
   );
 };
 
-export default Add;
+export default Update;

@@ -4,8 +4,10 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { deployURLs } from "./../../../public/constants.js";
+import "../../styles/AdminPanel/AdminPanelLoginView.css";
 
 const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
 
@@ -21,54 +23,55 @@ const Login = () => {
       try {
         const decodedToken = jwtDecode(response.credential);
         console.log(decodedToken);
-        const userData = {
-          name: decodedToken.given_name,
-          lastName: decodedToken.family_name,
-          email: decodedToken.email,
-          image: decodedToken.picture,
-          username: "defaultUsername",
-          password: "defaultPassword",
-          mobileNumber: "123456789",
-          role: "defaultRole",
-          jti: decodedToken.jti
-        };
 
-        localStorage.email = userData.email;
+        localStorage.jti = decodedToken.jti;
+        localStorage.image = decodedToken.picture;
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch('https://feedtrack-backend.vercel.app/api/getMaxUserId');
+        const maxIdResponse = await fetch(`${deployURLs.backendURL}/api/getMaxUserId`);
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
-        userData.id = nextId;
 
-        console.log(JSON.stringify(userData));
+        const userData = {
+          id: nextId,
+          name: decodedToken.given_name,
+          lastname: decodedToken.family_name,
+          email: decodedToken.email,
+          image: decodedToken.picture,
+          verified: true
+        };
+
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        console.log(localStorage.user);
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch('https://feedtrack-backend.vercel.app/api/addUser', {
+        const existingUserResponse = await fetch(`${deployURLs.backendURL}/api/addUser`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(userData)
         });
-
+        let existingUserResult = " ", errorData = " ";
         if (existingUserResponse.ok) {
-          const existingUserResult = await existingUserResponse.json();
+          existingUserResult = await existingUserResponse.json();
           if (existingUserResult.message === "User already exists") {
             console.log('User already exists');
           } else {
             console.log('User added successfully');
           }
         } else if (existingUserResponse.status === 400) {
-          const errorData = await existingUserResponse.json();
+          errorData = await existingUserResponse.json();
           console.error('Error adding user:', errorData.message);
         } else {
           console.error('Error adding user:', existingUserResponse.statusText);
         }
 
-        localStorage.setItem("token", existingUserResponse.token);
-
-        navigate('/homePage', { state: { "username": localStorage.getItem("email"), "token": localStorage.getItem("token") } });
+        localStorage.user = existingUserResult.user || errorData.user;
+        localStorage.token = existingUserResult.token || errorData.token;
+        console.log("ehhhh: "+localStorage.user);
+        navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token } });
 
         console.log("Redirection completed successfully.");
       } catch (error) {
@@ -90,11 +93,11 @@ const Login = () => {
       console.log('Google Identity Services library not loaded.');
     }
 
-    if (localStorage.getItem("username") != null && localStorage.getItem("refreshToken") != null)
-      navigate('/homePage', {
+    if (localStorage.getItem("user") != null && localStorage.getItem("refreshToken") != null)
+      navigate('/home', {
         state:
         {
-          "username": localStorage.getItem("username"),
+          "user": localStorage.user,
           "refreshToken": localStorage.getItem("refreshToken"),
           "accessToken": localStorage.getItem("accessToken")
         }
@@ -137,7 +140,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   async function loginLogic(event) {
-    
+
     event.preventDefault();
 
     const inputType = loginWithEmail ? "email" : "number";
@@ -155,143 +158,227 @@ const Login = () => {
 
     try {
       const requestBody = {};
-      requestBody["email"] = inputType=="email" ? name : " ";
+      requestBody["email"] = inputType == "email" ? name : " ";
       requestBody["password"] = pass;
-      requestBody["number"] = inputType=="email" ? " " : name;
+      requestBody["number"] = inputType == "email" ? " " : name;
 
       console.log(JSON.stringify(requestBody));
-      const response = await fetch('https://feedtrack-backend.vercel.app/api/login', {
+      const response = await fetch(`${deployURLs.backendURL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
       });
-/*
-      const response = await fetch('https://feedback-backend.vercel.app/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ "email": name, "password": pass })
-      });*/
 
+      let responseData;
       if (response.ok) {
         // Handle successful login
         console.log('Login successful');
-        let responseData = await response.json()
-        localStorage.setItem('token', responseData.token);
-        localStorage.setItem('username', responseData.username);
-
-        navigate('/homePage', { state: { "username": responseData.username, "token": responseData.token}});
-
+        responseData = await response.json()
       } else {
         // Handle login error
         console.error('Login failed');
       }
+
+      console.log(JSON.stringify(responseData));
+      const dataSecret = responseData.secret;
+      // Postavljanje secret-a u localStorage
+      localStorage.setItem('token', responseData.token);
+      localStorage.setItem('user', responseData.user);
+      localStorage.setItem('secretURL', responseData.secret.otpauth_url);
+      localStorage.setItem('secret', responseData.secret);
+      console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
+      localStorage.setItem('verified', responseData.verified);
+      localStorage.setItem('id', responseData.id);
+      if(responseData.verified === true){
+        navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token, "id": localStorage.id } });
+      }
+      // Pozivanje 2faSetup rute
+      const twofactorResponse = await fetch(`${deployURLs.backendURL}/api/2faSetup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          secret: localStorage.secretURL
+        })
+      });
+
+      if (twofactorResponse.ok) {
+        const twofactorData = await twofactorResponse.json();
+        console.log("2fa response je: "+twofactorData);
+        const { dataUrl } = twofactorData;
+        Object.entries(dataSecret).forEach(([ključ, vrijednost]) => {
+          console.log(`${ključ}: ${vrijednost}`);
+        });
+        console.log("ovo je sta se salje: "+dataSecret);
+        // Process the data URL (e.g., render QR code)
+        processQRCode(dataUrl, dataSecret);
+      } else {
+        console.error('Failed to retrieve 2FA setup data');
+      }
+
     } catch (error) {
       console.error('Error logging in:', error);
     }
   }
 
-    return (
-      <div>
-        <div className="logo">
-          <img src={feedtrackLogo} className="logo" alt="FeedTrack logo" />
+  const processQRCode = (dataUrl, secret) => {
+    const template = `
+      <h1>Setup Authenticator</h1>
+      <h3>Use the QR code with your authenticator app</h3>
+      <img src="${dataUrl}" > <br>
+      <input type="text" id="tokenInput" placeholder="Enter token">
+      <button id="verifyButton">Verify</button>
+    `;
+
+    const QRcontainer = document.getElementById('qrCodeContainer');
+    const container = document.getElementById('container');
+    QRcontainer.hidden = false;
+    container.hidden = true;
+    QRcontainer.innerHTML = template;
+
+    // Define verifyToken globally
+    window.verifyToken = (secret) => {
+      const token = document.getElementById('tokenInput').value;
+      fetch(`${deployURLs.backendURL}/api/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userToken: token, secret: secret }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const user_id = localStorage.getItem("id");
+            //ubaciti promjenu verified u true;
+            fetch(`${deployURLs.backendURL}/api/users/${user_id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ "verified": true }),
+            })
+            //provjera id-a
+            console.log("user id prije redirect je: ",localStorage.getItem("id"));
+            navigate('/home', { state: { "user": localStorage.getItem("user"), "token": localStorage.getItem("token") } });
+          } else {
+            document.getElementById('tokenInput').value = "Incorrect code";
+          }
+        })
+        .catch(error => {
+          console.error('Error verifying token:', error);
+        });
+    };
+
+    // Attach event listener to the Verify button
+    const verifyButton = document.getElementById('verifyButton');
+    verifyButton.addEventListener('click', () => {
+      verifyToken(secret);
+    });
+  };
+
+  return (
+    <div className="loginLayout">
+      <div className="logo">
+        <img src={feedtrackLogo} className="logo" alt="FeedTrack logo" />
+      </div>
+      <div className="container" id="container">
+        <div className="form-container sign-up">
+          <form>
+            <h1>Create Account</h1>
+            <div className="options">
+              <a
+                href="#"
+                className={`icon ${loginWithEmail ? "active" : ""}`}
+                onClick={() => setLoginWithEmail(true)}
+              >
+                <FontAwesomeIcon icon={faEnvelope} />
+              </a>
+              <a
+                href="#"
+                className={`icon ${!loginWithEmail ? "active" : ""}`}
+                onClick={() => setLoginWithEmail(false)}
+              >
+                <FontAwesomeIcon icon={faPhone} />
+              </a>
+              <a href="#" className="icon" onClick={handleGoogleSignIn}>
+                <FontAwesomeIcon icon={faGoogle} />
+              </a>
+            </div>
+            <span>
+              or use your {loginWithEmail ? "email" : "phone number"} for
+              registration
+            </span>
+            <input type="text" placeholder="Name" />
+            <input
+              type={loginWithEmail ? "email" : "mobilenumberSU"}
+              id={loginWithEmail ? "emailSU" : "mobilenumberSU"}
+              placeholder={loginWithEmail ? "Email" : "Phone Number"}
+            />
+            <input type="password" id="passwordSU" placeholder="Password" />
+            <button>Sign Up</button>
+          </form>
         </div>
-        <div className="container" id="container">
-          <div className="form-container sign-up">
-            <form>
-              <h1>Create Account</h1>
-              <div className="options">
-                <a
-                  href="#"
-                  className={`icon ${loginWithEmail ? "active" : ""}`}
-                  onClick={() => setLoginWithEmail(true)}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} />
-                </a>
-                <a
-                  href="#"
-                  className={`icon ${!loginWithEmail ? "active" : ""}`}
-                  onClick={() => setLoginWithEmail(false)}
-                >
-                  <FontAwesomeIcon icon={faPhone} />
-                </a>
-                <a href="#" className="icon" onClick={handleGoogleSignIn}>
-                  <FontAwesomeIcon icon={faGoogle} />
-                </a>
-              </div>
-              <span>
-                or use your {loginWithEmail ? "email" : "phone number"} for
-                registration
-              </span>
-              <input type="text" placeholder="Name" />
-              <input
-                type={loginWithEmail ? "email" : "mobileNumberSU"}
-                id={loginWithEmail ? "emailSU" : "mobileNumberSU"}
-                placeholder={loginWithEmail ? "Email" : "Phone Number"}
-              />
-              <input type="password" id="passwordSU" placeholder="Password" />
-              <button>Sign Up</button>
-            </form>
-          </div>
-          <div className="form-container sign-in">
-            <form onSubmit={loginLogic}>
-              <h1>Sign In</h1>
-              <div className="options">
-                <a
-                  href="#"
-                  className={`icon ${loginWithEmail ? "active" : ""}`}
-                  onClick={() => setLoginWithEmail(true)}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} />
-                </a>
-                <a
-                  href="#"
-                  className={`icon ${!loginWithEmail ? "active" : ""}`}
-                  onClick={() => setLoginWithEmail(false)}
-                >
-                  <FontAwesomeIcon icon={faPhone} />
-                </a>
-                <a href="#" className="icon" onClick={handleGoogleSignIn}>
-                  <FontAwesomeIcon icon={faGoogle} />
-                </a>
-              </div>
-              <input
-                type={loginWithEmail ? "email" : "number"}
-                id={loginWithEmail ? "email" : "number"}
-                placeholder={loginWithEmail ? "Email" : "Phone Number"}
-              />{" "}
-              <input type="password" id="password" placeholder="Password" />
-              <a href="#">Forgot Your Password?</a>
-              <button>Sign In</button>
-              {error && <p>{error}</p>}
-            </form>
-          </div>
-          <div className="toggle-container">
-            <div className="toggle">
-              <div className="toggle-panel toggle-left">
-                <h1>Welcome Back!</h1>
-                <p>Enter your personal details to use all site features</p>
-                <button className="hidden" id="login">
-                  Sign In
-                </button>
-              </div>
-              <div className="toggle-panel toggle-right">
-                <h1>Hello there!</h1>
-                <p>
-                  Register with your personal details to use all site features
-                </p>
-                <button className="hidden" id="register">
-                  Sign Up
-                </button>
-              </div>
+        <div className="form-container sign-in">
+          <form onSubmit={loginLogic}>
+            <h1>Sign In</h1>
+            <div className="options">
+              <a
+                href="#"
+                className={`icon ${loginWithEmail ? "active" : ""}`}
+                onClick={() => setLoginWithEmail(true)}
+              >
+                <FontAwesomeIcon icon={faEnvelope} />
+              </a>
+              <a
+                href="#"
+                className={`icon ${!loginWithEmail ? "active" : ""}`}
+                onClick={() => setLoginWithEmail(false)}
+              >
+                <FontAwesomeIcon icon={faPhone} />
+              </a>
+              <a href="#" className="icon" onClick={handleGoogleSignIn}>
+                <FontAwesomeIcon icon={faGoogle} />
+              </a>
+            </div>
+            <input
+              type={loginWithEmail ? "email" : "number"}
+              id={loginWithEmail ? "email" : "number"}
+              placeholder={loginWithEmail ? "Email" : "Phone Number"}
+            />{" "}
+            <input type="password" id="password" placeholder="Password" />
+            <a href="#">Forgot Your Password?</a>
+            <button>Sign In</button>
+            {error && <p>{error}</p>}
+          </form>
+        </div>
+        <div className="toggle-container">
+          <div className="toggle">
+            <div className="toggle-panel toggle-left">
+              <h1>Welcome Back!</h1>
+              <p>Enter your personal details to use all site features</p>
+              <button className="hidden" id="login">
+                Sign In
+              </button>
+            </div>
+            <div className="toggle-panel toggle-right">
+              <h1>Hello there!</h1>
+              <p>
+                Register with your personal details to use all site features
+              </p>
+              <button className="hidden" id="register">
+                Sign Up
+              </button>
             </div>
           </div>
         </div>
       </div>
-    );
-  };
+      <div id="qrCodeContainer" hidden></div>
+    </div>
+  );
+};
 
-  export default Login;
+export default Login;
