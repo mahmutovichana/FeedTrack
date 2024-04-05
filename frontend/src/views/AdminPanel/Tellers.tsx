@@ -4,7 +4,6 @@ import './tellers.scss';
 import { GridColDef } from '@mui/x-data-grid';
 import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
-import { deployURLs } from "./../../../public/constants.js";
 
 interface Teller {
     id: number;
@@ -17,7 +16,7 @@ const Tellers = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/teller`)
+        fetch(`https://feedtrack-backend.vercel.app/api/teller`)
             .then((response) => response.json())
             .then((data: Teller[]) => {
                 if (data.length > 0) {
@@ -39,7 +38,7 @@ const Tellers = () => {
     }, []);
 
     const deleteTeller = (id: number) => {
-        fetch(`${deployURLs.backendURL}/api/teller/${id}`, {
+        fetch(`https://feedtrack-backend.vercel.app/api/teller/${id}`, {
             method: 'DELETE'
         })
             .then((response) => {
