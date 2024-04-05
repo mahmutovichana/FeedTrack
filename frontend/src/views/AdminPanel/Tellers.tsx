@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './tellers.scss';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable from '../../components/dataTable/DataTable';
+import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 
