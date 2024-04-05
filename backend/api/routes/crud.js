@@ -58,7 +58,7 @@ const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
 router.use("/users", userRouter);
 router.use("/feedbacks", feedbackRouter);
 router.use("/branches", branchRouter);
-router.use("/teller", tellerRouter);
+router.use("/tellers", tellerRouter);
 router.use("/dummy", dummyRouter); // only for testing
 
 module.exports = router;
