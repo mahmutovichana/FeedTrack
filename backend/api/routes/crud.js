@@ -1,92 +1,64 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router(); // Inicijalizacija rutera
+
+const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
 const genericCRUD = require("./genericCRUD");
 
-const tables = ['Person', 'Feedback', 'Branch', 'Teller', 'Dummy'];
+// Definiranje funkcije za rute
+function setupRoutes(genericModel, tableName) {
+  const handleError = (res, error) => {
+    res.status(500).json({ error: error.message });
+  };
 
-const handleError = (res, error) => {
-  res.status(500).json({ error: error.message });
-};
+  // Middleware for checking auth and roles before all routes
+  // router.use(authenticateToken, authRole("superAdmin", "tellerAdmin", "branchAdmin"));
 
-console.log("bar sam u crud.js..");
+  router.get('/', async (req, res) => {
+      try { res.json(await genericModel.getAll(tableName)); }
+      catch (error) { handleError(res, error); }
+    });
 
-tables.forEach(tableName => {
-  const subRouter = express.Router();
+  router.get('/:id', async (req, res) => {
+      try { res.json(await genericModel.getById(tableName, req.params.id)); }
+      catch (error) { handleError(res, error); }
+    });
 
-  subRouter.get('/', async (req, res) => {
-    try { 
-      console.log(`Fetching all records for table: ${tableName}`);
-      res.json(await genericCRUD.getAll(tableName)); 
-    }
-    catch (error) { 
-      console.error(`Error fetching all records for table ${tableName}:`, error);
-      handleError(res, error); 
-    }
-  });
+  router.post('/', async (req, res) => {
+      try { res.status(201).json(await genericModel.add(tableName, req.body)); }
+      catch (error) { handleError(res, error); }
+    });
 
-  subRouter.get('/:id', async (req, res) => {
-    try { 
-      console.log(`Fetching record with ID ${req.params.id} from table: ${tableName}`);
-      res.json(await genericCRUD.getById(tableName, req.params.id)); 
-    }
-    catch (error) { 
-      console.error(`Error fetching record with ID ${req.params.id} from table ${tableName}:`, error);
-      handleError(res, error); 
-    }
-  });
+  router.put('/:id', async (req, res) => {
+      try {
+        const entity = await genericModel.update(tableName, req.params.id, req.body);
+        res.json(entity || { error: 'Entity not found' });
+      }
+      catch (error) { handleError(res, error); }
+    });
 
-  subRouter.post('/', async (req, res) => {
-    try { 
-      console.log(`Adding a new record to table: ${tableName}`);
-      res.status(201).json(await genericCRUD.add(tableName, req.body)); 
-    }
-    catch (error) { 
-      console.error(`Error adding a new record to table ${tableName}:`, error);
-      handleError(res, error); 
-    }
-  });
+  router.delete('/:id', async (req, res) => {
+      try { await genericModel.deleteById(tableName, req.params.id); res.sendStatus(204); }
+      catch (error) { handleError(res, error); }
+    });
 
-  subRouter.put('/:id', async (req, res) => {
-    try {
-      console.log(`Updating record with ID ${req.params.id} in table: ${tableName}`);
-      const entity = await genericCRUD.update(tableName, req.params.id, req.body);
-      res.json(entity || { error: 'Entity not found' });
-    }
-    catch (error) { 
-      console.error(`Error updating record with ID ${req.params.id} in table ${tableName}:`, error);
-      handleError(res, error); 
-    }
-  });
+  router.delete('/', async (req, res) => {
+      try { await genericModel.deleteAll(tableName); res.sendStatus(204); }
+      catch (error) { handleError(res, error); }
+    });
+}
 
-  subRouter.delete('/:id', async (req, res) => {
-    try { 
-      console.log(`Deleting record with ID ${req.params.id} from table: ${tableName}`);
-      await genericCRUD.deleteById(tableName, req.params.id); 
-      res.sendStatus(204); 
-    }
-    catch (error) { 
-      console.error(`Error deleting record with ID ${req.params.id} from table ${tableName}:`, error);
-      handleError(res, error); 
-    }
-  });
+// Setup rute za različite tabele
+const userRouter = setupRoutes(genericCRUD, "Person");
+const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
+const branchRouter = setupRoutes(genericCRUD, "Branch");
+const tellerRouter = setupRoutes(genericCRUD, "Teller");
+const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
 
-  subRouter.delete('/', async (req, res) => {
-    try { 
-      console.log(`Deleting all records from table: ${tableName}`);
-      await genericCRUD.deleteAll(tableName); 
-      res.sendStatus(204); 
-    }
-    catch (error) { 
-      console.error(`Error deleting all records from table ${tableName}:`, error);
-      handleError(res, error); 
-    }
-  });
-
-  // Uklonite ovu liniju:
-  // router.use("/:tableName", async (req, res, next) => {
-
-  // Zamijenite je sa ovom linijom:
-  router.use(`/${tableName.toLowerCase()}`, subRouter);
-});
+// Dodavanje ruta u aplikaciju
+router.use("/users", userRouter);
+router.use("/feedbacks", feedbackRouter);
+router.use("/branches", branchRouter);
+router.use("/tellers", tellerRouter);
+router.use("/dummy", dummyRouter); // only for testing
 
 module.exports = router;
