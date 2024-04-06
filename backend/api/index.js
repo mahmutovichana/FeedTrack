@@ -33,7 +33,7 @@ app.use(cors({
     origin: 'https://feedtrack.vercel.app',
 }));
 
-app.use("/api", crudRouter);
+app.use("/", crudRouter);
 app.use("/api", authRouter);
 app.use("/api", devRouter);
 app.use("/api", adminRouter);
