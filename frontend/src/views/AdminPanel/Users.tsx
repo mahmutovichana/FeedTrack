@@ -93,7 +93,6 @@ const Users = () => {
     console.log("DA LI SAM SUPERADMIN: ", isSuperAdmin);
   }
 
-
   return (
     <div className="users">
       <div className="info">

@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './views/AdminPanel/AdminPanelLoginView.jsx';
 import AdminDashboardPage from './views/AdminPanel/AdminDashboard.tsx';
-import Users from './views/AdminPanel/Users.tsx';
-import Tellers from './views/AdminPanel/Tellers.tsx';
-import Branches from './views/AdminPanel/Branches.tsx';
+import Users from './views/AdminPanel/Users'
+import Tellers from './views/AdminPanel/Tellers';
+import Branches from './views/AdminPanel/Branches';
 import Layout from './Layout.tsx';
 
 function App() {
