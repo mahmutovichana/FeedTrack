@@ -1,6 +1,6 @@
 export const deployURLs = {
-    backendURL: "https://feeedtrack-backend.vercel.app",
-    frontendURL: "https://feedtrack.vercel.app"
+    backendURL: "https://feed-track-backend.vercel.app",
+    frontendURL: "https://feed-track-backup.vercel.app"
   }
   
 
