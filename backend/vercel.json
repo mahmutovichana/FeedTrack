@@ -3,7 +3,7 @@
 
   "rewrites": [
     { "source": "/api/login", "destination": "/api/index.js" },
-    { "source": "/api/users/:path*", "destination": "/api/index.js" },
+    { "source": "/api/users/:path*", "destination": "/api/routes/crud.js" },
     { "source": "/api/crud/:path*", "destination": "/api/index.js" }
   ]
 
