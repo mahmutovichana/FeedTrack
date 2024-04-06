@@ -88,9 +88,8 @@ const Users = () => {
   if (!userDataString) {
     console.error("User data not found in localStorage");
   } else {
-    const userData = JSON.parse(userDataString);
-    isSuperAdmin = userData.role === 'superAdmin';
-    console.log("IZ USERS: ", userData);
+    isSuperAdmin = userDataString.role === 'superAdmin';
+    console.log("IZ USERS: ", userDataString);
     console.log("DA LI SAM SUPERADMIN: ", isSuperAdmin);
   }
 
