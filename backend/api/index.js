@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 //app.use(cors());
 
 app.use(cors({
-    origin: 'https://feedtrack.vercel.app',
+    origin: 'https://feedtrack-backend.vercel.app',
 }));
 
 app.use("/", crudRouter);
