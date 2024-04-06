@@ -1,9 +1,13 @@
 {
   "version": 2,
+
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/api" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://feedtrack-backend.vercel.app/api/:path*"
+    }
   ],
+
   "routes": [
     { "src": "/(.*)", "dest": "/" }
   ],
