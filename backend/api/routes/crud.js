@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const genericCRUD = require("./genericCRUD");
 
-const tables = ['Users', 'Feedbacks', 'Branches', 'Tellers', 'Dummy'];
+const tables = ['Person', 'Feedback', 'Branch', 'Teller', 'Dummy'];
 
 const handleError = (res, error) => {
   res.status(500).json({ error: error.message });
@@ -83,7 +83,15 @@ tables.forEach(tableName => {
     }
   });
 
-  router.use(`/api/${tableName.toLowerCase()}`, subRouter);
+  router.use("/:tableName", async (req, res, next) => {
+    const { tableName } = req.params;
+    if (tables.includes(tableName)) {
+      next();
+    } else {
+      res.status(404).json({ error: `Table ${tableName} not found` });
+    }
+  }, subRouter);
+  
 });
 
 module.exports = router;

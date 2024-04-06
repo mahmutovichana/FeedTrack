@@ -32,11 +32,10 @@ app.use(cors({
     origin: 'https://feedtrack-backend.vercel.app',
 }));
 
-app.use("/api/auth", authRouter);
-app.use("/api/dev", devRouter);
-app.use("/api/crud", crudRouter);
-app.use("/api/admin", adminRouter);
-
+app.use("/api", authRouter);
+app.use("/api", devRouter);
+app.use("/api", crudRouter);
+app.use("/api", adminRouter);
 
 const PORT = process.env.PORT || 3000;
 
