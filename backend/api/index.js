@@ -31,10 +31,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use(cors({
-    origin: 'https://feed-track-backup.vercel.app/' ,
-    credentials: true
-
+  origin: "*"
 }));
+
 /*
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
