@@ -9,6 +9,8 @@ const handleError = (res, error) => {
   res.status(500).json({ error: error.message });
 };
 
+console.log("bar sam u crud.js..");
+
 tables.forEach(tableName => {
   const subRouter = express.Router();
 
