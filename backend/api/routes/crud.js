@@ -48,7 +48,7 @@ tables.forEach(tableName => {
   });
 
   // Dodavanje podrutera za svaku tablicu pod odgovarajuću stazu
-  router.use(`/api/${tableName.toLowerCase()}`, subRouter);
+  router.use(`/${tableName.toLowerCase()}`, subRouter);
 });
 
 module.exports = router;
