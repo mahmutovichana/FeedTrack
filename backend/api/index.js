@@ -9,8 +9,7 @@ const { swagger } = require("./constants");
 
 const authRouter = require("./routes/auth");
 const devRouter = require("./routes/dev");
-// Uklonite sljedeću liniju:
-// const crudRouter = require("./routes/crud");
+const crudRouter = require("./routes/crud");
 const adminRouter = require("./routes/admin");
 
 app.use(
@@ -28,16 +27,15 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//app.use(cors());
 
 app.use(cors({
     origin: 'https://feedtrack-backend.vercel.app',
 }));
 
+app.use("/api", crudRouter);
 app.use("/api", authRouter);
 app.use("/api", devRouter);
-// Dodajte sljedeću liniju:
-const crudRouter = require("./routes/crud");
-app.use("/api", crudRouter);
 app.use("/api", adminRouter);
 
 const PORT = process.env.PORT || 3000;

@@ -6,29 +6,28 @@ const genericCRUD = require("./genericCRUD");
 
 // Definiranje funkcije za rute
 function setupRoutes(genericModel, tableName) {
+  const subRouter = express.Router(); // Inicijalizacija podrutera
+
   const handleError = (res, error) => {
     res.status(500).json({ error: error.message });
   };
 
-  // Middleware for checking auth and roles before all routes
-  // router.use(authenticateToken, authRole("superAdmin", "tellerAdmin", "branchAdmin"));
-
-  router.get('/', async (req, res) => {
+  subRouter.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); }
       catch (error) { handleError(res, error); }
     });
 
-  router.get('/:id', async (req, res) => {
+  subRouter.get('/:id', async (req, res) => {
       try { res.json(await genericModel.getById(tableName, req.params.id)); }
       catch (error) { handleError(res, error); }
     });
 
-  router.post('/', async (req, res) => {
+  subRouter.post('/', async (req, res) => {
       try { res.status(201).json(await genericModel.add(tableName, req.body)); }
       catch (error) { handleError(res, error); }
     });
 
-  router.put('/:id', async (req, res) => {
+  subRouter.put('/:id', async (req, res) => {
       try {
         const entity = await genericModel.update(tableName, req.params.id, req.body);
         res.json(entity || { error: 'Entity not found' });
@@ -36,15 +35,17 @@ function setupRoutes(genericModel, tableName) {
       catch (error) { handleError(res, error); }
     });
 
-  router.delete('/:id', async (req, res) => {
+  subRouter.delete('/:id', async (req, res) => {
       try { await genericModel.deleteById(tableName, req.params.id); res.sendStatus(204); }
       catch (error) { handleError(res, error); }
     });
 
-  router.delete('/', async (req, res) => {
+  subRouter.delete('/', async (req, res) => {
       try { await genericModel.deleteAll(tableName); res.sendStatus(204); }
       catch (error) { handleError(res, error); }
     });
+
+  return subRouter; // Vraćanje podrutera
 }
 
 // Setup rute za različite tabele
