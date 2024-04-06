@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const genericCRUD = require("./genericCRUD");
 
-const tables = ['Person', 'Feedback', 'Branch', 'Teller', 'Dummy'];
+const tables = ['Users', 'Feedbacks', 'Branches', 'Tellers', 'Dummy'];
 
 const handleError = (res, error) => {
   res.status(500).json({ error: error.message });
