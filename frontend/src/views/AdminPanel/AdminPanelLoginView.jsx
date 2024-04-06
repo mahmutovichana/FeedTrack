@@ -93,13 +93,13 @@ const Login = () => {
       console.log('Google Identity Services library not loaded.');
     }
 
-    if (localStorage.getItem("user") != null && localStorage.getItem("refreshToken") != null)
+    if (localStorage.getItem("user") != null && localStorage.getItem("token") != null)
       navigate('/home', {
         state:
         {
           "user": localStorage.user,
-          "refreshToken": localStorage.getItem("refreshToken"),
-          "accessToken": localStorage.getItem("accessToken")
+          "token": localStorage.getItem("token"),
+          //"accessToken": localStorage.getItem("accessToken")
         }
       })
 
@@ -185,7 +185,7 @@ const Login = () => {
       const dataSecret = responseData.secret;
       // Postavljanje secret-a u localStorage
       localStorage.setItem('token', responseData.token);
-      localStorage.setItem('user', responseData.user);
+      localStorage.setItem('user', JSON.stringify(responseData));
       localStorage.setItem('secretURL', responseData.secret.otpauth_url);
       localStorage.setItem('secret', responseData.secret);
       console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));

@@ -17,18 +17,41 @@ module.exports = {
   },
 
   add: async (tableName, data) => {
-    const columns = Object.keys(data).join(', ');
-    const values = Object.values(data);
-    if (data.password) { // if adding a new user, encrypt the password
-      const hashedPassword = await bcrypt.hash(data.password, 10); 
+    // Getting the columns and values
+    var columns = Object.keys(data).map(key => `"${key}"`).join(', ');
+    columns = columns + ",\"id\"";
+    // Executing the query
+
+
+    // Fetching the count of rows in the table
+    const countQuery = `SELECT MAX(id) FROM "${tableName}"`;
+
+    const { rows: countRows } = await db.query(countQuery);
+    console.log(countRows[0]);
+    const id = parseInt(countRows[0].max) + 1;
+    console.log(id);
+
+    // Adding the ID to the inserted row
+    var values = Object.values(data);
+    values.push(id);
+
+    // If adding a new user, encrypt the password
+    if (data.password) {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
       values[values.indexOf(data.password)] = hashedPassword;
     }
+
+    // Generating placeholders for prepared statement
     const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+
+    // Creating query to insert data into table and get back inserted row
     const query = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders}) RETURNING *`;
-    console.log("add query:", query, "values:", values);
+
     const { rows } = await db.query(query, values);
+
     return rows[0];
-  },
+  }
+  ,
 
   update: async (tableName, id, data) => {
     const updates = Object.entries(data).map(([key, value], index) => {

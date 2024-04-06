@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 import "./AdminDashboard.scss"
 
@@ -18,6 +18,10 @@ import {
 } from "../../data";
 
 const AdminDashboardPage = () => {
+    let navigate=useNavigate();
+    useEffect( () => {
+        if(localStorage.getItem("token") == null) navigate('/');
+    }, [])
     return (
         <div className="home">
           <div className="box box1">

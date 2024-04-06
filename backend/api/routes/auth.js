@@ -62,6 +62,7 @@ router.post("/addUser", async (req, res) => {
         .status(400)
         .json({ message: "User already exists", token: token, user: JSON.stringify(existingUser.rows[0]) });
     }
+    refreshTokens.push(token);
     console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
