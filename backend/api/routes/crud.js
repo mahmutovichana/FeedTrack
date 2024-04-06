@@ -10,14 +10,14 @@ function setupRoutes(genericModel, tableName) {
 
   // Middleware for checking auth and roles before all routes
   // router.use(authenticateToken, authRole("superAdmin", "tellerAdmin", "branchAdmin"));
-
+/*
   router.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); }
       catch (error) { handleError(res, error); }
-    });
+    });*/
 
     router.get('/users', async (req, res) => {
-        try { res.json(await genericModel.getAll(tableName)); }
+        try { res.json(await genericModel.getAll(Person)); }
         catch (error) { handleError(res, error); }
     });
 
