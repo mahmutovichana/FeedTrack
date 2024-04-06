@@ -54,13 +54,15 @@ router.post("/addUser", async (req, res) => {
       'SELECT * FROM "Person" WHERE email = $1',
       [email]
     );
+
     if (existingUser.rows.length > 0) {
       const token = generateUserJwtToken(JSON.stringify(existingUser.rows[0])).token;
       console.log("ovo je za existing user token: " + token);
       refreshTokens.push(token);
+      let nestaFino = existingUser.rows[0];
       return res
         .status(400)
-        .json({ message: "User already exists", token: token, user: JSON.stringify(existingUser.rows[0]) });
+        .json({ message: "User already exists", token: token, user: nestaFino });
     }
     refreshTokens.push(token);
     console.log(password);
