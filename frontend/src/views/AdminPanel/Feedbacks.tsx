@@ -1,65 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './tellers.scss';
+import './feedbacks.scss';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable from '../../components/dataTable/DataTable';
+import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
-import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
 
-interface Teller {
+interface Feedback {
     id: number;
     [key: string]: any;
 }
 
-const Tellers = () => {
+const Feedbacks = () => {
     const [openAdd, setOpenAdd] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<Feedback | undefined>(); // Dodali smo stanje za selektovanog korisnika
   const navigate = useNavigate();
   const [name, setName] = useState();
   const [token, setToken] = useState();
   const [user, setUser] = useState(null);
 
-    
+
     const [open, setOpen] = useState(false);
-    const [tellers, setTellers] = useState<Teller[]>([]); 
+    const [feedbacks, setFeedbacks] = useState<Feedback[]>([]); 
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/tellers`)
+        fetch(`http://localhost:3000/api/feedbacks`)
             .then((response) => response.json())
-            .then((data: Teller[]) => {
+            .then((data: Feedback[]) => {
                 if (data.length > 0) {
-                    const teller = data[0];
-                    const tellerKeys = Object.keys(teller);
-                    const generatedColumns = tellerKeys.map((key) => {
+                    const feedback = data[0];
+                    const feedbackKeys = Object.keys(feedback);
+                    const generatedColumns = feedbackKeys.map((key) => {
                         return {
                             field: key,
                             headerName: key.charAt(0).toUpperCase() + key.slice(1),
                             width: 150,
-                            type: typeof teller[key] === 'boolean' ? 'boolean' : 'string',
+                            type: typeof feedback[key] === 'boolean' ? 'boolean' : 'string',
                         };
                     }).filter(column => column !== null) as GridColDef[];
                     setColumns(generatedColumns);
-                    setTellers(data);
+                    setFeedbacks(data);
                 }
             })
-            .catch((error) => console.error('Error fetching tellers:', error));
+            .catch((error) => console.error('Error fetching feedbacks:', error));
     }, []);
 
-    const deleteTeller = (id: number) => {
-        fetch(`${deployURLs.backendURL}/api/tellers/${id}`, {
+    const deleteFeedback = (id: number) => {
+        fetch(`http://localhost:3000/api/feedbacks/${id}`, {
             method: 'DELETE'
         })
             .then((response) => {
                 if (response.ok) {
-                    const updatedTellers = tellers.filter(teller => teller.id !== id);
-                    setTellers(updatedTellers);
+                    const updatedFeedbacks = feedbacks.filter(feedback => feedback.id !== id);
+                    setFeedbacks(updatedFeedbacks);
                 } else {
-                    console.error('Error deleting teller:', response.statusText);
+                    console.error('Error deleting feedback:', response.statusText);
                 }
             })
-            .catch((error) => console.error('Error deleting teller:', error));
+            .catch((error) => console.error('Error deleting feedback:', error));
     };
 
     
@@ -81,11 +81,10 @@ const Tellers = () => {
       }
     }
 
-
     return (
-        <div className="tellers">
+        <div className="feedbacks">
             <div className="info">
-                <h1>Tellers</h1>
+                <h1>Feedbacks</h1>
                 {isValidAdmin && (
           <>
             <button onClick={() => setOpenAdd(true)}>Add</button>
@@ -93,11 +92,11 @@ const Tellers = () => {
           </>
         )}
             </div>
-            <DataTable slug="tellers" columns={columns} rows={tellers} onDelete={deleteTeller} />
-            {openAdd && <Add slug="teller" columns={columns} setOpen={setOpenAdd} />}
-            {openUpdate && <Update slug="teller" columns={columns} setOpen={setOpenUpdate} />}
+            <DataTable slug="feedbacks" columns={columns} rows={feedbacks} onDelete={deleteFeedback} />
+            {openAdd && <Add slug="feedback" columns={columns} setOpen={setOpenAdd} />}
+            {openUpdate && <Update slug="feedback" columns={columns} setOpen={setOpenUpdate} />}
         </div>
     );
 };
 
-export default Tellers;
+export default Feedbacks;

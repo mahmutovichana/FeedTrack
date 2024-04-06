@@ -74,23 +74,22 @@ const Users = () => {
       .catch((error) => console.error('Error deleting user:', error));
   };
 
-  const updateUser = (id: number) => {
-    // Pronađi korisnika sa odgovarajućim ID-em
-    const userToUpdate = users.find(user => user.id === id);
-    // Postavi selektovanog korisnika
-    setSelectedUser(userToUpdate);
-    // Otvori update formu
-    setOpenUpdate(true);
-  };
-
   let isSuperAdmin = false;
-  const userDataString = localStorage.user;
+  const userDataString = localStorage.getItem('user'); // Koristimo getItem metodu da bismo dobili string iz localStorage-a
+
   if (!userDataString) {
     console.error("User data not found in localStorage");
   } else {
-    isSuperAdmin = userDataString.role === 'superAdmin';
-    console.log("IZ USERS: ", userDataString);
-    console.log("DA LI SAM SUPERADMIN: ", isSuperAdmin);
+    const userData = JSON.parse(userDataString); // Parsiramo string u JavaScript objekat
+    console.log(userData);
+
+    if (userData && userData.role) { // Provjera da li atribut role postoji
+      isSuperAdmin = userData.role === 'superAdmin';
+      console.log("IZ USERS: ", userData);
+      console.log("DA LI SAM SUPERADMIN: ", isSuperAdmin);
+    } else {
+      console.error("Role not found in user data");
+    }
   }
 
   return (

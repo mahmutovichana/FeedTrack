@@ -92,16 +92,15 @@ const Login = () => {
     } else {
       console.log('Google Identity Services library not loaded.');
     }
-
+/*
     if (localStorage.getItem("user") != null && localStorage.getItem("token") != null)
       navigate('/home', {
         state:
         {
           "user": localStorage.user,
-          "token": localStorage.getItem("token"),
-          //"accessToken": localStorage.getItem("accessToken")
+          "token": localStorage.getItem("token")
         }
-      })
+      })*/
 
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
@@ -216,6 +215,7 @@ const Login = () => {
         // Process the data URL (e.g., render QR code)
         processQRCode(dataUrl, dataSecret);
       } else {
+        navigate('/');
         console.error('Failed to retrieve 2FA setup data');
       }
 
@@ -226,12 +226,13 @@ const Login = () => {
 
   const processQRCode = (dataUrl, secret) => {
     const template = `
-      <h1>Setup Authenticator</h1>
-      <h3>Use the QR code with your authenticator app</h3>
-      <img src="${dataUrl}" > <br>
-      <input type="text" id="tokenInput" placeholder="Enter token">
-      <button id="verifyButton">Verify</button>
-    `;
+    <h1>Setup Authenticator</h1>
+    <h3>Use the QR code with your authenticator app</h3>
+    <img src="${dataUrl}" > <br>
+    <input type="text" id="tokenInput" placeholder="Enter token">
+    <button id="verifyButton">Verify</button>
+    <label id="errorLabel" style="color: red;"></label> <!-- Error label -->
+  `;
 
     const QRcontainer = document.getElementById('qrCodeContainer');
     const container = document.getElementById('container');
@@ -265,7 +266,9 @@ const Login = () => {
             console.log("user id prije redirect je: ",localStorage.getItem("id"));
             navigate('/home', { state: { "user": localStorage.getItem("user"), "token": localStorage.getItem("token") } });
           } else {
-            document.getElementById('tokenInput').value = "Incorrect code";
+            // Prikazivanje error label-e umjesto mijenjanja input polja
+          const errorLabel = document.getElementById('errorLabel');
+          errorLabel.textContent = "Incorrect code";
           }
         })
         .catch(error => {

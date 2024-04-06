@@ -25,8 +25,7 @@ const Update = (props: Props) => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    let slugPlural;
+  let slugPlural;
     switch (props.slug) {
       case 'user':
         slugPlural = 'users';
@@ -46,22 +45,28 @@ const Update = (props: Props) => {
         return; // Ili postavite default slug
     }
 
+  useEffect(() => {
+
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
-      method: 'PUT',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
+      }
     })
-      .then(response => {
-        if (response.ok) {
-          console.log('Data sent successfully');
-          props.setOpen(false);
-        } else {
-          console.error('Error sending data:', response.statusText);
-        }
-      })
-      .catch(error => console.error('Error sending data:', error));
+    .then(response => {
+      if (response.ok) {
+        return response.json(); // Parsiranje odgovora kao JSON
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    })
+    .then(data => {
+      console.log('Data received successfully:', data);
+      setUsers(data); 
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
 
   }, []);
 
@@ -97,7 +102,7 @@ const Update = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-    fetch(`${deployURLs.backendURL}/api/users/${selectedUserId}`, {
+    fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedUserId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -175,3 +180,4 @@ const Update = (props: Props) => {
 };
 
 export default Update;
+
