@@ -9,7 +9,8 @@ const { swagger } = require("./constants");
 
 const authRouter = require("./routes/auth");
 const devRouter = require("./routes/dev");
-const crudRouter = require("./routes/crud");
+// Uklonite sljedeću liniju:
+// const crudRouter = require("./routes/crud");
 const adminRouter = require("./routes/admin");
 
 app.use(
@@ -34,6 +35,8 @@ app.use(cors({
 
 app.use("/api", authRouter);
 app.use("/api", devRouter);
+// Dodajte sljedeću liniju:
+const crudRouter = require("./routes/crud");
 app.use("/api", crudRouter);
 app.use("/api", adminRouter);
 

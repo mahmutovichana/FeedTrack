@@ -1,4 +1,3 @@
-// routes/crud.js
 const express = require('express');
 const router = express.Router();
 const genericCRUD = require("./genericCRUD");
@@ -83,15 +82,11 @@ tables.forEach(tableName => {
     }
   });
 
-  router.use("/:tableName", async (req, res, next) => {
-    const { tableName } = req.params;
-    if (tables.includes(tableName)) {
-      next();
-    } else {
-      res.status(404).json({ error: `Table ${tableName} not found` });
-    }
-  }, subRouter);
-  
+  // Uklonite ovu liniju:
+  // router.use("/:tableName", async (req, res, next) => {
+
+  // Zamijenite je sa ovom linijom:
+  router.use(`/${tableName.toLowerCase()}`, subRouter);
 });
 
 module.exports = router;
