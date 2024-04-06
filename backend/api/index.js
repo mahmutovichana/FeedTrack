@@ -34,6 +34,12 @@ app.use(cors({
   origin: "*"
 }));
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://feed-track-backup.vercel.app');
+  next();
+});
+
+
 /*
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
