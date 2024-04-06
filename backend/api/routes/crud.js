@@ -1,18 +1,15 @@
 const express = require('express');
-const router = express.Router(); // Inicijalizacija rutera
-const genericCRUD = require("./genericCRUD");
+const router = express.Router();
+const genericCRUD = require("../genericCRUD");
 
-const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
-
-const tables = ['Person', 'Feedback', 'Branch', 'Teller', 'Dummy']; // Popis tablica
+const tables = ['Person', 'Feedback', 'Branch', 'Teller', 'Dummy'];
 
 const handleError = (res, error) => {
   res.status(500).json({ error: error.message });
 };
 
-// Iteriranje kroz tablice i dodavanje ruta
 tables.forEach(tableName => {
-  const subRouter = express.Router(); // Inicijalizacija podrutera za svaku tablicu
+  const subRouter = express.Router();
 
   subRouter.get('/', async (req, res) => {
     try { res.json(await genericCRUD.getAll(tableName)); }
@@ -47,7 +44,6 @@ tables.forEach(tableName => {
     catch (error) { handleError(res, error); }
   });
 
-  // Dodavanje podrutera za svaku tablicu pod odgovarajuću stazu
   router.use(`/${tableName.toLowerCase()}`, subRouter);
 });
 
