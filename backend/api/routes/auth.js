@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const db = require("../db");
 const { generateUserJwtToken, authenticateToken } = require("./../middlewares/authMiddleware");
 const speakeasy = require("speakeasy");
