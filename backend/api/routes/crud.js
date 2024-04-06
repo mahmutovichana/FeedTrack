@@ -8,14 +8,17 @@ function setupRoutes(genericModel, tableName) {
     res.status(500).json({ error: error.message });
   };
 
-  const router = express.Router();
-
   // Middleware for checking auth and roles before all routes
   // router.use(authenticateToken, authRole("superAdmin", "tellerAdmin", "branchAdmin"));
 
   router.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); }
       catch (error) { handleError(res, error); }
+    });
+
+    router.get('/users', async (req, res) => {
+        try { res.json(await genericModel.getAll(tableName)); }
+        catch (error) { handleError(res, error); }
     });
 
   router.get('/:id', async (req, res) => {
