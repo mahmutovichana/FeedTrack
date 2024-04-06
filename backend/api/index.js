@@ -7,8 +7,8 @@ const swaggerUI = require("swagger-ui-express");
 const swaggerJson = require("./swagger.json");
 const { swagger } = require("./constants");
 
-const authRouter = require("./routes/auth");
-const devRouter = require("./routes/dev");
+//const authRouter = require("./routes/auth");
+//const devRouter = require("./routes/dev");
 const crudRouter = require("./routes/crud");
 const adminRouter = require("./routes/admin");
 
@@ -34,7 +34,7 @@ app.use(cors({
 }));
 
 app.use("/api", crudRouter);
-app.use("/api", authRouter);
+//app.use("/api", authRouter);
 app.use("/api", devRouter);
 app.use("/api", adminRouter);
 
