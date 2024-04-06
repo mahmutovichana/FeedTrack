@@ -45,22 +45,43 @@ const Add = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-    fetch(`${deployURLs.backendURL}/api/users`, {
+    let slugPlural;
+    switch (props.slug) {
+      case 'user':
+        slugPlural = 'users';
+        break;
+      case 'teller':
+        slugPlural = 'tellers';
+        break;
+      case 'branch':
+        slugPlural = 'branches';
+        break;
+      case 'feedback':
+        slugPlural = 'feedbacks';
+        break;
+      default:
+        // Default ako slug ne odgovara nijednoj od opcija
+        console.error('Invalid slug:', props.slug);
+        return; // Ili postavite default slug
+    }
+
+    fetch(`${deployURLs.backendURL}/api/${slugPlural}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData)
     })
-    .then(response => {
-      if (response.ok) {
-        console.log('Data sent successfully');
-        props.setOpen(false);
-      } else {
-        console.error('Error sending data:', response.statusText);
-      }
-    })
-    .catch(error => console.error('Error sending data:', error));
+      .then(response => {
+        if (response.ok) {
+          console.log('Data sent successfully');
+          props.setOpen(false);
+        } else {
+          console.error('Error sending data:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Error sending data:', error));
+
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,11 +104,11 @@ const Add = (props: Props) => {
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? 'error-label' : ''}>{column.headerName}</label>
-                <input 
-                  type={column.type} 
-                  name={column.field} 
-                  placeholder={column.field} 
-                  onChange={handleChange} 
+                <input
+                  type={column.type}
+                  name={column.field}
+                  placeholder={column.field}
+                  onChange={handleChange}
                   required
                 />
                 {errors[column.field] && <span className="error">{errors[column.field]}</span>}
