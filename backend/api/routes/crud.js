@@ -1,67 +1,54 @@
-const router = require("express").Router();
 const express = require('express');
-const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
+const router = express.Router(); // Inicijalizacija rutera
 const genericCRUD = require("./genericCRUD");
 
-function setupRoutes(genericModel, tableName) {
-  const handleError = (res, error) => {
-    res.status(500).json({ error: error.message });
-  };
+const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
 
-  // Middleware for checking auth and roles before all routes
-  // router.use(authenticateToken, authRole("superAdmin", "tellerAdmin", "branchAdmin"));
+const tables = ['Person', 'Feedback', 'Branch', 'Teller', 'Dummy']; // Popis tablica
 
-  router.get('/', async (req, res) => {
-      try { res.json(await genericModel.getAll(tableName)); }
-      catch (error) { handleError(res, error); }
-    });
-/*
-    router.get('/users', async (req, res) => {
-        try { res.json(await genericModel.getAll("Person")); }
-        catch (error) { handleError(res, error); }
-    });
-*/
-  router.get('/:id', async (req, res) => {
-      try { res.json(await genericModel.getById(tableName, req.params.id)); }
-      catch (error) { handleError(res, error); }
-    });
+const handleError = (res, error) => {
+  res.status(500).json({ error: error.message });
+};
 
-  router.post('/', async (req, res) => {
-      try { res.status(201).json(await genericModel.add(tableName, req.body)); }
-      catch (error) { handleError(res, error); }
-    });
+// Iteriranje kroz tablice i dodavanje ruta
+tables.forEach(tableName => {
+  const subRouter = express.Router(); // Inicijalizacija podrutera za svaku tablicu
 
-  router.put('/:id', async (req, res) => {
-      try {
-        const entity = await genericModel.update(tableName, req.params.id, req.body);
-        res.json(entity || { error: 'Entity not found' });
-      }
-      catch (error) { handleError(res, error); }
-    });
+  subRouter.get('/', async (req, res) => {
+    try { res.json(await genericCRUD.getAll(tableName)); }
+    catch (error) { handleError(res, error); }
+  });
 
-  router.delete('/:id', async (req, res) => {
-      try { await genericModel.deleteById(tableName, req.params.id); res.sendStatus(204); }
-      catch (error) { handleError(res, error); }
-    });
+  subRouter.get('/:id', async (req, res) => {
+    try { res.json(await genericCRUD.getById(tableName, req.params.id)); }
+    catch (error) { handleError(res, error); }
+  });
 
-  router.delete('/', async (req, res) => {
-      try { await genericModel.deleteAll(tableName); res.sendStatus(204); }
-      catch (error) { handleError(res, error); }
-    });
+  subRouter.post('/', async (req, res) => {
+    try { res.status(201).json(await genericCRUD.add(tableName, req.body)); }
+    catch (error) { handleError(res, error); }
+  });
 
-  return router;
-}
+  subRouter.put('/:id', async (req, res) => {
+    try {
+      const entity = await genericCRUD.update(tableName, req.params.id, req.body);
+      res.json(entity || { error: 'Entity not found' });
+    }
+    catch (error) { handleError(res, error); }
+  });
 
-const userRouter = setupRoutes(genericCRUD, "Person");
-const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
-const branchRouter = setupRoutes(genericCRUD, "Branch");
-const tellerRouter = setupRoutes(genericCRUD, "Teller");
-const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
+  subRouter.delete('/:id', async (req, res) => {
+    try { await genericCRUD.deleteById(tableName, req.params.id); res.sendStatus(204); }
+    catch (error) { handleError(res, error); }
+  });
 
-router.use("/api/users", userRouter);
-router.use("/api/feedbacks", feedbackRouter);
-router.use("/api/branches", branchRouter);
-router.use("/api/tellers", tellerRouter);
-router.use("/api/dummy", dummyRouter); // only for testing
+  subRouter.delete('/', async (req, res) => {
+    try { await genericCRUD.deleteAll(tableName); res.sendStatus(204); }
+    catch (error) { handleError(res, error); }
+  });
+
+  // Dodavanje podrutera za svaku tablicu pod odgovarajuću stazu
+  router.use(`/api/${tableName.toLowerCase()}`, subRouter);
+});
 
 module.exports = router;
