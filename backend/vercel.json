@@ -1,14 +1,13 @@
 {
   "version": 2,
 
-  "rewrites": [
+  "redirects": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "source": "/(.*)",
+      "destination": "/$1"
     }
-  ]
+  ],
 
-,
   "routes": [
     { "src": "/", "dest": "/" },
     { "src": "/api", "dest": "/api" },
