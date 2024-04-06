@@ -30,7 +30,8 @@ app.use(express.urlencoded({ extended: true }));
 //app.use(cors());
 
 app.use(cors({
-    origin: 'https://feed-track-backend.vercel.app',
+    origin: 'https://feed-track-backup.vercel.app/',
+    credentials: true
 }));
 
 app.use("/api", crudRouter);
