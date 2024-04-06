@@ -49,6 +49,7 @@ const Login = () => {
         const existingUserResponse = await fetch(`${deployURLs.backendURL}/api/addUser`, {
           method: 'POST',
           headers: {
+            'Access-Control-Allow-Origin':true ,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(userData)
@@ -165,6 +166,7 @@ const Login = () => {
       const response = await fetch(`${deployURLs.backendURL}/api/login`, {
         method: 'POST',
         headers: {
+          'Access-Control-Allow-Origin':true ,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
@@ -197,6 +199,7 @@ const Login = () => {
       const twofactorResponse = await fetch(`${deployURLs.backendURL}/api/2faSetup`, {
         method: 'POST',
         headers: {
+          'Access-Control-Allow-Origin':true ,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -246,6 +249,7 @@ const Login = () => {
       fetch(`${deployURLs.backendURL}/api/verify`, {
         method: 'POST',
         headers: {
+          'Access-Control-Allow-Origin':true ,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ userToken: token, secret: secret }),
@@ -258,6 +262,7 @@ const Login = () => {
             fetch(`${deployURLs.backendURL}/api/users/${user_id}`, {
               method: 'PUT',
               headers: {
+                'Access-Control-Allow-Origin':true ,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ "verified": true }),

@@ -14,7 +14,7 @@
       "description": "Development server"
     },
     {
-      "url": "http://feedtrack-backend.vercel.app",
+      "url": "https://feedtrack-backend.vercel.app",
       "description": "Production server"
     }
   ],
