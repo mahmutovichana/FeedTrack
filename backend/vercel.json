@@ -2,8 +2,11 @@
   "version": 2,
 
   "rewrites": [
-    { "source": "/api/:match*", "destination": "/api/:match*" }
+    { "source": "/api/login", "destination": "/api/index.js" },
+    { "source": "/api/users/:path*", "destination": "/api/index.js" },
+    { "source": "/api/crud/:path*", "destination": "/api/index.js" }
   ]
+
 ,
   "routes": [
     { "src": "/", "dest": "/" },
