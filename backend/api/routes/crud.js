@@ -83,7 +83,7 @@ tables.forEach(tableName => {
     }
   });
 
-  router.use(`/${tableName.toLowerCase()}`, subRouter);
+  router.use(`/api/${tableName.toLowerCase()}`, subRouter);
 });
 
 module.exports = router;
