@@ -17,7 +17,7 @@ function setupRoutes(genericModel, tableName) {
     });*/
 
     router.get('/users', async (req, res) => {
-        try { res.json(await genericModel.getAll(Person)); }
+        try { res.json(await genericModel.getAll("Person")); }
         catch (error) { handleError(res, error); }
     });
 
@@ -58,10 +58,10 @@ const branchRouter = setupRoutes(genericCRUD, "Branch");
 const tellerRouter = setupRoutes(genericCRUD, "Teller");
 const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
 
-router.use("/users", userRouter);
-router.use("/feedbacks", feedbackRouter);
-router.use("/branches", branchRouter);
-router.use("/teller", tellerRouter);
-router.use("/dummy", dummyRouter); // only for testing
+router.use("/api/users", userRouter);
+router.use("/api/feedbacks", feedbackRouter);
+router.use("/api/branches", branchRouter);
+router.use("/api/tellers", tellerRouter);
+router.use("/api/dummy", dummyRouter); // only for testing
 
 module.exports = router;
