@@ -20,7 +20,13 @@ const Feedbacks = () => {
 
     // get all feedbacks for the table
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/feedbacks`)
+        fetch(`${deployURLs.backendURL}/api/feedbacks`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            },
+        })
             .then((response) => response.json())
             .then((data: Feedback[]) => {
                 if (data.length > 0) {
@@ -44,7 +50,11 @@ const Feedbacks = () => {
     // handle deleting a feedback
     const deleteFeedback = (id: number) => {
         fetch(`${deployURLs.backendURL}/api/feedbacks/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            }
         })
             .then((response) => {
                 if (response.ok) {

@@ -19,7 +19,13 @@ const Tellers = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/tellers`)
+        fetch(`${deployURLs.backendURL}/api/tellers`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            }
+        })
             .then((response) => response.json())
             .then((data: Teller[]) => {
                 if (data.length > 0) {
@@ -42,7 +48,11 @@ const Tellers = () => {
 
     const deleteTeller = (id: number) => {
         fetch(`${deployURLs.backendURL}/api/tellers/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            }
         })
             .then((response) => {
                 if (response.ok) {

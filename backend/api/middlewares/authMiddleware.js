@@ -3,11 +3,8 @@ const jwt = require("jsonwebtoken");
 // function to check the provided token is it valid
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
-
   console.log(authHeader);
-
   if (!authHeader) return res.status(401).json({ message: "You are not authenticated!" });
-  
   const token = authHeader.split(" ")[1];
   jwt.verify(
     token,
