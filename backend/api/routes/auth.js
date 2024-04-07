@@ -11,7 +11,6 @@ let refreshTokens = [];
 // Route for login logic
 router.post("/login", async (req, res) => {
   let { email, number, password } = req.body;
-  console.log("Usao");
   if (!email && !number) return res.status(400).json({ message: "Email or mobile number is required!" });
   const query = (email != " ") ? 'SELECT * FROM "Person" WHERE "email" = $1' : 'SELECT * FROM "Person" WHERE "mobilenumber" = $1';
   const queryValues = (email != " ") ? [email] : [number];
@@ -129,7 +128,6 @@ router.post("/2faSetup", (req, res) => {
 router.post("/verify", (req, res) => {
   const { userToken: token, secret } = req.body;
   const baseSecret = secret.base32;
-
   const verified = speakeasy.totp.verify({
     secret: baseSecret,
     encoding: "base32",
