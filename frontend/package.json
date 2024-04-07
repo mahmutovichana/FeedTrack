@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "proxy": "https://feedtrack.vercel.app",
+  "proxy": "https://feed-track-backup.vercel.app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -28,6 +28,7 @@
     "jwt-decode": "^4.0.0",
     "mysql2": "^2.3.0",
     "nodemon": "^3.1.0",
+    "pg": "^8.11.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",

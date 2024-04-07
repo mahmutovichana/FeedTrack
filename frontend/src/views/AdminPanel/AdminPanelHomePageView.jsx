@@ -22,6 +22,7 @@ const AdminHomePage = () => {
             const response = await fetch(`${deployURLs.backendURL}/api/logout`, {
                 method: 'POST',
                 headers: {
+                    'Access-Control-Allow-Origin':true ,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ "token": localStorage.getItem("token") })

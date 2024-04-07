@@ -10,7 +10,7 @@ function App() {
 
   async function getBackendData() {
     try {
-      const response = await fetch('https://feedtrack-backend.vercel.app/api');
+      const response = await fetch('https://feed-track-backend.vercel.app/api');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -26,7 +26,7 @@ function App() {
   useEffect(() => {
     async function fetchBranches() {
       try {
-        const response = await fetch('https://feedtrack-backend.vercel.app/api/branches');
+        const response = await fetch('https://feed-track-backend.vercel.app/api/branches');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

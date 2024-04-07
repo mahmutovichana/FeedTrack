@@ -11,6 +11,7 @@ let refreshTokens = [];
 // Route for login logic
 router.post("/login", async (req, res) => {
   let { email, number, password } = req.body;
+  console.log("Usao");
   if (!email && !number) return res.status(400).json({ message: "Email or mobile number is required!" });
   const query = (email != " ") ? 'SELECT * FROM "Person" WHERE "email" = $1' : 'SELECT * FROM "Person" WHERE "mobilenumber" = $1';
   const queryValues = (email != " ") ? [email] : [number];

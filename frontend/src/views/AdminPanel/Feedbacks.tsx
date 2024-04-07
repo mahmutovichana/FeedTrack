@@ -26,7 +26,7 @@ const Feedbacks = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`http://localhost:3000/api/feedbacks`)
+        fetch(`https://feed-track-backend.vercel.app/api/feedbacks`)
             .then((response) => response.json())
             .then((data: Feedback[]) => {
                 if (data.length > 0) {
@@ -48,7 +48,7 @@ const Feedbacks = () => {
     }, []);
 
     const deleteFeedback = (id: number) => {
-        fetch(`http://localhost:3000/api/feedbacks/${id}`, {
+        fetch(`https://feed-track-backend.vercel.app/api/feedbacks/${id}`, {
             method: 'DELETE'
         })
             .then((response) => {
