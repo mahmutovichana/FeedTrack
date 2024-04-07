@@ -29,7 +29,13 @@ const Users = () => {
   }, [state]);
 
   useEffect(() => {
-    fetch(`${deployURLs.backendURL}/api/users`)
+    fetch(`${deployURLs.backendURL}/api/users`, {
+      method: 'GET',
+      headers: {
+          'Authorization': `Bearer ${localStorage.token}`, 
+          'Content-Type': 'application/json',
+      }
+  })
       .then((response) => response.json())
       .then((data: User[]) => {
         if (data.length > 0) {
@@ -55,7 +61,11 @@ const Users = () => {
 
   const deleteUser = (id: number) => {
     fetch(`${deployURLs.backendURL}/api/users/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.token}`, 
+        'Content-Type': 'application/json',
+    }
     })
       .then((response) => {
         if (response.ok) {

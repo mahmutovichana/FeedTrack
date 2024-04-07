@@ -20,7 +20,13 @@ const Branches = () => {
 
     // Get all branches for the table
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/branches`)
+        fetch(`${deployURLs.backendURL}/api/branches`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            }
+        })
             .then((response) => response.json())
             .then((data: Branch[]) => {
                 if (data.length > 0) {
@@ -44,7 +50,11 @@ const Branches = () => {
     // handle deleting a branch
     const deleteBranch = (id: number) => {
         fetch(`${deployURLs.backendURL}/api/branches/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            }
         })
             .then((response) => {
                 if (response.ok) {
