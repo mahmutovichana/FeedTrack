@@ -11,12 +11,12 @@ function setupRoutes(genericModel, tableName) {
   const handleError = (res, error) => {
     res.status(500).json({ error: error.message });
   };
-
+  
   subRouter.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); }
       catch (error) { handleError(res, error); }
     });
-
+    
   subRouter.get('/:id', async (req, res) => {
       try { res.json(await genericModel.getById(tableName, req.params.id)); }
       catch (error) { handleError(res, error); }

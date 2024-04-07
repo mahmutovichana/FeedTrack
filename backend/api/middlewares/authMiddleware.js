@@ -10,13 +10,13 @@ function authenticateToken(req, res, next) {
   const token = authHeader.split(" ")[1];
   jwt.verify(
     token,
-    process.env.ACCESS_TOKEN_SECRET,
+    "FeedTrackAccessToken",
     (err, decodedToken) => {
       console.log(decodedToken);
       if (err) return res.status(403).json({ message: "Token is not valid!" });
       const extendedToken = jwt.sign(
         { ...decodedToken, exp: decodedToken.exp + 30 * 60 },
-        process.env.ACCESS_TOKEN_SECRET
+        "FeedTrackAccessToken"
         );
         req.headers["authorization"] = `Bearer ${extendedToken}`;
         req.decodedToken = decodedToken;
@@ -36,7 +36,7 @@ function generateUserJwtToken(user) {
   const expiresIn = "30m";
   const email = user.email, role = user.role;
   console.log(user);
-  const token = jwt.sign({email, role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn});
+  const token = jwt.sign({email, role}, "FeedTrackAccessToken", {expiresIn});
   console.log(token);
   return {token, user};
 }

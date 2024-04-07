@@ -1,5 +1,5 @@
 const db = require("../db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
   getAll: async (tableName) => {
@@ -20,12 +20,9 @@ module.exports = {
     // Getting the columns and values
     var columns = Object.keys(data).map(key => `"${key}"`).join(', ');
     columns = columns + ",\"id\"";
-    // Executing the query
-
 
     // Fetching the count of rows in the table
     const countQuery = `SELECT MAX(id) FROM "${tableName}"`;
-
     const { rows: countRows } = await db.query(countQuery);
     console.log(countRows[0]);
     const id = parseInt(countRows[0].max) + 1;
@@ -40,7 +37,6 @@ module.exports = {
       const hashedPassword = await bcrypt.hash(data.password, 10);
       values[values.indexOf(data.password)] = hashedPassword;
     }
-
     // Generating placeholders for prepared statement
     const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
 
