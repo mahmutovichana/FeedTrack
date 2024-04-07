@@ -1,6 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 .loginLayout {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
     * {
         margin: 0;
         padding: 0;
@@ -230,4 +236,50 @@
     .google-signin-button {
         display: none;
     }
+
+    #qrCodeContainer {
+
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .authenticator-container {
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .tokenInputs {
+            margin-bottom: 20px;
+        }
+
+        .tokenInput {
+            width: 60px;
+            height: 60px;
+            margin: 0 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #verifyButton {
+            display: flow-root;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: medium;
+            width: 20%;
+        }
+
+        #errorLabel {
+            color: red;
+        }
+
+    }
+
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './branches.scss';
+import './../../styles/AdminPanel/branches.scss';
 import { GridColDef } from '@mui/x-data-grid';
 import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
@@ -14,18 +14,11 @@ interface Branch {
 
 const Branches = () => {
     const [openAdd, setOpenAdd] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<Branch | undefined>(); // Dodali smo stanje za selektovanog korisnika
-  const navigate = useNavigate();
-  const [name, setName] = useState();
-  const [token, setToken] = useState();
-  const [user, setUser] = useState(null);
-
-
-    const [open, setOpen] = useState(false);
-    const [branches, setBranches] = useState<Branch[]>([]); 
+    const [openUpdate, setOpenUpdate] = useState(false);
+    const [branches, setBranches] = useState<Branch[]>([]);
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
+    // Get all branches for the table
     useEffect(() => {
         fetch(`${deployURLs.backendURL}/api/branches`)
             .then((response) => response.json())
@@ -48,6 +41,7 @@ const Branches = () => {
             .catch((error) => console.error('Error fetching branches:', error));
     }, []);
 
+    // handle deleting a branch
     const deleteBranch = (id: number) => {
         fetch(`${deployURLs.backendURL}/api/branches/${id}`, {
             method: 'DELETE'
@@ -63,34 +57,31 @@ const Branches = () => {
             .catch((error) => console.error('Error deleting branch:', error));
     };
 
+    // check if admin is authorized to see and use CRUD 
     let isValidAdmin = false;
-  const userDataString = localStorage.getItem('user'); // Koristimo getItem metodu da bismo dobili string iz localStorage-a
-
-  if (!userDataString) {
-    console.error("User data not found in localStorage");
-  } else {
-    const userData = JSON.parse(userDataString); // Parsiramo string u JavaScript objekat
-    console.log(userData);
-
-    if (userData && userData.role) { // Provjera da li atribut role postoji
-        isValidAdmin = (userData.role === 'superAdmin') || (userData.role === 'branchAdmin');
-      console.log("IZ USERS: ", userData);
-      console.log("DA LI SAM VALIDAN admin: ", isValidAdmin);
-    } else {
-      console.error("Role not found in user data");
+    const userDataString = localStorage.getItem('user');
+    if (!userDataString) console.error("User data not found in localStorage");
+    else {
+        const userData = JSON.parse(userDataString);
+        if (userData && userData.role) {
+            isValidAdmin = (userData.role === 'superAdmin') || (userData.role === 'branchAdmin');
+            console.log("User: ", userData);
+            console.log("Am I a valid admin? ", isValidAdmin);
+        } else {
+            console.error("Role not found in user data");
+        }
     }
-  }
 
     return (
         <div className="branches">
             <div className="info">
                 <h1>Branches</h1>
                 {isValidAdmin && (
-          <>
-            <button onClick={() => setOpenAdd(true)}>Add</button>
-            <button onClick={() => setOpenUpdate(true)}>Update</button>
-          </>
-        )}
+                    <>
+                        <button onClick={() => setOpenAdd(true)}>Add</button>
+                        <button onClick={() => setOpenUpdate(true)}>Update</button>
+                    </>
+                )}
             </div>
             <DataTable slug="branches" columns={columns} rows={branches} onDelete={deleteBranch} />
             {openAdd && <Add slug="branch" columns={columns} setOpen={setOpenAdd} />}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './users.scss';
+import './../../styles/AdminPanel/users.scss';
 import { GridColDef } from '@mui/x-data-grid';
 import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
@@ -17,14 +17,9 @@ const Users = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [users, setUsers] = useState<User[]>([]); // Korišćenje tipa User[]
   const [columns, setColumns] = useState<GridColDef[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | undefined>(); // Dodali smo stanje za selektovanog korisnika
-  const navigate = useNavigate();
-
   const { state } = useLocation();
-  const [name, setName] = useState();
   const [token, setToken] = useState();
   const [user, setUser] = useState(null);
-
 
   useEffect(() => {
     if (state && state.user) {
@@ -64,7 +59,7 @@ const Users = () => {
     })
       .then((response) => {
         if (response.ok) {
-          // Ako je korisnik uspešno obrisan, osveži podatke
+          // if user is deleted succesfully, then refresh the table
           const updatedUsers = users.filter(user => user.id !== id);
           setUsers(updatedUsers);
         } else {
@@ -74,19 +69,17 @@ const Users = () => {
       .catch((error) => console.error('Error deleting user:', error));
   };
 
+  // check if admin is authorized to see and use CRUD (superAdmin only)
   let isSuperAdmin = false;
-  const userDataString = localStorage.getItem('user'); // Koristimo getItem metodu da bismo dobili string iz localStorage-a
-
+  const userDataString = localStorage.getItem('user');
   if (!userDataString) {
     console.error("User data not found in localStorage");
   } else {
-    const userData = JSON.parse(userDataString); // Parsiramo string u JavaScript objekat
-    console.log(userData);
-
-    if (userData && userData.role) { // Provjera da li atribut role postoji
+    const userData = JSON.parse(userDataString);
+    if (userData && userData.role) {
       isSuperAdmin = userData.role === 'superAdmin';
-      console.log("IZ USERS: ", userData);
-      console.log("DA LI SAM SUPERADMIN: ", isSuperAdmin);
+      console.log("User: ", userData);
+      console.log("Am I a super admin? ", isSuperAdmin);
     } else {
       console.error("Role not found in user data");
     }

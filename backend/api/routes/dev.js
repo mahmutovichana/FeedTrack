@@ -3,9 +3,7 @@ const db = require("../db");
 
 router.get("/tables", async (req, res) => {
     const tables = ['"Branch"', '"Feedback"', '"Person"', '"Report"', '"Teller"'];
-
     const sql = tables.map((name) => `SELECT * FROM ${name}`).join(";");
-
     const result = await db.query(sql);
 
     const html = result

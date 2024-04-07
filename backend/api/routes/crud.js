@@ -4,13 +4,14 @@ const router = express.Router(); // Inicijalizacija rutera
 const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
 const genericCRUD = require("./genericCRUD");
 
-// Definiranje funkcije za rute
 function setupRoutes(genericModel, tableName) {
-  const subRouter = express.Router(); // Inicijalizacija podrutera
+  const subRouter = express.Router(); 
 
   const handleError = (res, error) => {
     res.status(500).json({ error: error.message });
   };
+
+  subRouter.use(authenticateToken, authRole);
   
   subRouter.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); }
@@ -45,17 +46,17 @@ function setupRoutes(genericModel, tableName) {
       catch (error) { handleError(res, error); }
     });
 
-  return subRouter; // Vraćanje podrutera
+  return subRouter; // Returning the subrouter filled with routes for one "generic" table
 }
 
-// Setup rute za različite tabele
+// Setup routes for each table
 const userRouter = setupRoutes(genericCRUD, "Person");
 const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
 const branchRouter = setupRoutes(genericCRUD, "Branch");
 const tellerRouter = setupRoutes(genericCRUD, "Teller");
 const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
 
-// Dodavanje ruta u aplikaciju
+// Adding the routes to the app
 router.use("/users", userRouter);
 router.use("/feedbacks", feedbackRouter);
 router.use("/branches", branchRouter);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './tellers.scss';
+import './../../styles/AdminPanel/tellers.scss';
 import { GridColDef } from '@mui/x-data-grid';
 import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
@@ -14,15 +14,8 @@ interface Teller {
 
 const Tellers = () => {
     const [openAdd, setOpenAdd] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
-  const navigate = useNavigate();
-  const [name, setName] = useState();
-  const [token, setToken] = useState();
-  const [user, setUser] = useState(null);
-
-    
-    const [open, setOpen] = useState(false);
-    const [tellers, setTellers] = useState<Teller[]>([]); 
+    const [openUpdate, setOpenUpdate] = useState(false);
+    const [tellers, setTellers] = useState<Teller[]>([]);
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
@@ -62,36 +55,32 @@ const Tellers = () => {
             .catch((error) => console.error('Error deleting teller:', error));
     };
 
-    
+    // check if admin is authorized to see and use CRUD 
     let isValidAdmin = false;
-    const userDataString = localStorage.getItem('user'); // Koristimo getItem metodu da bismo dobili string iz localStorage-a
-  
+    const userDataString = localStorage.getItem('user');
     if (!userDataString) {
-      console.error("User data not found in localStorage");
+        console.error("User data not found in localStorage");
     } else {
-      const userData = JSON.parse(userDataString); // Parsiramo string u JavaScript objekat
-      console.log(userData);
-  
-      if (userData && userData.role) { // Provjera da li atribut role postoji
-          isValidAdmin = (userData.role === 'superAdmin') || (userData.role === 'branchAdmin') || (userData.role === 'tellerAdmin');
-        console.log("IZ USERS: ", userData);
-        console.log("DA LI SAM validan admin: ", isValidAdmin);
-      } else {
-        console.error("Role not found in user data");
-      }
+        const userData = JSON.parse(userDataString);
+        if (userData && userData.role) {
+            isValidAdmin = (userData.role === 'superAdmin') || (userData.role === 'branchAdmin') || (userData.role === 'tellerAdmin');
+            console.log("User: ", userData);
+            console.log("Am I a valid admin? ", isValidAdmin);
+        } else {
+            console.error("Role not found in user data");
+        }
     }
-
 
     return (
         <div className="tellers">
             <div className="info">
                 <h1>Tellers</h1>
                 {isValidAdmin && (
-          <>
-            <button onClick={() => setOpenAdd(true)}>Add</button>
-            <button onClick={() => setOpenUpdate(true)}>Update</button>
-          </>
-        )}
+                    <>
+                        <button onClick={() => setOpenAdd(true)}>Add</button>
+                        <button onClick={() => setOpenUpdate(true)}>Update</button>
+                    </>
+                )}
             </div>
             <DataTable slug="tellers" columns={columns} rows={tellers} onDelete={deleteTeller} />
             {openAdd && <Add slug="teller" columns={columns} setOpen={setOpenAdd} />}
