@@ -6,7 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { deployURLs } from "../../../public/constants";
+import { deployURLs } from "./../../../public/constants";
 
 type Props = {
   slug: string;

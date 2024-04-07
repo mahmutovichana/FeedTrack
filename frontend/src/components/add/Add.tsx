@@ -1,7 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
 import "./add.scss";
 import React, { useState } from "react";
-import { deployURLs } from "../../../public/constants";
+import { deployURLs } from "./../../../public/constants";
 
 type Props = {
   slug: string;

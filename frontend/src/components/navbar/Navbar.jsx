@@ -1,7 +1,7 @@
 import "./navbar.scss"
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
-import { deployURLs } from "./../../../public/constants.js";
+import { deployURLs } from "./../../../public/constants";
 
 const Navbar = () => {
 
