@@ -5,6 +5,7 @@ import { GridColDef } from '@mui/x-data-grid';
 import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import Update from '../../components/update/Update';
+import { deployURLs } from '../../../public/constants';
 
 interface User {
   id: number;
@@ -33,7 +34,7 @@ const Users = () => {
   }, [state]);
 
   useEffect(() => {
-    fetch(`https://feedtrack-backend.vercel.app/api/users`)
+    fetch(`${deployURLs.backendURL}/api/users`)
       .then((response) => response.json())
       .then((data: User[]) => {
         if (data.length > 0) {
@@ -58,7 +59,7 @@ const Users = () => {
   }, []);
 
   const deleteUser = (id: number) => {
-    fetch(`https://feedtrack-backend.vercel.app/api/users/${id}`, {
+    fetch(`${deployURLs.backendURL}/api/users/${id}`, {
       method: 'DELETE'
     })
       .then((response) => {

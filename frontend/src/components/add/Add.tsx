@@ -1,6 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
 import "./add.scss";
 import React, { useState } from "react";
+import { deployURLs } from "../../../public/constants";
 
 type Props = {
   slug: string;
@@ -44,7 +45,6 @@ const Add = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-<<<<<<< HEAD
     let slugPlural;
     switch (props.slug) {
       case 'user':
@@ -66,9 +66,6 @@ const Add = (props: Props) => {
     }
 
     fetch(`${deployURLs.backendURL}/api/${slugPlural}`, {
-=======
-    fetch(`https://feedtrack-backend.vercel.app/api/users`, {
->>>>>>> main
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

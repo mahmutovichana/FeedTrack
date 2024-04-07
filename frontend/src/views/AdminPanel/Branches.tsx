@@ -4,11 +4,8 @@ import './branches.scss';
 import { GridColDef } from '@mui/x-data-grid';
 import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
-<<<<<<< HEAD
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
-=======
->>>>>>> main
 
 interface Branch {
     id: number;
@@ -30,7 +27,7 @@ const Branches = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
-        fetch(`https://feedtrack-backend.vercel.app/api/branches`)
+        fetch(`${deployURLs.backendURL}/api/branches`)
             .then((response) => response.json())
             .then((data: Branch[]) => {
                 if (data.length > 0) {
@@ -52,11 +49,7 @@ const Branches = () => {
     }, []);
 
     const deleteBranch = (id: number) => {
-<<<<<<< HEAD
         fetch(`${deployURLs.backendURL}/api/branches/${id}`, {
-=======
-        fetch(`https://feedtrack-backend.vercel.app/api/branches/${id}`, {
->>>>>>> main
             method: 'DELETE'
         })
             .then((response) => {
