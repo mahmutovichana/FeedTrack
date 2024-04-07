@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './tellers.scss';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable from '../../components/dataTable/DataTable';
+import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
+<<<<<<< HEAD
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
+=======
+>>>>>>> main
 
 interface Teller {
     id: number;
@@ -26,7 +29,11 @@ const Tellers = () => {
     const [columns, setColumns] = useState<GridColDef[]>([]);
 
     useEffect(() => {
+<<<<<<< HEAD
         fetch(`${deployURLs.backendURL}/api/tellers`)
+=======
+        fetch(`https://feedtrack-backend.vercel.app/api/tellers`)
+>>>>>>> main
             .then((response) => response.json())
             .then((data: Teller[]) => {
                 if (data.length > 0) {
@@ -48,7 +55,11 @@ const Tellers = () => {
     }, []);
 
     const deleteTeller = (id: number) => {
+<<<<<<< HEAD
         fetch(`${deployURLs.backendURL}/api/tellers/${id}`, {
+=======
+        fetch(`https://feedtrack-backend.vercel.app/api/tellers/${id}`, {
+>>>>>>> main
             method: 'DELETE'
         })
             .then((response) => {

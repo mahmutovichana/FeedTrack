@@ -6,7 +6,6 @@ import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { deployURLs } from "./../../../public/constants.js";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
 
 const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
@@ -28,7 +27,7 @@ const Login = () => {
         localStorage.image = decodedToken.picture;
 
         // Fetch maximum ID from the database
-        const maxIdResponse = await fetch(`${deployURLs.backendURL}/api/getMaxUserId`);
+        const maxIdResponse = await fetch("https://feedtrack-backend.vercel.app/api/getMaxUserId");
         const maxIdData = await maxIdResponse.json();
         const nextId = maxIdData.maxId + 1;
 
@@ -46,7 +45,7 @@ const Login = () => {
         console.log(localStorage.user);
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch(`${deployURLs.backendURL}/api/addUser`, {
+        const existingUserResponse = await fetch("https://feedtrack-backend.vercel.app/api/addUser", {
           method: 'POST',
           headers: {
             'Access-Control-Allow-Origin':true ,
@@ -163,7 +162,7 @@ const Login = () => {
       requestBody["number"] = inputType == "email" ? " " : name;
 
       console.log(JSON.stringify(requestBody));
-      const response = await fetch(`${deployURLs.backendURL}/api/login`, {
+      const response = await fetch(`https://feedtrack-backend.vercel.app/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -195,7 +194,7 @@ const Login = () => {
         navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token, "id": localStorage.id } });
       }
       // Pozivanje 2faSetup rute
-      const twofactorResponse = await fetch(`${deployURLs.backendURL}/api/2faSetup`, {
+      const twofactorResponse = await fetch("https://feedtrack-backend.vercel.app/api/2faSetup", {
         method: 'POST',
         headers: {
           'Access-Control-Allow-Origin':true ,
@@ -245,7 +244,7 @@ const Login = () => {
     // Define verifyToken globally
     window.verifyToken = (secret) => {
       const token = document.getElementById('tokenInput').value;
-      fetch(`${deployURLs.backendURL}/api/verify`, {
+      fetch(`https://feedtrack-backend.vercel.app/api/verify`, {
         method: 'POST',
         headers: {
           'Access-Control-Allow-Origin':true ,
@@ -258,7 +257,7 @@ const Login = () => {
           if (data.success) {
             const user_id = localStorage.getItem("id");
             //ubaciti promjenu verified u true;
-            fetch(`${deployURLs.backendURL}/api/users/${user_id}`, {
+            fetch(`https://feedtrack-backend.vercel.app/api/users/${user_id}`, {
               method: 'PUT',
               headers: {
                 'Access-Control-Allow-Origin':true ,
