@@ -3,13 +3,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
-import "../../styles/AdminPanel/AdminPanelLoginView.css";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import "../../styles/AdminPanel/AdminPanelLoginView.css";
-import { deployURLs } from "./../../../public/constants";
+import "../../styles/AdminPanel/AdminLogin.scss";
+import { deployURLs } from "../../../public/constants";
 
-const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
 
 const Login = () => {
 
@@ -17,13 +16,16 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  /** 
+ * Handles the response after the user signs in via Google. 
+ * Decodes the JWT token, sends requests to the backend to verify and add the user to the database, 
+ * and saves user data in local storage. Prints appropriate error messages if there are any errors
+ */
   async function handleCallbackResponse(response) {
-    console.log("Encoded JWT ID token: " + response.credential);
     if (response.credential) {
       try {
         const decodedToken = jwtDecode(response.credential);
         console.log(decodedToken);
-
         localStorage.jti = decodedToken.jti;
         localStorage.image = decodedToken.picture;
 
@@ -42,14 +44,13 @@ const Login = () => {
         };
 
         localStorage.setItem('user', JSON.stringify(userData));
-
         console.log(localStorage.user);
 
         // Check if user exists in the database
-        const existingUserResponse = await fetch(`${deployURLs.backendURL}/api/addUser`, {
+        const existingUserResponse = await fetch(`${deployURLs.backendURL}/api/googleAddUser`, {
           method: 'POST',
           headers: {
-            'Access-Control-Allow-Origin':true ,
+            'Access-Control-Allow-Origin': true,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(userData)
@@ -71,7 +72,7 @@ const Login = () => {
 
         localStorage.user = existingUserResult.user || errorData.user;
         localStorage.token = existingUserResult.token || errorData.token;
-        console.log("ehhhh: "+localStorage.user);
+        console.log("User in local storage: " + localStorage.user);
         navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token } });
 
         console.log("Redirection completed successfully.");
@@ -83,52 +84,64 @@ const Login = () => {
     }
   }
 
+  /* Initializes the Google SDK and sets event listeners for clicks on the "About Us" and "Sign In" buttons. 
+  * Also removes event listeners when the component unmounts. 
+  */
   useEffect(() => {
     // Ensuring that google is defined before using it
     if (typeof window.google !== 'undefined' && window.google.accounts) {
       window.google.accounts.id.initialize({
-        client_id: YOUR_CLIENT_ID,
+        client_id: GOOGLE_CLIENT_ID,
         callback: handleCallbackResponse
       });
-    } else {
-      console.log('Google Identity Services library not loaded.');
-    }
-/*
-    if (localStorage.getItem("user") != null && localStorage.getItem("token") != null)
-      navigate('/home', {
-        state:
-        {
-          "user": localStorage.user,
-          "token": localStorage.getItem("token")
-        }
-      })*/
+    } else console.log('Google Identity Services library not loaded.');
+
+    /*
+        if (localStorage.getItem("user") != null && localStorage.getItem("token") != null)
+          navigate('/home', {
+            state:
+            {
+              "user": localStorage.user,
+              "token": localStorage.getItem("token")
+            }
+          })*/
 
     const container = document.getElementById("container");
-    const registerBtn = document.getElementById("register");
+    const aboutUsBtn = document.getElementById("aboutUs");
     const loginBtn = document.getElementById("login");
 
-    const handleRegisterClick = () => {
-      container.classList.add("active");
-    };
+    if (container && aboutUsBtn && loginBtn) {
+      const handleAboutUsClick = () => {
+        container.classList.add("active");
+      };
 
-    const handleLoginClick = () => {
-      container.classList.remove("active");
-    };
+      const handleLoginClick = () => {
+        container.classList.remove("active");
+      };
 
-    registerBtn.addEventListener("click", handleRegisterClick);
-    loginBtn.addEventListener("click", handleLoginClick);
+      aboutUsBtn.addEventListener("click", handleAboutUsClick);
+      loginBtn.addEventListener("click", handleLoginClick);
+
+      // Cleanup event listeners when component unmounts
+      return () => {
+        aboutUsBtn.removeEventListener("click", handleAboutUsClick);
+        loginBtn.removeEventListener("click", handleLoginClick);
+      };
+    }
 
     // Cleanup event listeners when component unmounts
     return () => {
-      registerBtn.removeEventListener("click", handleRegisterClick);
+      aboutUsBtn.removeEventListener("click", handleAboutUsClick);
       loginBtn.removeEventListener("click", handleLoginClick);
     };
   }, []);
 
+  /* Toggles between email and phone number login form states.*/
   const handleToggle = () => {
     setLoginWithEmail((prevState) => !prevState);
   };
 
+  /* Initiates the Google sign-in process if the Google SDK is loaded */
   const handleGoogleSignIn = () => {
     if (typeof window.google !== 'undefined' && window.google.accounts) {
       window.google.accounts.id.prompt();
@@ -139,6 +152,12 @@ const Login = () => {
 
   const [error, setError] = useState("");
 
+  /*
+  * Validates user input (email/phone and password), sends an authentication request to the backend. 
+  * If login is successful, saves user data and tokens in local storage. 
+  * If the user is verified, redirects to the home page. 
+  * Also handles 2FA setup if enabled, displaying a QR code for authentication.
+  */
   async function loginLogic(event) {
 
     event.preventDefault();
@@ -178,27 +197,28 @@ const Login = () => {
         responseData = await response.json()
       } else {
         // Handle login error
-        console.error('Login failed');
+        const errorResponseData = await response.json();
+        setError(errorResponseData.message);
       }
 
       console.log(JSON.stringify(responseData));
       const dataSecret = responseData.secret;
-      // Postavljanje secret-a u localStorage
+      // setting the token, user and secret in localStorage
       localStorage.setItem('token', responseData.token);
       localStorage.setItem('user', JSON.stringify(responseData));
       localStorage.setItem('secretURL', responseData.secret.otpauth_url);
       localStorage.setItem('secret', responseData.secret);
-      console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
+      console.log("localStorage.getItem('secret'): " + JSON.stringify(localStorage.getItem('secret')));
       localStorage.setItem('verified', responseData.verified);
       localStorage.setItem('id', responseData.id);
-      if(responseData.verified === true){
+      if (responseData.verified === true) {
         navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token, "id": localStorage.id } });
       }
-      // Pozivanje 2faSetup rute
+      // setuping up the 2fa for the non-verified users
       const twofactorResponse = await fetch(`${deployURLs.backendURL}/api/2faSetup`, {
         method: 'POST',
         headers: {
-          'Access-Control-Allow-Origin':true ,
+          'Access-Control-Allow-Origin': true,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -208,12 +228,12 @@ const Login = () => {
 
       if (twofactorResponse.ok) {
         const twofactorData = await twofactorResponse.json();
-        console.log("2fa response je: "+twofactorData);
+        console.log("2fa response: " + twofactorData);
         const { dataUrl } = twofactorData;
-        Object.entries(dataSecret).forEach(([ključ, vrijednost]) => {
-          console.log(`${ključ}: ${vrijednost}`);
+        Object.entries(dataSecret).forEach(([key, value]) => {
+          console.log(`${key}: ${value}`);
         });
-        console.log("ovo je sta se salje: "+dataSecret);
+        console.log("this is the data secret: " + dataSecret);
         // Process the data URL (e.g., render QR code)
         processQRCode(dataUrl, dataSecret);
       } else {
@@ -226,15 +246,23 @@ const Login = () => {
     }
   }
 
+  /* Processes the QR code displayed after successful login for 2FA activation. 
+  * After the user enters the token and clicks verify, 
+  * sends a request to the backend to verify the token. 
+  */
   const processQRCode = (dataUrl, secret) => {
     const template = `
-    <h1>Setup Authenticator</h1>
-    <h3>Use the QR code with your authenticator app</h3>
-    <img src="${dataUrl}" > <br>
-    <input type="text" id="tokenInput" placeholder="Enter token">
-    <button id="verifyButton">Verify</button>
-    <label id="errorLabel" style="color: red;"></label> <!-- Error label -->
-  `;
+        <h1>Setup Authenticator</h1>
+        <h3>Use the QR code with your authenticator app</h3>
+        <img src="${dataUrl}" > <br>
+        <div class="tokenInputs">
+        ${Array.from({ length: 6 }, (_, index) => `
+          <input type="text" maxlength="1" size="1" class="tokenInput" autocomplete="off">
+        `).join('')}
+        </div>
+        <button id="verifyButton">Verify</button>
+        <label id="errorLabel" style="color: red;"></label> <!-- Error label -->
+      `;
 
     const QRcontainer = document.getElementById('qrCodeContainer');
     const container = document.getElementById('container');
@@ -242,13 +270,32 @@ const Login = () => {
     container.hidden = true;
     QRcontainer.innerHTML = template;
 
+    const tokenInputs = document.querySelectorAll('.tokenInput');
+
+    // Define function to focus on next input field
+    const focusNextInput = (index) => {
+      if (index < tokenInputs.length - 1) {
+        tokenInputs[index + 1].focus();
+      }
+    };
+
+    // Attach event listeners to each input field
+    tokenInputs.forEach((input, index) => {
+      input.addEventListener('input', (event) => {
+        const inputLength = event.target.value.length;
+        if (inputLength === 1) {
+          focusNextInput(index);
+        }
+      });
+    });
+
     // Define verifyToken globally
     window.verifyToken = (secret) => {
-      const token = document.getElementById('tokenInput').value;
+      const token = Array.from(tokenInputs).map(input => input.value).join('');
       fetch(`${deployURLs.backendURL}/api/verify`, {
         method: 'POST',
         headers: {
-          'Access-Control-Allow-Origin':true ,
+          'Access-Control-Allow-Origin': true,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ userToken: token, secret: secret }),
@@ -261,18 +308,20 @@ const Login = () => {
             fetch(`${deployURLs.backendURL}/api/users/${user_id}`, {
               method: 'PUT',
               headers: {
-                'Access-Control-Allow-Origin':true ,
+                'Access-Control-Allow-Origin': true,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ "verified": true }),
             })
-            //provjera id-a
-            console.log("user id prije redirect je: ",localStorage.getItem("id"));
             navigate('/home', { state: { "user": localStorage.getItem("user"), "token": localStorage.getItem("token") } });
           } else {
-            // Prikazivanje error label-e umjesto mijenjanja input polja
-          const errorLabel = document.getElementById('errorLabel');
-          errorLabel.textContent = "Incorrect code";
+            // Display error message
+            const errorLabel = document.getElementById('errorLabel');
+            if (errorLabel) {
+              errorLabel.textContent = "Incorrect code";
+            } else {
+              console.error('Error label element not found');
+            }
           }
         })
         .catch(error => {
@@ -281,10 +330,10 @@ const Login = () => {
     };
 
     // Attach event listener to the Verify button
-    const verifyButton = document.getElementById('verifyButton');
     verifyButton.addEventListener('click', () => {
       verifyToken(secret);
     });
+
   };
 
   return (
@@ -295,38 +344,15 @@ const Login = () => {
       <div className="container" id="container">
         <div className="form-container sign-up">
           <form>
-            <h1>Create Account</h1>
-            <div className="options">
-              <a
-                href="#"
-                className={`icon ${loginWithEmail ? "active" : ""}`}
-                onClick={() => setLoginWithEmail(true)}
-              >
-                <FontAwesomeIcon icon={faEnvelope} />
-              </a>
-              <a
-                href="#"
-                className={`icon ${!loginWithEmail ? "active" : ""}`}
-                onClick={() => setLoginWithEmail(false)}
-              >
-                <FontAwesomeIcon icon={faPhone} />
-              </a>
-              <a href="#" className="icon" onClick={handleGoogleSignIn}>
-                <FontAwesomeIcon icon={faGoogle} />
-              </a>
-            </div>
-            <span>
-              or use your {loginWithEmail ? "email" : "phone number"} for
-              registration
-            </span>
-            <input type="text" placeholder="Name" />
-            <input
-              type={loginWithEmail ? "email" : "mobilenumberSU"}
-              id={loginWithEmail ? "emailSU" : "mobilenumberSU"}
-              placeholder={loginWithEmail ? "Email" : "Phone Number"}
-            />
-            <input type="password" id="passwordSU" placeholder="Password" />
-            <button>Sign Up</button>
+            <h1>About Us 🚀</h1>
+            <p style={{ textAlign: 'justify' }}>
+              FeedTrack is a platform utilized in bank branches to collect feedback from customers after service transactions.
+              This feedback helps administrators to analyze and improve customer experience.
+              Additionally, FeedTrack enables running various campaigns to gather diverse responses and insights for further enhancements.
+            </p>
+            <p style={{ textAlign: 'justify' }}>
+              Join us on our journey to revolutionize customer feedback in banking! 💼📊
+            </p>
           </form>
         </div>
         <div className="form-container sign-in">
@@ -359,7 +385,7 @@ const Login = () => {
             <input type="password" id="password" placeholder="Password" />
             <a href="#">Forgot Your Password?</a>
             <button>Sign In</button>
-            {error && <p>{error}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
           </form>
         </div>
         <div className="toggle-container">
@@ -374,10 +400,10 @@ const Login = () => {
             <div className="toggle-panel toggle-right">
               <h1>Hello there!</h1>
               <p>
-                Register with your personal details to use all site features
+                Curious to learn more about us? Let's dive in and discover what makes us unique! 💡🔍
               </p>
-              <button className="hidden" id="register">
-                Sign Up
+              <button className="hidden" id="aboutUs">
+                About Us
               </button>
             </div>
           </div>

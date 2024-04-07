@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
   if (!isValidPassword) return res.status(400).json({ message: "Password incorrect!" });
   const user = result.rows[0];
   delete user.password;
-  console.log("OVOOO JE USERRR: "+user);
+  console.log("Logged in user: " + user);
   const token = generateUserJwtToken(user).token;
   refreshTokens.push(token);
   var secret = speakeasy.generateSecret(); // Generate secret for 2FA
@@ -32,28 +32,14 @@ router.post("/login", async (req, res) => {
 });
 
 // Route for adding a new user to the database
-router.post("/addUser", async (req, res) => {
+router.post("/googleAddUser", async (req, res) => {
   try {
-    const {
-      id,
-      name,
-      lastname,
-      email,
-      image,
-      password,
-      mobilenumber,
-      role,
-      verified
-    } = req.body;
-
+    const {id, name, lastname, email, image, password, mobilenumber, role, verified} = req.body;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email))
       return res.status(400).json({ message: "Invalid email address" });
 
-    const existingUser = await db.query(
-      'SELECT * FROM "Person" WHERE email = $1',
-      [email]
-    );
+    const existingUser = await db.query('SELECT * FROM "Person" WHERE email = $1',[email]);
 
     if (existingUser.rows.length > 0) {
       const token = generateUserJwtToken(JSON.stringify(existingUser.rows[0])).token;
@@ -68,22 +54,11 @@ router.post("/addUser", async (req, res) => {
     console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log("ovo je verified: "+verified);
+    console.log("this is verified: " + verified);
 
     const newUser = await db.query(
       'INSERT INTO "Person" ("id", "name", "lastname", "image", "password", "email", "mobilenumber", "role", "verified") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-      [
-        id,
-        name,
-        lastname,
-        image,
-        hashedPassword,
-        email,
-        mobilenumber,
-        role || "superAdmin",
-        verified
-      ]
-    );
+      [id, name, lastname, image, hashedPassword, email, mobilenumber, role || "superAdmin", verified]);
 
     console.log("OVO JE REZULTAT: " + newUser.rows[0]);
     const token = generateUserJwtToken(JSON.stringify(newUser.rows[0])).token;
