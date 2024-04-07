@@ -7,6 +7,7 @@ import "../../styles/AdminPanel/AdminPanelLoginView.css";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../../styles/AdminPanel/AdminPanelLoginView.css";
+import { deployURLs } from "./../../../public/constants";
 
 const YOUR_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
 
