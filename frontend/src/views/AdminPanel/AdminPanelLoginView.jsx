@@ -48,6 +48,7 @@ const Login = () => {
         const existingUserResponse = await fetch("https://feedtrack-backend.vercel.app/api/addUser", {
           method: 'POST',
           headers: {
+            'Access-Control-Allow-Origin':true ,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(userData)
@@ -91,16 +92,15 @@ const Login = () => {
     } else {
       console.log('Google Identity Services library not loaded.');
     }
-
-    if (localStorage.getItem("user") != null && localStorage.getItem("refreshToken") != null)
+/*
+    if (localStorage.getItem("user") != null && localStorage.getItem("token") != null)
       navigate('/home', {
         state:
         {
           "user": localStorage.user,
-          "refreshToken": localStorage.getItem("refreshToken"),
-          "accessToken": localStorage.getItem("accessToken")
+          "token": localStorage.getItem("token")
         }
-      })
+      })*/
 
     const container = document.getElementById("container");
     const registerBtn = document.getElementById("register");
@@ -184,7 +184,7 @@ const Login = () => {
       const dataSecret = responseData.secret;
       // Postavljanje secret-a u localStorage
       localStorage.setItem('token', responseData.token);
-      localStorage.setItem('user', responseData.user);
+      localStorage.setItem('user', JSON.stringify(responseData));
       localStorage.setItem('secretURL', responseData.secret.otpauth_url);
       localStorage.setItem('secret', responseData.secret);
       console.log("localStorage.getItem('secret'): "+JSON.stringify(localStorage.getItem('secret')));
@@ -197,6 +197,7 @@ const Login = () => {
       const twofactorResponse = await fetch("https://feedtrack-backend.vercel.app/api/2faSetup", {
         method: 'POST',
         headers: {
+          'Access-Control-Allow-Origin':true ,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -215,6 +216,7 @@ const Login = () => {
         // Process the data URL (e.g., render QR code)
         processQRCode(dataUrl, dataSecret);
       } else {
+        navigate('/');
         console.error('Failed to retrieve 2FA setup data');
       }
 
@@ -225,12 +227,13 @@ const Login = () => {
 
   const processQRCode = (dataUrl, secret) => {
     const template = `
-      <h1>Setup Authenticator</h1>
-      <h3>Use the QR code with your authenticator app</h3>
-      <img src="${dataUrl}" > <br>
-      <input type="text" id="tokenInput" placeholder="Enter token">
-      <button id="verifyButton">Verify</button>
-    `;
+    <h1>Setup Authenticator</h1>
+    <h3>Use the QR code with your authenticator app</h3>
+    <img src="${dataUrl}" > <br>
+    <input type="text" id="tokenInput" placeholder="Enter token">
+    <button id="verifyButton">Verify</button>
+    <label id="errorLabel" style="color: red;"></label> <!-- Error label -->
+  `;
 
     const QRcontainer = document.getElementById('qrCodeContainer');
     const container = document.getElementById('container');
@@ -244,6 +247,7 @@ const Login = () => {
       fetch(`https://feedtrack-backend.vercel.app/api/verify`, {
         method: 'POST',
         headers: {
+          'Access-Control-Allow-Origin':true ,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ userToken: token, secret: secret }),
@@ -256,6 +260,7 @@ const Login = () => {
             fetch(`https://feedtrack-backend.vercel.app/api/users/${user_id}`, {
               method: 'PUT',
               headers: {
+                'Access-Control-Allow-Origin':true ,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ "verified": true }),
@@ -264,7 +269,9 @@ const Login = () => {
             console.log("user id prije redirect je: ",localStorage.getItem("id"));
             navigate('/home', { state: { "user": localStorage.getItem("user"), "token": localStorage.getItem("token") } });
           } else {
-            document.getElementById('tokenInput').value = "Incorrect code";
+            // Prikazivanje error label-e umjesto mijenjanja input polja
+          const errorLabel = document.getElementById('errorLabel');
+          errorLabel.textContent = "Incorrect code";
           }
         })
         .catch(error => {

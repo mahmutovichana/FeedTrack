@@ -6,7 +6,6 @@ import Footer from "./components/footer/Footer";
 import Menu from "./components/menu/Menu";
 
 const Layout = () => {
-
     return (
         <div className="layout">
             <div className="main">

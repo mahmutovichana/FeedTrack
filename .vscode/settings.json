@@ -2,7 +2,7 @@
     "sqltools.connections": [
         {
             "previewLimit": 50,
-            "server": "localhost",
+            "server": "aws-0-eu-central-1.pooler.supabase.com",
             "driver": "PostgreSQL",
             "name": "conn",
             "connectString": "postgres://postgres.gavgivgrmhhepowbdlxb:feedtrack_password@aws-0-eu-central-1.pooler.supabase.com:5432/postgres",

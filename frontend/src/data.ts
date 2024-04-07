@@ -38,6 +38,12 @@ export const menu = [
           title: "Tellers",
           url: "/tellers",
           icon: "concierge-bell.png",
+        },
+        {
+          id: 4,
+          title: "Feedbacks",
+          url: "/feedbacks",
+          icon: "feedback-review.png",
         }
       ],
     },

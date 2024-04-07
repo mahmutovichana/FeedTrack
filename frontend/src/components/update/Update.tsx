@@ -13,7 +13,6 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-
 interface User {
   id: number;
   [key: string]: any;
@@ -25,7 +24,51 @@ const Update = (props: Props) => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
 
+  let slugPlural;
+    switch (props.slug) {
+      case 'user':
+        slugPlural = 'users';
+        break;
+      case 'teller':
+        slugPlural = 'tellers';
+        break;
+      case 'branch':
+        slugPlural = 'branches';
+        break;
+      case 'feedback':
+        slugPlural = 'feedbacks';
+        break;
+      default:
+        // Default ako slug ne odgovara nijednoj od opcija
+        console.error('Invalid slug:', props.slug);
+        return; // Ili postavite default slug
+    }
+
   useEffect(() => {
+<<<<<<< HEAD
+
+    fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json(); // Parsiranje odgovora kao JSON
+      } else {
+        throw new Error('Network response was not ok');
+      }
+    })
+    .then(data => {
+      console.log('Data received successfully:', data);
+      setUsers(data); 
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+
+=======
     fetch("https://feedtrack-backend.vercel.app/api/users")
       .then((response) => response.json())
       .then((data) => {
@@ -36,6 +79,7 @@ const Update = (props: Props) => {
         }
       })
       .catch((error) => console.error("Error fetching users:", error));
+>>>>>>> main
   }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -70,22 +114,26 @@ const Update = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
+<<<<<<< HEAD
+    fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedUserId}`, {
+=======
     fetch(`https://feedtrack-backend.vercel.app/api/users/${selectedUserId}`, {
+>>>>>>> main
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData)
     })
-    .then(response => {
-      if (response.ok) {
-        console.log('Data sent successfully');
-        props.setOpen(false);
-      } else {
-        console.error('Error sending data:', response.statusText);
-      }
-    })
-    .catch(error => console.error('Error sending data:', error));
+      .then(response => {
+        if (response.ok) {
+          console.log('Data sent successfully');
+          props.setOpen(false);
+        } else {
+          console.error('Error sending data:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Error sending data:', error));
   };
 
   const handleChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,34 +155,34 @@ const Update = (props: Props) => {
         </span>
         <h1>Update {props.slug}</h1>
         <Box sx={{ minWidth: 120 }}>
-        <FormControl fullWidth>
-          <Select
-            value={selectedUserId || ""}
-            onChange={handleUserChange}
-            displayEmpty
-          >
-            <MenuItem value="" disabled>
-              Select user
-            </MenuItem>
-            {users.map((user) => (
-              <MenuItem key={user.id} value={user.id.toString()}>
-                {user.id}
+          <FormControl fullWidth>
+            <Select
+              value={selectedUserId || ""}
+              onChange={handleUserChange}
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Select user
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-    </Box>
+              {users.map((user) => (
+                <MenuItem key={user.id} value={user.id.toString()}>
+                  {user.id}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
             .filter((item) => item.field !== "id" && item.field !== "img")
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? 'error-label' : ''}>{column.headerName}</label>
-                <input 
-                  type={column.type} 
-                  name={column.field} 
-                  placeholder={column.field} 
-                  onChange={handleChange2} 
+                <input
+                  type={column.type}
+                  name={column.field}
+                  placeholder={column.field}
+                  onChange={handleChange2}
                   required
                 />
                 {errors[column.field] && <span className="error">{errors[column.field]}</span>}
@@ -148,3 +196,4 @@ const Update = (props: Props) => {
 };
 
 export default Update;
+

@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const db = require("../db");
 const { generateUserJwtToken, authenticateToken } = require("./../middlewares/authMiddleware");
 const speakeasy = require("speakeasy");
@@ -54,14 +54,17 @@ router.post("/addUser", async (req, res) => {
       'SELECT * FROM "Person" WHERE email = $1',
       [email]
     );
+
     if (existingUser.rows.length > 0) {
       const token = generateUserJwtToken(JSON.stringify(existingUser.rows[0])).token;
       console.log("ovo je za existing user token: " + token);
       refreshTokens.push(token);
+      let nestaFino = existingUser.rows[0];
       return res
         .status(400)
-        .json({ message: "User already exists", token: token, user: JSON.stringify(existingUser.rows[0]) });
+        .json({ message: "User already exists", token: token, user: nestaFino });
     }
+    refreshTokens.push(token);
     console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -125,7 +128,6 @@ router.post("/2faSetup", (req, res) => {
 router.post("/verify", (req, res) => {
   const { userToken: token, secret } = req.body;
   const baseSecret = secret.base32;
-
   const verified = speakeasy.totp.verify({
     secret: baseSecret,
     encoding: "base32",
@@ -135,3 +137,4 @@ router.post("/verify", (req, res) => {
 });
 
 module.exports = router;
+
