@@ -6,6 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { deployURLs } from "./../../../public/constants";
 
 type Props = {
   slug: string;
@@ -45,7 +46,6 @@ const Update = (props: Props) => {
     }
 
   useEffect(() => {
-<<<<<<< HEAD
 
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
       method: 'GET',
@@ -68,18 +68,6 @@ const Update = (props: Props) => {
       console.error('Error fetching data:', error);
     });
 
-=======
-    fetch("https://feedtrack-backend.vercel.app/api/users")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.length > 0) {
-          setSelectedUserId(data[0].id);
-          console.log(data[0].id);
-          setUsers(data);
-        }
-      })
-      .catch((error) => console.error("Error fetching users:", error));
->>>>>>> main
   }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -114,11 +102,7 @@ const Update = (props: Props) => {
 
     console.log(JSON.stringify(formData));
 
-<<<<<<< HEAD
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedUserId}`, {
-=======
-    fetch(`https://feedtrack-backend.vercel.app/api/users/${selectedUserId}`, {
->>>>>>> main
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
