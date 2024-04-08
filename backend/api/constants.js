@@ -13,8 +13,8 @@ const swagger = {
 };
 
 const deployURLs = {
-  backendURL: "https://feedtrack-backend.vercel.app",
-  frontendURL: "https://feedtrack.vercel.app"
+  backendURL: "http://localhost:5432", // https://feedtrack-backend.vercel.app https://localhost:3000
+  frontendURL: "http://localhost:5173" // https://feedtrack.vercel.app https://localhost:5173
 }
 
 module.exports = {
