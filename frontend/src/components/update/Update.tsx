@@ -150,8 +150,6 @@ const Update = (props: Props) => {
       return;
     }
 
-    console.log(JSON.stringify(formData));
-
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedUserId}`, {
       method: 'PUT',
       headers: {
@@ -165,6 +163,8 @@ const Update = (props: Props) => {
           props.setOpen(false);
           props.toggleRefreshData();
         } else {
+          console.log("selected user id: " + selectedUserId);
+          console.log("NEvalja, evo data: " + JSON.stringify(formData));
           console.error('Error sending data:', response.statusText);
         }
       })
@@ -200,7 +200,7 @@ const Update = (props: Props) => {
                 Select user
               </MenuItem>
               {users.map((user) => (
-                <MenuItem key={user.id} value={user.name.toString()}>
+                <MenuItem key={user.id} value={user.id.toString()}>
                   {user.name + " " + user.lastname}
                 </MenuItem>
               ))}
