@@ -1,6 +1,6 @@
 export const deployURLs = {
-  backendURL: "https://localhost:5432",
-  frontendURL: "https://localhost:5173"
+  backendURL: "http://localhost:5432",
+  frontendURL: "http://localhost:5173"
 }
 
 /*
@@ -12,7 +12,7 @@ export const deployURLs = {
 
 /*
 export const deployURLs = {
-  backendURL: "https://localhost:5432",
-  frontendURL: "https://localhost:5173"
+  backendURL: "http://localhost:5432",
+  frontendURL: "http://localhost:5173"
 }
 */
