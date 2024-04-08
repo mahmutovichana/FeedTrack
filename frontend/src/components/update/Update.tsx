@@ -12,6 +12,7 @@ type Props = {
   slug: string;
   columns: GridColDef[];
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleRefreshData: () => void;
 };
 
 interface User {
@@ -47,26 +48,55 @@ const Update = (props: Props) => {
 
   useEffect(() => {
 
-    fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json(); // Parsiranje odgovora kao JSON
-      } else {
-        throw new Error('Network response was not ok');
-      }
-    })
-    .then(data => {
-      console.log('Data received successfully:', data);
-      setUsers(data); 
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
+    // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
+    const userDataString = localStorage.getItem('user');
+    const userData = JSON.parse(userDataString);
+    const isSuperAdmin = userData.role === 'superAdmin';
+    if(!isSuperAdmin && props.slug=="user"){
+      fetch(`${deployURLs.backendURL}/api/userRoles`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.token}`, 
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .then(data => {
+        console.log('Data received successfully:', data);
+        setUsers(data); 
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+    }
+    else{
+      fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .then(data => {
+        console.log('Data received successfully:', data);
+        setUsers(data); 
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+    }
 
   }, []);
 
@@ -133,6 +163,7 @@ const Update = (props: Props) => {
         if (response.ok) {
           console.log('Data sent successfully');
           props.setOpen(false);
+          props.toggleRefreshData();
         } else {
           console.error('Error sending data:', response.statusText);
         }

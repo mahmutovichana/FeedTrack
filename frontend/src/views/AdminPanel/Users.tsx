@@ -20,6 +20,7 @@ const Users = () => {
   const { state } = useLocation();
   const [token, setToken] = useState();
   const [user, setUser] = useState(null);
+  const [refreshData, setRefreshData] = useState(false);
 
   useEffect(() => {
     if (state && state.user) {
@@ -77,7 +78,7 @@ const Users = () => {
       .catch((error) => console.error('Error fetching users:', error));
     } else {
       // Fetch from another route (only 'user' roles)
-      fetch(`http://localhost:5432/api/userRoles`, {
+      fetch(`${deployURLs.backendURL}/api/userRoles`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.token}`, 
@@ -106,7 +107,11 @@ const Users = () => {
       })
       .catch((error) => console.error('Error fetching users:', error));
     }
-  }, [isSuperAdmin]); // isSuperAdmin is in dependency array
+  }, [isSuperAdmin, refreshData]);
+
+  const toggleRefreshData = () => {
+    setRefreshData(prevState => !prevState);
+  };
 
   const deleteUser = (id: number) => {
     fetch(`${deployURLs.backendURL}/api/users/${id}`, {
@@ -148,8 +153,8 @@ const Users = () => {
         )}
       </div>
       <DataTable slug="users" columns={columns} rows={users} onDelete={deleteUser} />
-      {openAdd && <Add slug="user" columns={columns} setOpen={setOpenAdd} />}
-      {openUpdate && <Update slug="user" columns={columns} setOpen={setOpenUpdate} />}
+      {openAdd && <Add slug="user" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
+      {openUpdate && <Update slug="user" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
     </div>
   );
 };

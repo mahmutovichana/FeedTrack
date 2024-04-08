@@ -7,6 +7,7 @@ type Props = {
   slug: string;
   columns: GridColDef[];
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleRefreshData: () => void;
 };
 
 const Add = (props: Props) => {
@@ -96,6 +97,7 @@ const Add = (props: Props) => {
         if (response.ok) {
           console.log('Data sent successfully');
           props.setOpen(false);
+          props.toggleRefreshData();
         } else {
           console.error('Error sending data:', response.statusText);
         }
