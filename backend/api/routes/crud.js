@@ -11,7 +11,9 @@ function setupRoutes(genericModel, tableName) {
     res.status(500).json({ error: error.message });
   };
 
-  subRouter.use(authenticateToken, authRole);
+  // needs to be optimized to be used, getting 504 error for using this
+  // aka too slow functions: authenticateToken, authRole
+  // subRouter.use(authenticateToken, authRole);
   
   subRouter.get('/', async (req, res) => {
       try { res.json(await genericModel.getAll(tableName)); }
