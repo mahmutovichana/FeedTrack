@@ -20,13 +20,23 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(
-      null,
-      req.body.message.replace(/\s+/g, "-") + path.extname(file.originalname)
-    );
+    cb(null, "welcome-image");
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false, req.fileValidationError);
+    }
+  },
+});
 
 router.post(
   "/welcomeData",
@@ -34,6 +44,10 @@ router.post(
   //authRole("superAdmin", "tellerAdmin", "branchAdmin"),
   upload.single("file"),
   async (req, res) => {
+    if (req.fileValidationError) {
+      return res.status(400).json({ message: "Invalid file type" });
+    }
+
     try {
       if (!req.headers["content-type"].includes("multipart/form-data")) {
         return res
@@ -44,6 +58,8 @@ router.post(
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
+
+      fs.writeFileSync(`${uploadDir}/welcome-message.js`, req.body.message);
 
       res
         .status(200)

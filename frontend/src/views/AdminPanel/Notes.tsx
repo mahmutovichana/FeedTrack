@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./../../styles/AdminPanel/notes.scss";
 import { deployURLs } from "../../../public/constants";
+import { Navigate } from "react-router-dom";
 
 const Notes = () => {
   const [file, setFile] = useState(null);
