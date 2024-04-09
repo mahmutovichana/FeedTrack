@@ -6,18 +6,23 @@ const Notes = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
   const handleUpload = async () => {
     try {
       const formData = new FormData();
       formData.append("message", message);
       formData.append("file", file);
 
+      // Form data
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ", " + pair[1]);
+      }
+
       const response = await fetch(`${deployURLs.backendURL}/api/welcomeData`, {
         method: "POST",
+        mode: "no-cors",
+        headers: {
+          authorization: `Bearer ${localStorage.token}`,
+        },
         body: formData,
       });
 
@@ -44,7 +49,11 @@ const Notes = () => {
       <br />
       <label>
         Upload image:{" "}
-        <input type="file" id="file" onChange={handleFileChange} />
+        <input
+          type="file"
+          id="file"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
       </label>
       <br />
       <button onClick={handleUpload}>Upload</button>

@@ -1,9 +1,59 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 const {
-  authenticateToken, authRole,
+  authenticateToken,
+  authRole,
 } = require("../middlewares/authMiddleware");
 const db = require("../db");
+
+const uploadDir = path.join(__dirname, "../welcome-data");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      req.body.message.replace(/\s+/g, "-") + path.extname(file.originalname)
+    );
+  },
+});
+const upload = multer({ storage: storage });
+
+router.post(
+  "/welcomeData",
+  //authenticateToken,
+  //authRole("superAdmin", "tellerAdmin", "branchAdmin"),
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      if (!req.headers["content-type"].includes("multipart/form-data")) {
+        return res
+          .status(400)
+          .json({ message: "Content-Type must be multipart/form-data" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      res
+        .status(200)
+        .json({ message: "File and message uploaded successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
 
 router.post(
   "/admin",
@@ -29,7 +79,10 @@ router.post(
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const existingUser = await db.query('SELECT * FROM "Person" WHERE email = $1', [email]);
+    const existingUser = await db.query(
+      'SELECT * FROM "Person" WHERE email = $1',
+      [email]
+    );
 
     if (existingUser.rowCount !== 0) {
       return res.status(400).json({ message: "User already exists" });
