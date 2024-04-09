@@ -7,6 +7,7 @@ import Branches from './views/AdminPanel/Branches';
 import Layout from './Layout.tsx';
 import Feedbacks from './views/AdminPanel/Feedbacks';
 import UserFeedbackInput from './views/UserPanel/FeedbackUserInputPage';
+import ProfilePage from './views/AdminPanel/Profile'
 
 function App() {
 
@@ -26,6 +27,10 @@ function App() {
         {
           path:"/home",
           element:<AdminDashboardPage/>
+        },
+        {
+          path:"/profile",
+          element:<ProfilePage/>
         },
         {
           path:"/users",

@@ -7,6 +7,7 @@ type Props = {
   slug: string;
   columns: GridColDef[];
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleRefreshData: () => void;
 };
 
 const Add = (props: Props) => {
@@ -16,10 +17,30 @@ const Add = (props: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // check if admin is superAdmin
+    let isSuperAdmin = false;
+    const userDataString = localStorage.getItem('user');
+    if (!userDataString) {
+      console.error("User data not found in localStorage");
+    } else {
+      const userData = JSON.parse(userDataString);
+      if (userData && userData.role) {
+        isSuperAdmin = userData.role === 'superAdmin';
+      } else {
+        console.error("Role not found in user data");
+      }
+    }
+
     // Provjera validnosti podataka
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
-    const validRoles = ["superAdmin", "tellerAdmin", "branchAdmin"];
+    let validRoles;
+    if(isSuperAdmin){
+      validRoles = ["superAdmin", "tellerAdmin", "branchAdmin", "user"];
+    }
+    else{
+      validRoles = ["user"];
+    }
     const currentErrors: { [key: string]: string } = {};
 
     props.columns.forEach(column => {
@@ -76,6 +97,7 @@ const Add = (props: Props) => {
         if (response.ok) {
           console.log('Data sent successfully');
           props.setOpen(false);
+          props.toggleRefreshData();
         } else {
           console.error('Error sending data:', response.statusText);
         }
@@ -100,7 +122,7 @@ const Add = (props: Props) => {
         <h1>Add new {props.slug}</h1>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "img")
+            .filter((item) => item.field !== "id" && item.field !== "img" && item.field != "verified")
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? 'error-label' : ''}>{column.headerName}</label>

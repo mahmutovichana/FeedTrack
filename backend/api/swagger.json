@@ -255,6 +255,75 @@
           }
         }
       }
+    },
+    "/api/userRoles": {
+      "get": {
+        "summary": "Get users with 'user' role",
+        "description": "Returns an array of users with the 'user' role.",
+        "responses": {
+          "200": {
+            "description": "A list of users with 'user' role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authenticated!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User token invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Token is not valid!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching users"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -312,6 +381,47 @@
           "refreshToken": {
             "type": "string",
             "example": "asdsadsad...sOeF7asduJMZs"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "User ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's first name"
+          },
+          "lastname": {
+            "type": "string",
+            "description": "User's last name"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL of user's image"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password (hashed)"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email address"
+          },
+          "mobilenumber": {
+            "type": "string",
+            "description": "User's mobile number"
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role"
+          },
+          "verified": {
+            "type": "string",
+            "description": "Indicates if the user's account is verified"
           }
         }
       }

@@ -58,4 +58,23 @@ router.post(
   }
 );
 
+// route for fetching users in users.tsx in case a branchAdmin or tellerAdmin is logged in
+// only users with 'user' role are fetched
+router.get(
+  "/userRoles",
+  authenticateToken,
+  authRole("branchAdmin", "tellerAdmin"),
+  async (req, res) => {
+    const query = `SELECT * FROM "Person" WHERE role = 'user'`;
+    try { 
+      const { rows } = await db.query(query); 
+      res.status(200).json(rows); 
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Error fetching users" });
+    }
+  }
+);
+
 module.exports = router;
