@@ -1,0 +1,52 @@
+/* Stilizacija kontejnera ComboBox-a */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+.comboBoxContainer {
+  margin: 10%;
+  margin-left: 0;
+  background-color: #0568ae59;
+  border-radius: 15px;
+  font-family: 'Montserrat';
+}
+
+/* Stilizacija Select komponente */
+.comboBoxSelect {
+  width: 100%;
+  border-radius: 25px;
+  outline: none;
+  font-family: 'Montserrat';
+  color: white;
+}
+
+#root > div > div > div.container > div.contentContainer > div > div > div {
+  width: unset;
+  margin-left: 0;
+}
+
+#root > div > div > div.container > div.contentContainer > div > div.MuiBox-root.css-ece9u5 > div > div {
+  all: unset;
+  color: white;
+  border-radius: 10px;
+  border-color: white;
+  font-family: 'Montserrat';
+}
+
+button {
+  background-color: #0277c9;
+  color: #fff;
+  font-size: 12px;
+  padding: 10px 45px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: 3%;
+  margin-left: 0;
+  cursor: pointer;
+  text-wrap: nowrap;
+}
+
+* {
+  font-family: 'Montserrat';
+}

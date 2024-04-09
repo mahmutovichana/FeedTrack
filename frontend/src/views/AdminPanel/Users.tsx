@@ -133,6 +133,7 @@ const Users = () => {
       .catch((error) => console.error('Error deleting user:', error));
   };
 
+
   useEffect(() => {
     if (openAdd || openUpdate) {
       document.body.style.overflow = 'hidden';

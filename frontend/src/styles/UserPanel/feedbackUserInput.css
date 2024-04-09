@@ -1,90 +1,86 @@
-.feedbackUserInputContainer {
-  .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 20px;
+.feedbackUserInputContainer .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+.feedbackUserInputContainer .logo {
+  margin-bottom: 30px;
+  filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
+}
+
+.feedbackUserInputContainer .logo-image {
+  width: 150px;
+}
+
+.feedbackUserInputContainer .feedback-section {
+  width: 100%;
+  text-align: center;
+}
+
+.feedbackUserInputContainer .smiley-feedback {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.feedbackUserInputContainer .smiley-feedback span {
+  display: inline-block;
+  margin: 0 10px;
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.feedbackUserInputContainer .smiley-feedback span.clicked {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.feedbackUserInputContainer button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.feedbackUserInputContainer button:hover {
+  background-color: #0056b3;
+}
+
+/* Dodatni stil za responzivnost */
+@media screen and (max-width: 768px) {
+  .feedbackUserInputContainer .container {
+    padding: 10px;
   }
 
-  .logo {
-    margin-bottom: 30px;
-    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
-  }
-
-  .logo-image {
-    width: 150px;
-  }
-
-  .feedback-section {
-    width: 100%;
-    text-align: center;
-  }
-
-  .smiley-feedback {
-    display: flex;
-    justify-content: center;
+  .feedbackUserInputContainer .logo {
     margin-bottom: 20px;
   }
 
-  .smiley-feedback span {
-    display: inline-block;
-    margin: 0 10px;
-    font-size: 2em;
-    cursor: pointer;
+  .feedbackUserInputContainer .logo-image {
+    width: 120px;
   }
 
-  .smiley-feedback span.clicked {
-    animation: pulse 1s infinite;
-    /* Dodajemo animaciju pulsiranja na odabrane smajliće */
-  }
+  .feedbackUserInputContainer .smiley-feedback span {
+    margin: 0 8px;
+    font-size: 1.5em;
 
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-
-    50% {
-      transform: scale(1.1);
-    }
-
-    100% {
-      transform: scale(1);
-    }
-  }
-
-  button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  button:hover {
-    background-color: #0056b3;
-  }
-
-  /* Dodatni stil za responzivnost */
-  @media screen and (max-width: 768px) {
-    .container {
-      padding: 10px;
-    }
-
-    .logo {
-      margin-bottom: 20px;
-    }
-
-    .logo-image {
-      width: 120px;
-    }
-
-    .smiley-feedback span {
-      margin: 0 8px;
-      font-size: 1.5em;
-    }
   }
 }

@@ -8,6 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { deployURLs } from "./../../../public/constants";
 
+
 type Props = {
   slug: string;
   columns: GridColDef[];
@@ -15,16 +16,19 @@ type Props = {
   toggleRefreshData: () => void;
 };
 
+
 interface User {
   id: number;
   [key: string]: any;
 }
+
 
 const Update = (props: Props) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+
 
   let slugPlural;
     switch (props.slug) {
@@ -45,6 +49,7 @@ const Update = (props: Props) => {
         console.error('Invalid slug:', props.slug);
         return; // Ili postavite default slug
     }
+
 
   useEffect(() => {
 
@@ -97,11 +102,12 @@ const Update = (props: Props) => {
         console.error('Error fetching data:', error);
       });
     }
-
   }, []);
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
 
     // check if admin is superAdmin
     let isSuperAdmin = false;
@@ -116,8 +122,6 @@ const Update = (props: Props) => {
         console.error("Role not found in user data");
       }
     }
-
-    // Provera validnosti podataka
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
     let validRoles;
@@ -128,6 +132,7 @@ const Update = (props: Props) => {
       validRoles = ["user"];
     }
     const currentErrors: { [key: string]: string } = {};
+
 
     props.columns.forEach(column => {
       if (column.field !== "id") {
@@ -144,7 +149,7 @@ const Update = (props: Props) => {
       }
     });
 
-    // Ako postoje greške, postavljamo ih i zaustavljamo slanje podataka
+
     if (Object.keys(currentErrors).length > 0) {
       setErrors(currentErrors);
       return;
@@ -169,6 +174,7 @@ const Update = (props: Props) => {
       .catch(error => console.error('Error sending data:', error));
   };
 
+
   const handleChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -176,9 +182,11 @@ const Update = (props: Props) => {
     });
   };
 
+
   const handleUserChange = (event: SelectChangeEvent<string>) => {
     setSelectedUserId(event.target.value);
   };
+
 
   return (
     <div className="update">
@@ -228,5 +236,5 @@ const Update = (props: Props) => {
   );
 };
 
-export default Update;
 
+export default Update;
