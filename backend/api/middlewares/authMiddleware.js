@@ -1,12 +1,10 @@
 const jwt = require("jsonwebtoken");
 
+// function to check the provided token is it valid
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
-
   console.log(authHeader);
-
   if (!authHeader) return res.status(401).json({ message: "You are not authenticated!" });
-  
   const token = authHeader.split(" ")[1];
   jwt.verify(
     token,
@@ -24,6 +22,7 @@ function authenticateToken(req, res, next) {
       });
 }
 
+// function to check if the user with this role is auth to do or view specific things
 function authRole(...roles) {
   return (req, res, next) => {
     console.log(req.decodedToken.role);
@@ -32,6 +31,7 @@ function authRole(...roles) {
   };
 }
 
+// function to generate a jwt token for the user
 function generateUserJwtToken(user) {
   const expiresIn = "30m";
   const email = user.email, role = user.role;

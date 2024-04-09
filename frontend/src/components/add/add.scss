@@ -1,6 +1,7 @@
 @import "../../styles/AdminPanel/variables.scss";
 
 .add {
+  z-index: 100; // added so that add and update components always show over datatable component
   width: 100vw;
   height: 100vh;
   position: absolute;
