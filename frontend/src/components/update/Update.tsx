@@ -163,8 +163,6 @@ const Update = (props: Props) => {
           props.setOpen(false);
           props.toggleRefreshData();
         } else {
-          console.log("selected user id: " + selectedUserId);
-          console.log("NEvalja, evo data: " + JSON.stringify(formData));
           console.error('Error sending data:', response.statusText);
         }
       })
