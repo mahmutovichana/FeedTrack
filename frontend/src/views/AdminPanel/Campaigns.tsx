@@ -129,8 +129,31 @@ const Campaigns = () => {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         console.log(selectedBranches);
+        try {
+            for (const area in selectedBranches) {
+                const branchIds = selectedBranches[area];
+                await Promise.all(branchIds.map(async branchId => {
+                    try {
+                        const response = await fetch(`${deployURLs.backendURL}/api/branches/${branchId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ campaignID: selectedCampaign })
+                        });
+                        if (!response.ok) {
+                            throw new Error('Failed to update branch');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }));
+            }
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleCampaignChange = (event: SelectChangeEvent<Campaign>) => {
