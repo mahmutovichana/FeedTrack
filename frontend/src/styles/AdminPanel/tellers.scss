@@ -5,6 +5,21 @@
       align-items: center;
       gap: 20px;
       margin-bottom: 20px;
-
+  
+      button {
+        background-color: #0277c9;
+        color: #fff;
+        font-size: 12px;
+        padding: 10px 45px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin: 3%;
+        margin-left: 0;
+        cursor: pointer;
+        text-wrap: nowrap;
+    }
     }
   }
