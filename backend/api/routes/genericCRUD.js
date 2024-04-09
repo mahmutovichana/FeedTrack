@@ -16,6 +16,13 @@ module.exports = {
     return rows[0];
   },
 
+  getByName: async (tableName, name) => {
+    const query = `SELECT * FROM "${tableName}" WHERE name = $1`;
+    console.log("getByName query:", query, "name:", name);
+    const { rows } = await db.query(query, [name]);
+    return rows[0];
+  },
+
   add: async (tableName, data) => {
     // Getting the columns and values
     var columns = Object.keys(data).map(key => `"${key}"`).join(', ');
@@ -42,7 +49,7 @@ module.exports = {
 
     // Creating query to insert data into table and get back inserted row
     const query = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders}) RETURNING *`;
-
+    console.log("add query:", query, "id:", id);
     const { rows } = await db.query(query, values);
 
     return rows[0];

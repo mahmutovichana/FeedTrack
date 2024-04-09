@@ -4,11 +4,28 @@
   align-items: center;
   justify-content: space-between;
 
+  button {
+    background-color: #0277c9;
+    color: #fff;
+    font-size: 12px;
+    padding: 10px 45px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 3%;
+    margin-left: 0;
+    cursor: pointer;
+    text-wrap: nowrap;
+  }
+
   .logo {
     display: flex;
     align-items: center;
     gap: 10px;
   }
+
   .icons {
     display: flex;
     align-items: center;
