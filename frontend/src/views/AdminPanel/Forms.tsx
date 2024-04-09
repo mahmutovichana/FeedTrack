@@ -183,7 +183,7 @@ const Forms = () => {
             onChange={(e) => handleQuestionChange(index, e.target.value)}
           />
           <img
-            src="./../../../public/delete.svg"
+            src="/delete.svg"
             alt="Delete"
             onClick={() => handleRemoveQuestion(index)}
             style={{ cursor: 'pointer', marginLeft: '5px' }}
