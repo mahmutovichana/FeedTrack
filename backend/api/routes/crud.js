@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router(); // Inicijalizacija rutera
+const router = express.Router(); // Router initialization
 
 const { authenticateToken, authRole } = require("../middlewares/authMiddleware");
 const genericCRUD = require("./genericCRUD");
@@ -54,6 +54,9 @@ const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
 const branchRouter = setupRoutes(genericCRUD, "Branch");
 const tellerRouter = setupRoutes(genericCRUD, "Teller");
 const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
+const questionRouter = setupRoutes(genericCRUD, "Question");
+const campaignRouter = setupRoutes(genericCRUD, "Campaign");
+const campaignQuestionRouter = setupRoutes(genericCRUD, "CampaignQuestion");
 
 // Dodavanje ruta u aplikaciju
 router.use("/users", userRouter);
@@ -61,5 +64,8 @@ router.use("/feedbacks", feedbackRouter);
 router.use("/branches", branchRouter);
 router.use("/tellers", tellerRouter);
 router.use("/dummy", dummyRouter); // only for testing
+router.use("/questions", questionRouter);
+router.use("/campaigns", campaignRouter);
+router.use("/campaignQuestions", campaignQuestionRouter);
 
 module.exports = router;

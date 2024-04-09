@@ -17,6 +17,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@hilla/react-components": "^2.3.10",
     "@mui/styled-engine": "^5.15.14",
     "@mui/x-data-grid": "^7.1.0",
     "bcrypt": "^5.1.1",

@@ -73,7 +73,7 @@ const Update = (props: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Provera validnosti podataka
+    // Check data validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
     const validRoles = ["superAdmin", "tellerAdmin", "branchAdmin"];
@@ -94,7 +94,6 @@ const Update = (props: Props) => {
       }
     });
 
-    // Ako postoje greške, postavljamo ih i zaustavljamo slanje podataka
     if (Object.keys(currentErrors).length > 0) {
       setErrors(currentErrors);
       return;
