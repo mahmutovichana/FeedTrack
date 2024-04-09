@@ -21,7 +21,7 @@ export default function Notes() {
     fetch(`${deployURLs.backendURL}/api/welcomeData`, {
       method: "POST",
       headers: {
-        authorization: `Bearer ${localStorage.token}`,
+        authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: formData,
     })

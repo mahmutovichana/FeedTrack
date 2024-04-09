@@ -1,4 +1,4 @@
 export const deployURLs = {
-  backendURL: "http://localhost:5432",
-  frontendURL: "http://localhost:5173",
+  backendURL: "https://feedtrack-backend.vercel.app",
+  frontendURL: "https://feedtrack.vercel.app",
 };

@@ -14,9 +14,6 @@ const UserFeedbackInput = () => {
   useEffect(() => {
     fetch(`${deployURLs.backendURL}/api/welcomeData`, {
       method: "GET",
-      headers: {
-        authorization: `Bearer ${localStorage.token}`,
-      },
     })
       .then((res) => res.json())
       .then((data) => {
