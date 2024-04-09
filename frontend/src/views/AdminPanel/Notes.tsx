@@ -1,37 +1,38 @@
 import React, { useState } from "react";
 import "./../../styles/AdminPanel/notes.scss";
 import { deployURLs } from "../../../public/constants";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const Notes = () => {
+export default function Notes() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [uploadMessage, setUploadMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleUpload = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("message", message);
-      formData.append("file", file);
+  const handleUpload = () => {
+    const formData = new FormData();
+    formData.append("message", message);
+    formData.append("file", file);
 
-      // Form data
-      for (const pair of formData.entries()) {
-        console.log(pair[0] + ", " + pair[1]);
-      }
-
-      const response = await fetch(`${deployURLs.backendURL}/api/welcomeData`, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          authorization: `Bearer ${localStorage.token}`,
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log(data);
-    } catch (err) {
-      console.error("Error uploading file: ", err);
+    if (!file || message.trim() === "") {
+      return setUploadMessage("Please provide a message and upload an image.");
     }
+
+    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${localStorage.token}`,
+      },
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUploadMessage("Upload successful");
+      })
+      .catch((err) => {
+        console.error("Error uploading file: ", err);
+        setUploadMessage("Error uploading file: " + err);
+      });
   };
 
   return (
@@ -58,8 +59,11 @@ const Notes = () => {
       </label>
       <br />
       <button onClick={handleUpload}>Upload</button>
+      <p className="upload-message">{uploadMessage}</p>
+      <br />
+      <button type="button" onClick={() => navigate("/userFeedback")}>
+        View user feedback page
+      </button>
     </div>
   );
-};
-
-export default Notes;
+}

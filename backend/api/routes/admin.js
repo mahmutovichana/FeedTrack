@@ -58,6 +58,10 @@ router.post(
           .json({ message: "Content-Type must be multipart/form-data" });
       }
 
+      if (!req.body.message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
@@ -80,6 +84,17 @@ router.post(
     }
   }
 );
+
+router.get("/welcomeData", (req, res) => {
+  try {
+    const message = JSON.parse(
+      fs.readFileSync(`${uploadDir}/welcome-message.json`)
+    );
+    res.status(200).json(message);
+  } catch (err) {
+    res.status(200).json({ message: "Default welcome message" });
+  }
+});
 
 router.post(
   "/admin",

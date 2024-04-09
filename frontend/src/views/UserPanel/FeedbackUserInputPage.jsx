@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
 import "./../../styles/UserPanel/feedbackUserInput.css";
-import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import { deployURLs } from "../../../public/constants";
 
 const UserFeedbackInput = () => {
   const [satisfactionLevel, setSatisfactionLevel] = useState(null);
   const [hidden, setHidden] = useState(true);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   const handleSmileyClick = (level) => {
     setSatisfactionLevel(level);
   };
 
   useEffect(() => {
-    const welcomeMessage = fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
       method: "GET",
       headers: {
         authorization: `Bearer ${localStorage.token}`,
       },
-    });
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setWelcomeMessage(data.message);
+      });
   }, []);
 
   const sendFeedback = async () => {
@@ -39,8 +43,14 @@ const UserFeedbackInput = () => {
             className="logo-image"
             alt="FeedTrack logo"
           />
+          <h1>{welcomeMessage}</h1>
         </div>
-        <button onClick={() => setHidden(false)}>Leave us a feedback</button>
+        <button
+          onClick={() => setHidden(false)}
+          style={{ display: hidden ? "inline" : "none" }}
+        >
+          Leave us a feedback
+        </button>
         <div
           className="feedback-section"
           style={{ display: hidden ? "none" : "block" }}
