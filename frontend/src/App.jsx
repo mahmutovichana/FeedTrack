@@ -7,7 +7,8 @@ import Branches from './views/AdminPanel/Branches';
 import Layout from './Layout.tsx';
 import Feedbacks from './views/AdminPanel/Feedbacks';
 import UserFeedbackInput from './views/UserPanel/FeedbackUserInputPage';
-import Forms from './views/AdminPanel/Forms.tsx';
+import Forms from './views/AdminPanel/Forms';
+import Campaigns from './views/AdminPanel/Campaigns';
 
 function App() {
 
@@ -48,6 +49,10 @@ function App() {
         {
           path: "/forms",
           element: <Forms />
+        },
+        {
+          path: "/campaigns",
+          element: <Campaigns />
         }
       ]
     }

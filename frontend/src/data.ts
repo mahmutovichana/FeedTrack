@@ -53,9 +53,9 @@ export const menu = [
       listItems: [
         {
           id: 1,
-          title: "Elements",
-          url: "/home",
-          icon: "element.svg",
+          title: "Campaigns",
+          url: "/campaigns",
+          icon: "megaphone.png",
         },
         {
           id: 2,
