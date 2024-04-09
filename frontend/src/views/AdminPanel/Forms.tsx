@@ -5,6 +5,8 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import "./../../styles/AdminPanel/forms.scss";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Forms = () => {
 
@@ -108,6 +110,8 @@ const Forms = () => {
         if (!campaignQuestionResponse.ok) {
           throw new Error(`Error adding question "${question.text}" to the campaign: ${campaignQuestionResponse.status}`);
         }
+
+        toast("Succesfully added new questions!");
       } catch (error) {
         console.error(error);
       }
@@ -201,6 +205,7 @@ const Forms = () => {
       {errorMessages.map((errorMessage, index) => (
         <p key={index} style={{ color: 'red' }}>{errorMessage}</p>
       ))}
+      <ToastContainer />
     </div>
   );
   
