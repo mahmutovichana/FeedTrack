@@ -1,5 +1,5 @@
 .dataTable{
-
+    z-index: 50; // added so that add and update components always show over datatable component
     display: grid;
     
     .dataGrid{

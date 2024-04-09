@@ -6,7 +6,7 @@ import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../../styles/AdminPanel/AdminLogin.scss";
-import { deployURLs } from "../../../public/constants";
+import { deployURLs } from "./../../../public/constants";
 
 const GOOGLE_CLIENT_ID = "613438595302-q36ubvr0othatg6lcpmrm7t52vu6jqkq.apps.googleusercontent.com";
 

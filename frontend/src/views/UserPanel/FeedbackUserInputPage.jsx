@@ -68,5 +68,5 @@ const SmileyFeedback = ({ onClick }) => {
   );
 };
 
-
 export default UserFeedbackInput;
+

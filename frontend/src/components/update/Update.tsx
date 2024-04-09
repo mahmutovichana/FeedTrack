@@ -13,6 +13,7 @@ type Props = {
   slug: string;
   columns: GridColDef[];
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleRefreshData: () => void;
 };
 
 
@@ -52,29 +53,55 @@ const Update = (props: Props) => {
 
   useEffect(() => {
 
-
-    fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json(); // Parsiranje odgovora kao JSON
-      } else {
-        throw new Error('Network response was not ok');
-      }
-    })
-    .then(data => {
-      console.log('Data received successfully:', data);
-      setUsers(data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-
-
+    // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
+    const userDataString = localStorage.getItem('user');
+    const userData = JSON.parse(userDataString);
+    const isSuperAdmin = userData.role === 'superAdmin';
+    if(!isSuperAdmin && props.slug=="user"){
+      fetch(`${deployURLs.backendURL}/api/userRoles`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.token}`, 
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .then(data => {
+        console.log('Data received successfully:', data);
+        setUsers(data); 
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+    }
+    else{
+      fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .then(data => {
+        console.log('Data received successfully:', data);
+        setUsers(data); 
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+    }
   }, []);
 
 
@@ -82,10 +109,28 @@ const Update = (props: Props) => {
     e.preventDefault();
 
 
-    // Check data validation
+    // check if admin is superAdmin
+    let isSuperAdmin = false;
+    const userDataString = localStorage.getItem('user');
+    if (!userDataString) {
+      console.error("User data not found in localStorage");
+    } else {
+      const userData = JSON.parse(userDataString);
+      if (userData && userData.role) {
+        isSuperAdmin = userData.role === 'superAdmin';
+      } else {
+        console.error("Role not found in user data");
+      }
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
-    const validRoles = ["superAdmin", "tellerAdmin", "branchAdmin"];
+    let validRoles;
+    if(isSuperAdmin){
+      validRoles = ["superAdmin", "tellerAdmin", "branchAdmin", "user"];
+    }
+    else{
+      validRoles = ["user"];
+    }
     const currentErrors: { [key: string]: string } = {};
 
 
@@ -110,10 +155,6 @@ const Update = (props: Props) => {
       return;
     }
 
-
-    console.log(JSON.stringify(formData));
-
-
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedUserId}`, {
       method: 'PUT',
       headers: {
@@ -125,6 +166,7 @@ const Update = (props: Props) => {
         if (response.ok) {
           console.log('Data sent successfully');
           props.setOpen(false);
+          props.toggleRefreshData();
         } else {
           console.error('Error sending data:', response.statusText);
         }
@@ -165,7 +207,7 @@ const Update = (props: Props) => {
               </MenuItem>
               {users.map((user) => (
                 <MenuItem key={user.id} value={user.id.toString()}>
-                  {user.id}
+                  {user.name + " " + user.lastname}
                 </MenuItem>
               ))}
             </Select>
@@ -173,7 +215,7 @@ const Update = (props: Props) => {
         </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "img")
+            .filter((item) => item.field !== "id" && item.field !== "img" && item.field != "verified")
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? 'error-label' : ''}>{column.headerName}</label>

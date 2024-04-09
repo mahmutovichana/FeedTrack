@@ -8,6 +8,8 @@ import Layout from './Layout.tsx';
 import Feedbacks from './views/AdminPanel/Feedbacks';
 import UserFeedbackInput from './views/UserPanel/FeedbackUserInputPage';
 import Forms from './views/AdminPanel/Forms.tsx';
+import ProfilePage from './views/AdminPanel/Profile'
+
 
 function App() {
 
@@ -22,6 +24,10 @@ function App() {
       element: <UserFeedbackInput />
     },
     {
+      path:"/userFeedback",
+      element:<UserFeedbackInput/>
+    },
+    {
       path: "/",
       element: <Layout />,
       children: [
@@ -30,8 +36,12 @@ function App() {
           element: <AdminDashboardPage />
         },
         {
-          path: "/users",
-          element: <Users />
+          path:"/profile",
+          element:<ProfilePage/>
+        },
+        {
+          path:"/users",
+          element:<Users/>
         },
         {
           path: "/tellers",
