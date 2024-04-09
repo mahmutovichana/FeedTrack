@@ -1,4 +1,5 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const fs = require("fs");
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, "welcome-image");
+    cb(null, "welcome-image.png");
   },
 });
 const upload = multer({
@@ -37,6 +38,8 @@ const upload = multer({
     }
   },
 });
+
+router.use("/welcomeData", express.static(uploadDir));
 
 router.post(
   "/welcomeData",
@@ -59,7 +62,14 @@ router.post(
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      fs.writeFileSync(`${uploadDir}/welcome-message.js`, req.body.message);
+      const data = {
+        message: req.body.message,
+      };
+
+      fs.writeFileSync(
+        `${uploadDir}/welcome-message.json`,
+        JSON.stringify(data)
+      );
 
       res
         .status(200)
