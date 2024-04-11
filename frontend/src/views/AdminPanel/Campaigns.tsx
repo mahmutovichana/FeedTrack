@@ -1,22 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { deployURLs } from "../../../public/constants.js";
-import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
-import "./../../styles/AdminPanel/campaigns.scss";
-
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import "./../../styles/AdminPanel/forms.scss";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-interface Branch {
-    id: number;
-    location: string;
-    area: string;
-}
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './../../styles/AdminPanel/feedbacks.scss';
+import { GridColDef } from '@mui/x-data-grid';
+import DataTable from './../../components/dataTable/DataTable';
+import Add from '../../components/add/Add';
+import Update from '../../components/update/Update';
+import { deployURLs } from "./../../../public/constants";
 
 interface Campaign {
     id: number;
@@ -24,195 +13,94 @@ interface Campaign {
 }
 
 const Campaigns = () => {
-    const [areas, setAreas] = useState<string[]>([]);
-    const [selectedArea, setSelectedArea] = useState<string>('');
-    const [branches, setBranches] = useState<Branch[]>([]);
-    const [selectedBranches, setSelectedBranches] = useState<{ [key: string]: number[] }>({});
-
-    const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+    const [openAdd, setOpenAdd] = useState(false);
+    const [openUpdate, setOpenUpdate] = useState(false);
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+    const [columns, setColumns] = useState<GridColDef[]>([]);
+    const [refreshData, setRefreshData] = useState(false);
 
+    // get all feedbacks for the table
     useEffect(() => {
-
         fetch(`${deployURLs.backendURL}/api/campaigns`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
+            },
         })
-          .then(response => {
-            if (response.ok) {
-              return response.json();
-            } else {
-              throw new Error('Network response was not ok');
-            }
-          })
-          .then(data => {
-            console.log('Data received successfully:', data);
-            setCampaigns(data);
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-          });
-    
-      }, []);
-
-    useEffect(() => {
-        // Dobijanje svih jedinstvenih area vrijednosti sa backenda
-        fetch(`${deployURLs.backendURL}/api/branches/areas`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Network response was not ok');
+            .then((response) => response.json())
+            .then((data: Campaign[]) => {
+                if (data.length > 0) {
+                    const campaign = data[0];
+                    const campaignKeys = Object.keys(campaign);
+                    const generatedColumns = campaignKeys.map((key) => {
+                        return {
+                            field: key,
+                            headerName: key.charAt(0).toUpperCase() + key.slice(1),
+                            width: 150,
+                            type: typeof campaign[key] === 'boolean' ? 'boolean' : 'string',
+                        };
+                    }).filter(column => column !== null) as GridColDef[];
+                    setColumns(generatedColumns);
+                    setCampaigns(data);
                 }
             })
-            .then(data => {
-                setAreas(data);
-            })
-            .catch(error => {
-                console.error('Error fetching areas:', error);
-            });
+            .catch((error) => console.error('Error fetching campaigns:', error));
     }, []);
 
-    const handleAreaChange = async (area: string) => {
-        if (selectedArea === area) {
-            setSelectedArea('');
-        } else {
-            setSelectedArea(area);
-            // Dobijanje svih filijala koje pripadaju odabranom kantonu
-            fetch(`${deployURLs.backendURL}/api/branches/by-area/${area}`)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Network response was not ok');
-                    }
-                })
-                .then(data => {
-                    setBranches(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching branches:', error);
-                });
-        }
-    };
-
-    const handleBranchCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string, branchId: number) => {
-        const checked = event.target.checked;
-        if (checked) {
-            setSelectedBranches(prevState => ({
-                ...prevState,
-                [area]: [...(prevState[area] || []), branchId]
-            }));
-        } else {
-            setSelectedBranches(prevState => ({
-                ...prevState,
-                [area]: (prevState[area] || []).filter(id => id !== branchId)
-            }));
-        }
-    };
-
-    const handleAreaCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string) => {
-        const checked = event.target.checked;
-        if (checked) {
-            setSelectedBranches(prevState => ({
-                ...prevState,
-                [area]: branches.filter(branch => branch.area === area).map(branch => branch.id)
-            }));
-        } else {
-            setSelectedBranches(prevState => {
-                const updatedSelectedBranches = { ...prevState };
-                delete updatedSelectedBranches[area];
-                return updatedSelectedBranches;
-            });
-        }
-    };
-
-    const handleSubmit = async () => {
-        console.log(selectedBranches);
-        try {
-            for (const area in selectedBranches) {
-                const branchIds = selectedBranches[area];
-                await Promise.all(branchIds.map(async branchId => {
-                    try {
-                        const response = await fetch(`${deployURLs.backendURL}/api/branches/${branchId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ campaignID: selectedCampaign })
-                        });
-                        if (!response.ok) {
-                            throw new Error('Failed to update branch');
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }));
+    // handle deleting a campaign
+    const deleteCampaign = (id: number) => {
+        fetch(`${deployURLs.backendURL}/api/campaigns/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`, 
+                'Content-Type': 'application/json',
             }
-        } catch (error) {
-            console.error(error);
-        }
+        })
+            .then((response) => {
+                if (response.ok) {
+                    const updatedCampaigns = campaigns.filter(campaign => campaign.id !== id);
+                    setCampaigns(updatedCampaigns);
+                } else {
+                    console.error('Error deleting campaign:', response.statusText);
+                }
+            })
+            .catch((error) => console.error('Error deleting campaign:', error));
     };
 
-    const handleCampaignChange = (event: SelectChangeEvent<Campaign>) => {
-        const selectedCampaignValue = event.target.value as Campaign;
-        setSelectedCampaign(selectedCampaignValue);
-        console.log("ovo je selectedCampaign: " + selectedCampaignValue);
+    // check if admin is authorized to see and use CRUD 
+    let isValidAdmin = false;
+    const userDataString = localStorage.getItem('user');
+    if (!userDataString) console.error("User data not found in localStorage");
+    else {
+        const userData = JSON.parse(userDataString);
+        if (userData && userData.role) {
+            isValidAdmin = (userData.role === 'superAdmin') || (userData.role === 'branchAdmin') || (userData.role === 'tellerAdmin');
+            console.log("User: ", userData);
+            console.log("Am I a valid admin? ", isValidAdmin);
+        } else {
+            console.error("Role not found in user data");
+        }
+    }
+
+    const toggleRefreshData = () => {
+        setRefreshData(prevState => !prevState);
       };
 
     return (
-        <div className='formsContainer'>
-            <h1>Branches by Area</h1>
-            <p>Assign campaigns to branches listed below!</p>
-            <Box sx={{ minWidth: 120 }}>
-                <FormControl fullWidth>
-                    <Select
-                        value={selectedCampaign || ""}
-                        onChange={handleCampaignChange}
-                        displayEmpty
-                    >
-                        <MenuItem value="" disabled>Select campaign</MenuItem>
-                        {campaigns.map((campaign) => (
-                            <MenuItem key={campaign.id} value={campaign.id}>
-                                {campaign.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </Box>
-
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                {areas.map((area, index) => (
-                    <div key={index} className="areaContainer">
-                        <label className="areaLabel" onClick={() => handleAreaChange(area)}>
-                            <Checkbox
-                                onChange={(event) => handleAreaCheckboxChange(event, area)}
-                                checked={!!selectedBranches[area]}
-                                color="primary"
-                                className="areaCheckbox"
-                            />
-                            <span className="areaText">{area}</span>
-                            <span className={`arrow ${selectedArea === area ? 'open' : ''}`}>&#9660;</span>
-                        </label>
-                        {selectedArea === area &&
-                            branches.map(branch => (
-                                <div key={branch.id} className="branchContainer">
-                                    <Checkbox
-                                        checked={selectedBranches[area]?.includes(branch.id)}
-                                        onChange={(event) => handleBranchCheckboxChange(event, area, branch.id)}
-                                        color="primary"
-                                        className="branchCheckbox"
-                                    />
-                                    <span className="branchText">{branch.location}</span>
-                                </div>
-                            ))
-                        }
-                    </div>
-                ))}
-            </Box>
-            <Button variant="contained" onClick={handleSubmit} style={{ marginTop: '20px', fontFamily: "Montserrat" }}>Submit</Button>
+        <div className="campaigns">
+            <div className="info">
+                <h1>Campaigns</h1>
+                {isValidAdmin && (
+                    <>
+                        <button onClick={() => setOpenAdd(true)}>Add</button>
+                        <button onClick={() => setOpenUpdate(true)}>Update</button>
+                    </>
+                )}
+            </div>
+            <DataTable slug="campaigns" columns={columns} rows={campaigns} onDelete={deleteCampaign} />
+            {openAdd && <Add slug="campaign" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
+            {openUpdate && <Update slug="campaign" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
         </div>
     );
 };
