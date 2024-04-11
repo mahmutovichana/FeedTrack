@@ -14,6 +14,14 @@ const TellerSetup = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const selectedTellerId = localStorage.getItem('selectedTellerId');
+        if (selectedTellerId !== null) {
+            // If it is already set up, redirect the user to the userFeedback page
+            navigate('/userFeedback');
+        }
+    }, []);
+
+    useEffect(() => {
         // Fetch branches from the API when component mounts
         fetch(`${deployURLs.backendURL}/api/branches`)
             .then(response => response.json())
