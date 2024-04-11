@@ -4,6 +4,7 @@ import { deployURLs } from "./../../../public/constants";
 import './../../styles/UserPanel/tellerSetup.scss';
 import logo from './../../../public/feedtrackLogoBlack.svg';
 
+
 const TellerSetup = () => {
     const [branches, setBranches] = useState([]);
     const [tellers, setTellers] = useState([]);
@@ -48,6 +49,8 @@ const TellerSetup = () => {
             selectedTeller
         };
         console.log('Submitted data:', data);
+        localStorage.setItem('selectedBranchLocation', selectedBranch.location);
+        localStorage.setItem('selectedTellerId', selectedTeller.id);
 
         // Redirect to /userFeedback after submission
         navigate('/userFeedback');

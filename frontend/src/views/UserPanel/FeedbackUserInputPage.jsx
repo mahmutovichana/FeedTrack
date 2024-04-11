@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './../../styles/UserPanel/feedbackUserInput.css';
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,10 +7,18 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const UserFeedbackInput = () => {
   const [satisfactionLevel, setSatisfactionLevel] = useState(null);
+  const [branchLocation, setBranchLocation] = useState('');
+  const [selectedTeller, setSelectedTeller] = useState('');
 
   const handleSmileyClick = (level) => {
     setSatisfactionLevel(level);
   };
+  useEffect(() => {
+    const storedBranchLocation = localStorage.getItem('selectedBranchLocation');
+    const storedTellerId = localStorage.getItem('selectedTellerId');
+    setBranchLocation(storedBranchLocation);
+    setSelectedTeller(storedTellerId);
+}, []);
 
   const sendFeedback = async () => {
     if (satisfactionLevel !== null) {
@@ -25,6 +33,10 @@ const UserFeedbackInput = () => {
   return (
     <div className='feedbackUserInputContainer'>
       <div className="container">
+        <div className='info'>
+          <h3>Branch: {branchLocation}</h3>
+          <h3>Teller ID: {selectedTeller}</h3>
+        </div>
         <div className="logo">
           <img src={feedtrackLogo} className="logo-image" alt="FeedTrack logo" />
         </div>
