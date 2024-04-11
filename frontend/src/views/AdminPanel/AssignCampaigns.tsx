@@ -12,7 +12,6 @@ import "./../../styles/AdminPanel/forms.scss";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { format } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
@@ -29,15 +28,17 @@ interface Campaign {
 }
 
 const AssignCampaigns = () => {
+    console.error = () => {};
+
     const [areas, setAreas] = useState<string[]>([]);
-    const [selectedArea, setSelectedArea] = useState<string>('');
     const [branches, setBranches] = useState<Branch[]>([]);
     const [selectedBranches, setSelectedBranches] = useState<{ [key: string]: number[] }>({});
-
+    const [openArea, setOpenArea] = useState<string | null>(null); // Novo stanje za praćenje otvorenog kantona
     let [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-    const [startDate, setStartDate] = useState<Date>();
-    const [endDate, setEndDate] = useState<Date>();
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+
 
     const handleStartDateSelect = (date: Date) => {
         setStartDate(date);
@@ -48,10 +49,11 @@ const AssignCampaigns = () => {
     };
 
     const handleAreaChange = async (area: string) => {
-        if (selectedArea === area) {
-            setSelectedArea('');
+        if (openArea === area) {
+            setOpenArea(null); // Ako je kliknut ponovno, zatvori meni
+
         } else {
-            setSelectedArea(area);
+            setOpenArea(area);
             // Dobijanje svih filijala koje pripadaju odabranom kantonu
             fetch(`${deployURLs.backendURL}/api/branches/by-area/${area}`)
                 .then(response => {
@@ -113,18 +115,17 @@ const AssignCampaigns = () => {
 
     const handleBranchCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string, branchId: number) => {
         const checked = event.target.checked;
+        const updatedSelectedBranches = { ...selectedBranches };
+    
         if (checked) {
-            setSelectedBranches(prevState => ({
-                ...prevState,
-                [area]: [...(prevState[area] || []), branchId]
-            }));
+            updatedSelectedBranches[area] = [...(updatedSelectedBranches[area] || []), branchId];
         } else {
-            setSelectedBranches(prevState => ({
-                ...prevState,
-                [area]: (prevState[area] || []).filter(id => id !== branchId)
-            }));
+            updatedSelectedBranches[area] = (updatedSelectedBranches[area] || []).filter(id => id !== branchId);
         }
+    
+        setSelectedBranches(updatedSelectedBranches);
     };
+    
 
     const handleAreaCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string) => {
         const checked = event.target.checked;
@@ -133,19 +134,45 @@ const AssignCampaigns = () => {
                 ...prevState,
                 [area]: branches.filter(branch => branch.area === area).map(branch => branch.id)
             }));
+            setOpenArea(area);
         } else {
             setSelectedBranches(prevState => {
                 const updatedSelectedBranches = { ...prevState };
                 delete updatedSelectedBranches[area];
                 return updatedSelectedBranches;
             });
+            setOpenArea(null);
         }
     };
+    
+    const handleToggleBranches = (area: string) => {
+        const allBranchesSelected = branches
+            .filter(branch => branch.area === area)
+            .every(branch => selectedBranches[area]?.includes(branch.id));
+
+        if (allBranchesSelected) {
+            setSelectedBranches(prevState => {
+                const updatedSelectedBranches = { ...prevState };
+                updatedSelectedBranches[area] = [];
+                return updatedSelectedBranches;
+            });
+        } else {
+            setSelectedBranches(prevState => {
+                const updatedSelectedBranches = { ...prevState };
+                updatedSelectedBranches[area] = branches
+                    .filter(branch => branch.area === area)
+                    .map(branch => branch.id);
+                return updatedSelectedBranches;
+            });
+        }
+    };
+
 
     const handleSubmit = async () => {
         try {
             if (!selectedCampaign) { toast.error("Please select a campaign!"); return; }
             if (!startDate || !endDate) { toast.error("Please select start and end dates!"); return; }
+            if (startDate >= endDate) { toast.error("Start date must be before end date!"); return; }
             if (Object.keys(selectedBranches).length === 0) { toast.error("No branches selected!"); return; }
 
             // Prvo ažurirajte kampanju sa izabranim datumima
@@ -155,8 +182,8 @@ const AssignCampaigns = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    startDate: format(startDate, 'dd-MM-yyyy'),
-                    endDate: format(endDate, 'dd-MM-yyyy')
+                    startDate: startDate,
+                    endDate: endDate
                 })
             });
 
@@ -192,8 +219,7 @@ const AssignCampaigns = () => {
 
     const handleCampaignChange = (event: SelectChangeEvent<number>) => {
         const selectedCampaignValue = event.target.value;
-        selectedCampaign = campaigns.find(campaign => campaign.id === selectedCampaignValue);
-        setSelectedCampaign(selectedCampaign);
+        setSelectedCampaign(campaigns.find(campaign => campaign.id === selectedCampaignValue));
     };
 
     return (
@@ -248,9 +274,9 @@ const AssignCampaigns = () => {
                                 className="areaCheckbox"
                             />
                             <span className="areaText">{area}</span>
-                            <span className={`arrow ${selectedArea === area ? 'open' : ''}`}>&#9660;</span>
+                            <span className={`arrow ${openArea === area ? 'open' : ''}`}>&#9660;</span>
                         </label>
-                        {selectedArea === area &&
+                        {openArea === area && ( // Prikaži filijale samo ako je kanton otvoren
                             branches.map(branch => (
                                 <div key={branch.id} className="branchContainer">
                                     <Checkbox
@@ -262,10 +288,12 @@ const AssignCampaigns = () => {
                                     <span className="branchText">{branch.location}</span>
                                 </div>
                             ))
-                        }
+                        )}
                     </div>
                 ))}
             </Box>
+
+
             <Button variant="contained" onClick={handleSubmit} style={{ marginTop: '20px', fontFamily: "Montserrat" }}>Submit</Button>
             <ToastContainer />
         </div>
