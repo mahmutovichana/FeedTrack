@@ -44,7 +44,7 @@ const Login = () => {
         };
 
         localStorage.setItem('user', JSON.stringify(userData));
-        console.log(localStorage.user);
+        console.log("ovo je localStorage user: " + localStorage.user);
 
         // Check if user exists in the database
         const existingUserResponse = await fetch(`${deployURLs.backendURL}/api/googleAddUser`, {
@@ -69,9 +69,15 @@ const Login = () => {
         } else {
           console.error('Error adding user:', existingUserResponse.statusText);
         }
+        
+        if (existingUserResult && typeof existingUserResult.user === 'object') {
+          localStorage.setItem('user', JSON.stringify(existingUserResult.user));
+          localStorage.setItem('token', existingUserResult.token);
+        } else if (errorData && typeof errorData.user === 'object') {
+          localStorage.setItem('user', JSON.stringify(errorData.user));
+          localStorage.setItem('token', errorData.token);
+        }
 
-        localStorage.user = existingUserResult.user || errorData.user;
-        localStorage.token = existingUserResult.token || errorData.token;
         console.log("User in local storage: " + localStorage.user);
         navigate('/home', { state: { "user": localStorage.user, "token": localStorage.token } });
 
