@@ -6,6 +6,10 @@ const Profile = () => {
   const userDataString = localStorage.getItem('user');
   const userData = userDataString ? JSON.parse(userDataString) : null;
 
+  console.log("ovo je userDatastring", userDataString);
+console.log("ovo je userData", JSON.stringify(userData));
+
+
   // Placeholders for missing data or invalid/missing image URL
   const placeholderImage = 'noavatar.png'; // Path to placeholder image
   const defaultValues = {
@@ -22,7 +26,7 @@ const Profile = () => {
         className="profile-image"
         src={userData?.image || placeholderImage}
         alt="Profile"
-        onError={(e) => { e.currentTarget.src = placeholderImage; }}
+        onError={(e) => { e.currentTarget.src = placeholderImage }}
       />
       <div className="user-details">
         <div className="detail">
