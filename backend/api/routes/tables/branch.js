@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router(); // Router initialization
 const db = require("./../../db");
 
-// Ruta za dobijanje svih jedinstvenih area vrijednosti
+// Route for getting all unique values for areas from branches
 router.get('/branches/areas', async (req, res) => {
     try {
         const query = 'SELECT DISTINCT area FROM "Branch"';
@@ -15,7 +15,7 @@ router.get('/branches/areas', async (req, res) => {
     }
 });
 
-// Ruta za dobijanje svih filijala koje pripadaju odabranom kantonu
+// Route for getting all branches grouped by their area 
 router.get('/branches/by-area/:area', async (req, res) => {
     try {
         const { area } = req.params;

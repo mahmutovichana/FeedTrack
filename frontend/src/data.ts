@@ -44,6 +44,12 @@ export const menu = [
           title: "Feedbacks",
           url: "/feedbacks",
           icon: "feedback-review.png",
+        },
+        {
+          id: 5,
+          title: "Campaigns",
+          url: "/campaigns",
+          icon: "megaphone.png",
         }
       ],
     },
@@ -53,9 +59,9 @@ export const menu = [
       listItems: [
         {
           id: 1,
-          title: "Campaigns",
-          url: "/campaigns",
-          icon: "megaphone.png",
+          title: "Assign Campaigns",
+          url: "/assignCampaigns",
+          icon: "assign.png",
         },
         {
           id: 2,

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import './../../styles/UserPanel/feedbackUserInput.css';
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const UserFeedbackInput = () => {
   const [satisfactionLevel, setSatisfactionLevel] = useState(null);
@@ -11,10 +14,10 @@ const UserFeedbackInput = () => {
 
   const sendFeedback = async () => {
     if (satisfactionLevel !== null) {
-      // Sending feedback to the server
+      toast("Thank you for your feedback :)"); 
       console.log('Feedback sent successfully:', satisfactionLevel);
     } else {
-      alert("Please select a satisfaction level")
+      toast.error("Please select a sastisfaction level!"); 
       console.log('Please select a satisfaction level.');
     }
   };
@@ -32,6 +35,7 @@ const UserFeedbackInput = () => {
           <button onClick={sendFeedback}>Submit</button>
         </div>
       </div>
+      <ToastContainer/>
     </div>
   );
 };

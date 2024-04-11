@@ -17,13 +17,14 @@ const Feedbacks = () => {
     const [openUpdate, setOpenUpdate] = useState(false);
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [columns, setColumns] = useState<GridColDef[]>([]);
+    const [refreshData, setRefreshData] = useState(false);
 
     // get all feedbacks for the table
     useEffect(() => {
         fetch(`${deployURLs.backendURL}/api/feedbacks`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${localStorage.token}`, 
+                'Authorization': `Bearer ${localStorage.token}`,
                 'Content-Type': 'application/json',
             },
         })
@@ -52,7 +53,7 @@ const Feedbacks = () => {
         fetch(`${deployURLs.backendURL}/api/feedbacks/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.token}`, 
+                'Authorization': `Bearer ${localStorage.token}`,
                 'Content-Type': 'application/json',
             }
         })
@@ -82,6 +83,10 @@ const Feedbacks = () => {
         }
     }
 
+    const toggleRefreshData = () => {
+        setRefreshData(prevState => !prevState);
+    };
+
     return (
         <div className="feedbacks">
             <div className="info">
@@ -94,8 +99,8 @@ const Feedbacks = () => {
                 )}
             </div>
             <DataTable slug="feedbacks" columns={columns} rows={feedbacks} onDelete={deleteFeedback} />
-            {openAdd && <Add slug="feedback" columns={columns} setOpen={setOpenAdd} />}
-            {openUpdate && <Update slug="feedback" columns={columns} setOpen={setOpenUpdate} />}
+            {openAdd && <Add slug="feedback" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
+            {openUpdate && <Update slug="feedback" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData} />}
         </div>
     );
 };

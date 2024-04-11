@@ -7,9 +7,10 @@ import Branches from './views/AdminPanel/Branches';
 import Layout from './Layout.tsx';
 import Feedbacks from './views/AdminPanel/Feedbacks';
 import UserFeedbackInput from './views/UserPanel/FeedbackUserInputPage';
-import Campaigns from './views/AdminPanel/Campaigns';
+import AssignCampaigns from './views/AdminPanel/AssignCampaigns';
 import Forms from './views/AdminPanel/Forms';
 import ProfilePage from './views/AdminPanel/Profile'
+import Campaigns from './views/AdminPanel/Campaigns';
 
 function App() {
 
@@ -22,10 +23,6 @@ function App() {
     {
       path: "/userFeedback",
       element: <UserFeedbackInput />
-    },
-    {
-      path:"/userFeedback",
-      element:<UserFeedbackInput/>
     },
     {
       path: "/",
@@ -62,6 +59,10 @@ function App() {
         {
           path: "/campaigns",
           element: <Campaigns />
+        },
+        {
+          path: "/assignCampaigns",
+          element: <AssignCampaigns />
         }
       ]
     }

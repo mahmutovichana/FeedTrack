@@ -26,29 +26,32 @@ interface User {
 const Update = (props: Props) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
 
 
   let slugPlural;
-    switch (props.slug) {
-      case 'user':
-        slugPlural = 'users';
-        break;
-      case 'teller':
-        slugPlural = 'tellers';
-        break;
-      case 'branch':
-        slugPlural = 'branches';
-        break;
-      case 'feedback':
-        slugPlural = 'feedbacks';
-        break;
-      default:
-        // Default ako slug ne odgovara nijednoj od opcija
-        console.error('Invalid slug:', props.slug);
-        return; // Ili postavite default slug
-    }
+  switch (props.slug) {
+    case 'user':
+      slugPlural = 'users';
+      break;
+    case 'teller':
+      slugPlural = 'tellers';
+      break;
+    case 'branch':
+      slugPlural = 'branches';
+      break;
+    case 'feedback':
+      slugPlural = 'feedbacks';
+      break;
+    case 'campaign':
+      slugPlural = 'campaigns';
+      break;
+    default:
+      // Default ako slug ne odgovara nijednoj od opcija
+      console.error('Invalid slug:', props.slug);
+      return; // Ili postavite default slug
+  }
 
 
   useEffect(() => {
@@ -57,50 +60,50 @@ const Update = (props: Props) => {
     const userDataString = localStorage.getItem('user');
     const userData = JSON.parse(userDataString);
     const isSuperAdmin = userData.role === 'superAdmin';
-    if(!isSuperAdmin && props.slug=="user"){
+    if (!isSuperAdmin && props.slug == "user") {
       fetch(`${deployURLs.backendURL}/api/userRoles`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${localStorage.token}`, 
+          'Authorization': `Bearer ${localStorage.token}`,
           'Content-Type': 'application/json',
         }
       })
-      .then(response => {
-        if (response.ok) {
-          return response.json(); // Parsiranje odgovora kao JSON
-        } else {
-          throw new Error('Network response was not ok');
-        }
-      })
-      .then(data => {
-        console.log('Data received successfully:', data);
-        setUsers(data); 
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+        .then(response => {
+          if (response.ok) {
+            return response.json(); // Parsiranje odgovora kao JSON
+          } else {
+            throw new Error('Network response was not ok');
+          }
+        })
+        .then(data => {
+          console.log('Data received successfully:', data);
+          setUsers(data);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
     }
-    else{
+    else {
       fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      .then(response => {
-        if (response.ok) {
-          return response.json(); // Parsiranje odgovora kao JSON
-        } else {
-          throw new Error('Network response was not ok');
-        }
-      })
-      .then(data => {
-        console.log('Data received successfully:', data);
-        setUsers(data); 
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+        .then(response => {
+          if (response.ok) {
+            return response.json(); // Parsiranje odgovora kao JSON
+          } else {
+            throw new Error('Network response was not ok');
+          }
+        })
+        .then(data => {
+          console.log('Data received successfully:', data);
+          setUsers(data);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
     }
   }, []);
 
@@ -125,10 +128,10 @@ const Update = (props: Props) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
     let validRoles;
-    if(isSuperAdmin){
+    if (isSuperAdmin) {
       validRoles = ["superAdmin", "tellerAdmin", "branchAdmin", "user"];
     }
-    else{
+    else {
       validRoles = ["user"];
     }
     const currentErrors: { [key: string]: string } = {};
@@ -155,7 +158,7 @@ const Update = (props: Props) => {
       return;
     }
 
-    fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedUserId}`, {
+    fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -184,7 +187,7 @@ const Update = (props: Props) => {
 
 
   const handleUserChange = (event: SelectChangeEvent<string>) => {
-    setSelectedUserId(event.target.value);
+    setSelectedId(event.target.value);
   };
 
 
@@ -198,12 +201,12 @@ const Update = (props: Props) => {
         <Box sx={{ minWidth: 120 }}>
           <FormControl fullWidth>
             <Select
-              value={selectedUserId || ""}
+              value={selectedId || ""}
               onChange={handleUserChange}
               displayEmpty
             >
               <MenuItem value="" disabled>
-                Select user
+                Select {props.slug}
               </MenuItem>
               {users.map((user) => (
                 <MenuItem key={user.id} value={user.id.toString()}>

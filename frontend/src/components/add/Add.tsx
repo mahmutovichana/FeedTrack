@@ -35,10 +35,10 @@ const Add = (props: Props) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{4,15}$/;
     let validRoles;
-    if(isSuperAdmin){
+    if (isSuperAdmin) {
       validRoles = ["superAdmin", "tellerAdmin", "branchAdmin", "user"];
     }
-    else{
+    else {
       validRoles = ["user"];
     }
     const currentErrors: { [key: string]: string } = {};
@@ -79,6 +79,9 @@ const Add = (props: Props) => {
         break;
       case 'feedback':
         slugPlural = 'feedbacks';
+        break;
+      case 'campaign':
+        slugPlural = 'campaigns';
         break;
       default:
         // Default ako slug ne odgovara nijednoj od opcija

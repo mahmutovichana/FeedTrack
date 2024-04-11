@@ -1,56 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+.campaigns{
 
-* {
-    font-family: "Montserrat";
-}
+    .info{
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+  
+      button {
+        background-color: #0277c9;
+        color: #fff;
+        font-size: 12px;
+        padding: 10px 45px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin: 3%;
+        margin-left: 0;
+        cursor: pointer;
+        text-wrap: nowrap;
+    }
 
-#root > div > div > div.container > div.contentContainer > div > div.MuiBox-root.css-ece9u5 > div {
-    width: unset;
-    margin-left: 0;
-    margin-bottom: 3%;
+    }
   }
-
-.areaContainer {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-}
-
-.areaLabel {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.areaText {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.arrow {
-    margin-left: auto;
-    cursor: pointer;
-}
-
-.open {
-    transform: rotate(180deg);
-}
-
-.areaCheckbox {
-    margin-right: 10px;
-}
-
-.branchContainer {
-    margin-left: 30px;
-    margin-top: 5px;
-    display: flex;
-    align-items: center;
-}
-
-.branchCheckbox {
-    margin-right: 10px;
-}
-
-.branchText {
-    font-size: 14px;
-}

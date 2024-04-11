@@ -29,7 +29,7 @@ const Forms = () => {
   };
 
   const handleSubmit = async () => {
-    // Kreiranje seta koji će sadržavati tekstove svih pitanja
+    
     const questionTexts = new Set<string>();
     setErrorMessages([]);
 
@@ -45,7 +45,7 @@ const Forms = () => {
       }
     }
   
-    // Proveravamo da li su svi tekstovi pitanja unikatni
+    // check if all provided questions are unique
     for (const question of questions) {
       if (questionTexts.has(question.text)) {
         console.error(`Duplicate question found: ${question.text}`);
@@ -54,10 +54,10 @@ const Forms = () => {
       questionTexts.add(question.text);
     }
   
-    // Ako su sva pitanja unikatna, šaljemo ih na server
+    // if the questions are unique, we add them to the server
     for (const question of questions) {
       try {
-        // Provjeravamo postoji li već pitanje s istim tekstom u bazi
+        // we check if there is a duplicate question in the database
         const response = await fetch(`${deployURLs.backendURL}/api/questions/name`, {
           method: 'POST',
           headers: {
@@ -73,12 +73,11 @@ const Forms = () => {
         const existingQuestion = await response.json();
   
         if (existingQuestion.question) {
-          const errorMessage = `The question "${question.text}" already exists in the database.`;
-          setErrorMessages(prevState => [...prevState, errorMessage]);
-          continue; // Preskačemo dodavanje pitanja ako već postoji
+          toast.error(`The question "${question.text}" already exists in the database.`);
+          continue; // we continue if the question already exists
         }
   
-        // Ako pitanje ne postoji, dodajemo ga u bazu
+        // if the question does not exist in the database, then we add it
         const questionResponse = await fetch(`${deployURLs.backendURL}/api/questions`, {
           method: 'POST',
           headers: {
@@ -95,7 +94,7 @@ const Forms = () => {
   
         const questionData = await questionResponse.json();
   
-        // Nakon što dodamo pitanje, dodajemo vezu između kampanje i pitanja
+        // after adding the question, we add the relation between the question and its campaign
         const campaignQuestionResponse = await fetch(`${deployURLs.backendURL}/api/campaignQuestions`, {
           method: 'POST',
           headers: {
