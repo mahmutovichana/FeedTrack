@@ -48,13 +48,14 @@ const AssignCampaigns = () => {
         setEndDate(date);
     };
 
+    // handles clicks on the area
     const handleAreaChange = async (area: string) => {
         if (openArea === area) {
-            setOpenArea(null); // Ako je kliknut ponovno, zatvori meni
+            setOpenArea(null); // if it's clicked again, close it
 
         } else {
             setOpenArea(area);
-            // Dobijanje svih filijala koje pripadaju odabranom kantonu
+            // get all branches grouped by their areas
             fetch(`${deployURLs.backendURL}/api/branches/by-area/${area}`)
                 .then(response => {
                     if (response.ok) {
@@ -72,6 +73,7 @@ const AssignCampaigns = () => {
         }
     };
 
+    // display all the campaign names
     useEffect(() => {
         fetch(`${deployURLs.backendURL}/api/campaigns`, {
             method: 'GET',
@@ -95,7 +97,7 @@ const AssignCampaigns = () => {
     }, []);
 
     useEffect(() => {
-        // Dobijanje svih jedinstvenih area vrijednosti sa backenda
+        // get all unique area names from the branches 
         fetch(`${deployURLs.backendURL}/api/branches/areas`)
             .then(response => {
                 if (response.ok) {
@@ -112,7 +114,7 @@ const AssignCampaigns = () => {
             });
     }, []);
 
-
+    // handles checkboxes from branches
     const handleBranchCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string, branchId: number) => {
         const checked = event.target.checked;
         const updatedSelectedBranches = { ...selectedBranches };
@@ -126,7 +128,7 @@ const AssignCampaigns = () => {
         setSelectedBranches(updatedSelectedBranches);
     };
     
-
+    // handles the checkbox from the area
     const handleAreaCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string) => {
         const checked = event.target.checked;
         if (checked) {
@@ -144,30 +146,8 @@ const AssignCampaigns = () => {
             setOpenArea(null);
         }
     };
-    
-    const handleToggleBranches = (area: string) => {
-        const allBranchesSelected = branches
-            .filter(branch => branch.area === area)
-            .every(branch => selectedBranches[area]?.includes(branch.id));
 
-        if (allBranchesSelected) {
-            setSelectedBranches(prevState => {
-                const updatedSelectedBranches = { ...prevState };
-                updatedSelectedBranches[area] = [];
-                return updatedSelectedBranches;
-            });
-        } else {
-            setSelectedBranches(prevState => {
-                const updatedSelectedBranches = { ...prevState };
-                updatedSelectedBranches[area] = branches
-                    .filter(branch => branch.area === area)
-                    .map(branch => branch.id);
-                return updatedSelectedBranches;
-            });
-        }
-    };
-
-
+    // handles the click from the submit button
     const handleSubmit = async () => {
         try {
             if (!selectedCampaign) { toast.error("Please select a campaign!"); return; }
@@ -217,6 +197,7 @@ const AssignCampaigns = () => {
         }
     };
 
+    // handles the change from the combo box of the list of campaign names
     const handleCampaignChange = (event: SelectChangeEvent<number>) => {
         const selectedCampaignValue = event.target.value;
         setSelectedCampaign(campaigns.find(campaign => campaign.id === selectedCampaignValue));
@@ -276,7 +257,7 @@ const AssignCampaigns = () => {
                             <span className="areaText">{area}</span>
                             <span className={`arrow ${openArea === area ? 'open' : ''}`}>&#9660;</span>
                         </label>
-                        {openArea === area && ( // Prikaži filijale samo ako je kanton otvoren
+                        {openArea === area && ( // display branches only if the area is opened
                             branches.map(branch => (
                                 <div key={branch.id} className="branchContainer">
                                     <Checkbox

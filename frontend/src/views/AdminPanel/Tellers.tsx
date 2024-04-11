@@ -17,6 +17,7 @@ const Tellers = () => {
     const [openUpdate, setOpenUpdate] = useState(false);
     const [tellers, setTellers] = useState<Teller[]>([]);
     const [columns, setColumns] = useState<GridColDef[]>([]);
+    const [refreshData, setRefreshData] = useState(false);
 
     useEffect(() => {
         fetch(`${deployURLs.backendURL}/api/tellers`, {
@@ -81,6 +82,10 @@ const Tellers = () => {
         }
     }
 
+    const toggleRefreshData = () => {
+        setRefreshData(prevState => !prevState);
+      };
+
     return (
         <div className="tellers">
             <div className="info">
@@ -93,8 +98,8 @@ const Tellers = () => {
                 )}
             </div>
             <DataTable slug="tellers" columns={columns} rows={tellers} onDelete={deleteTeller} />
-            {openAdd && <Add slug="teller" columns={columns} setOpen={setOpenAdd} />}
-            {openUpdate && <Update slug="teller" columns={columns} setOpen={setOpenUpdate} />}
+            {openAdd && <Add slug="teller" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
+            {openUpdate && <Update slug="teller" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
         </div>
     );
 };

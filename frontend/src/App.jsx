@@ -25,10 +25,6 @@ function App() {
       element: <UserFeedbackInput />
     },
     {
-      path:"/userFeedback",
-      element:<UserFeedbackInput/>
-    },
-    {
       path: "/",
       element: <Layout />,
       children: [

@@ -24,7 +24,7 @@ const Campaigns = () => {
         fetch(`${deployURLs.backendURL}/api/campaigns`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${localStorage.token}`, 
+                'Authorization': `Bearer ${localStorage.token}`,
                 'Content-Type': 'application/json',
             },
         })
@@ -53,7 +53,7 @@ const Campaigns = () => {
         fetch(`${deployURLs.backendURL}/api/campaigns/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.token}`, 
+                'Authorization': `Bearer ${localStorage.token}`,
                 'Content-Type': 'application/json',
             }
         })
@@ -85,7 +85,7 @@ const Campaigns = () => {
 
     const toggleRefreshData = () => {
         setRefreshData(prevState => !prevState);
-      };
+    };
 
     return (
         <div className="campaigns">
@@ -99,8 +99,8 @@ const Campaigns = () => {
                 )}
             </div>
             <DataTable slug="campaigns" columns={columns} rows={campaigns} onDelete={deleteCampaign} />
-            {openAdd && <Add slug="campaign" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
-            {openUpdate && <Update slug="campaign" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
+            {openAdd && <Add slug="campaign" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
+            {openUpdate && <Update slug="campaign" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData} />}
         </div>
     );
 };
