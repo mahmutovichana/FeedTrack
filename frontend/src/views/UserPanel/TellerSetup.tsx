@@ -71,7 +71,7 @@ const TellerSetup = () => {
                     <label htmlFor="selectedTeller">Select Teller:</label>
                     <select id="selectedTeller" value={selectedTeller ? selectedTeller.id : ''} onChange={handleTellerSelect}>
                         <option value="">Select Teller</option>
-                        {tellers.map(teller => (
+                        {selectedBranch && tellers.filter(teller => teller.branchID === selectedBranch.id).map(teller => (
                             <option key={teller.id} value={teller.id}>{teller.id}</option>
                         ))}
                     </select>
