@@ -1,5 +1,9 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
+const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 const {
   authenticateToken, authRole,
 } = require("../middlewares/authMiddleware");
@@ -76,5 +80,92 @@ router.get(
     }
   }
 );
+
+
+const uploadDir = path.join(__dirname, "../welcome-data");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, "welcome-image.png");
+  },
+});
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false, req.fileValidationError);
+    }
+  },
+});
+
+router.use("/welcomeData", express.static(uploadDir));
+
+router.post(
+  "/welcomeData",
+  //authenticateToken,
+  //authRole("superAdmin", "tellerAdmin", "branchAdmin"),
+  upload.single("file"),
+  async (req, res) => {
+    if (req.fileValidationError) {
+      return res.status(400).json({ message: "Invalid file type" });
+    }
+
+    try {
+      if (!req.headers["content-type"].includes("multipart/form-data")) {
+        return res
+          .status(400)
+          .json({ message: "Content-Type must be multipart/form-data" });
+      }
+
+      if (!req.body.message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const data = {
+        message: req.body.message,
+      };
+
+      fs.writeFileSync(
+        `${uploadDir}/welcome-message.json`,
+        JSON.stringify(data)
+      );
+
+      res
+        .status(200)
+        .json({ message: "File and message uploaded successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
+router.get("/welcomeData", (req, res) => {
+  try {
+    const message = JSON.parse(
+      fs.readFileSync(`${uploadDir}/welcome-message.json`)
+    );
+    res.status(200).json(message);
+  } catch (err) {
+    res.status(200).json({ message: "Default welcome message" });
+  }
+});
 
 module.exports = router;

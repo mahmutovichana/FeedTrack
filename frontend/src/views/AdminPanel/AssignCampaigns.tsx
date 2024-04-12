@@ -28,7 +28,7 @@ interface Campaign {
 }
 
 const AssignCampaigns = () => {
-    console.error = () => {};
+    console.error = () => { };
 
     const [areas, setAreas] = useState<string[]>([]);
     const [branches, setBranches] = useState<Branch[]>([]);
@@ -38,7 +38,7 @@ const AssignCampaigns = () => {
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-
+    const [noQuestions, setNoQuestions] = useState("");
 
     const handleStartDateSelect = (date: Date) => {
         setStartDate(date);
@@ -118,16 +118,16 @@ const AssignCampaigns = () => {
     const handleBranchCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string, branchId: number) => {
         const checked = event.target.checked;
         const updatedSelectedBranches = { ...selectedBranches };
-    
+
         if (checked) {
             updatedSelectedBranches[area] = [...(updatedSelectedBranches[area] || []), branchId];
         } else {
             updatedSelectedBranches[area] = (updatedSelectedBranches[area] || []).filter(id => id !== branchId);
         }
-    
+
         setSelectedBranches(updatedSelectedBranches);
     };
-    
+
     // handles the checkbox from the area
     const handleAreaCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, area: string) => {
         const checked = event.target.checked;
@@ -191,6 +191,19 @@ const AssignCampaigns = () => {
                         console.error(error);
                     }
                 }));
+            }
+            try {
+                const noOfQuestionsResponse = await fetch(`${deployURLs.backendURL}/api/campaigns/${selectedCampaign.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        questionsperpage: noQuestions
+                    })
+                });
+            } catch (error) {
+                console.error(error);
             }
         } catch (error) {
             console.error(error);
@@ -274,7 +287,13 @@ const AssignCampaigns = () => {
                 ))}
             </Box>
 
-
+            <input
+                type="number"
+                id="noQuestions"
+                placeholder="No. Of Questions Per Page"
+                value={noQuestions}
+                onChange={(e) => setNoQuestions(e.target.value)}
+            />
             <Button variant="contained" onClick={handleSubmit} style={{ marginTop: '20px', fontFamily: "Montserrat" }}>Submit</Button>
             <ToastContainer />
         </div>

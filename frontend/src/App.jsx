@@ -11,6 +11,8 @@ import AssignCampaigns from './views/AdminPanel/AssignCampaigns';
 import Forms from './views/AdminPanel/Forms';
 import ProfilePage from './views/AdminPanel/Profile'
 import Campaigns from './views/AdminPanel/Campaigns';
+import TellerSetup from './views/UserPanel/TellerSetup';
+import Notes from "./views/AdminPanel/Notes";
 
 function App() {
 
@@ -23,6 +25,10 @@ function App() {
     {
       path: "/userFeedback",
       element: <UserFeedbackInput />
+    },
+    {
+      path: "/tellerSetup",
+      element: <TellerSetup />
     },
     {
       path: "/",
@@ -63,6 +69,10 @@ function App() {
         {
           path: "/assignCampaigns",
           element: <AssignCampaigns />
+        },
+        {
+          path: "/notes",
+          element: <Notes />
         }
       ]
     }
