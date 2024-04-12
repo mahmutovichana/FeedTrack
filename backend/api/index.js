@@ -13,6 +13,7 @@ const crudRouter = require("./routes/crud");
 const adminRouter = require("./routes/admin");
 const branchesRouter = require("./routes/tables/branch");
 const campaignsRouter = require("./routes/tables/campaign");
+const viewsRouter = require("./routes/view");
 
 app.use(
   "/api-docs",
@@ -45,6 +46,7 @@ app.use("/api", devRouter);
 app.use("/api", adminRouter);
 app.use("/api", branchesRouter);
 app.use("/api", campaignsRouter);
+app.use("/api", viewsRouter);
 
 const PORT = 5432;
 
