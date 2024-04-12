@@ -6,7 +6,6 @@ import './../../styles/UserPanel/feedbackUserInput.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 //function for conversion of date
 function formatDate(timestamp) {
     const padZero = (num) => (num < 10 ? '0' + num : num);
@@ -47,7 +46,7 @@ const UserFeedbackInput = () => {
 
     async function fetchQuestionsFromDatabase() {
         try {
-            const response = await fetch(`http://localhost:5432/api/campaign/view/${campaignID}`, {
+            const response = await fetch(`${deployURLs.backendURL}/api/campaign/view/${campaignID}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${localStorage.token}`,
