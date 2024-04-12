@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { deployURLs } from "./../../../public/constants";
 import './../../styles/UserPanel/tellerSetup.scss';
 import logo from './../../../public/feedtrackLogoBlack.svg';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const TellerSetup = () => {
@@ -15,7 +17,7 @@ const TellerSetup = () => {
 
     useEffect(() => {
         const selectedTellerId = localStorage.getItem('selectedTellerId');
-        if (selectedTellerId !== null) {
+        if (selectedTellerId && selectedBranch) {
             // If it is already set up, redirect the user to the userFeedback page
             navigate('/userFeedback');
         }
@@ -51,14 +53,19 @@ const TellerSetup = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
+        if (!selectedBranch || !selectedTeller) {
+            toast.error("Please select both the branch and the teller!");
+            return;
+        }
+
         // Simulate sending data to the server
         const data = {
             selectedBranch,
             selectedTeller
         };
         console.log('Submitted data:', data);
-        localStorage.setItem('selectedBranchLocation', selectedBranch.location);
-        localStorage.setItem('selectedTellerId', selectedTeller.id);
+        localStorage.setItem('selectedBranch', JSON.stringify(selectedBranch));
+        localStorage.setItem('selectedTeller', JSON.stringify(selectedTeller));
 
         // Redirect to /userFeedback after submission
         navigate('/userFeedback');
@@ -89,6 +96,7 @@ const TellerSetup = () => {
                 </div>
                 <button type="submit" className="submit-button">Submit</button>
             </form>
+            <ToastContainer/>
         </div>
     );
 };

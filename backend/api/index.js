@@ -12,6 +12,7 @@ const devRouter = require("./routes/dev");
 const crudRouter = require("./routes/crud");
 const adminRouter = require("./routes/admin");
 const branchesRouter = require("./routes/tables/branch");
+const campaignsRouter = require("./routes/tables/campaign");
 
 app.use(
   "/api-docs",
@@ -43,6 +44,7 @@ app.use("/api", authRouter);
 app.use("/api", devRouter);
 app.use("/api", adminRouter);
 app.use("/api", branchesRouter);
+app.use("/api", campaignsRouter);
 
 const PORT = 5432;
 

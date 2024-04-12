@@ -66,7 +66,7 @@ export const menu = [
         {
           id: 2,
           title: "Notes",
-          url: "/home",
+          url: "/notes",
           icon: "note.svg",
         },
         {
