@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./../../styles/AdminPanel/notes.scss";
 import { deployURLs } from "../../../public/constants";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Notes = () => {
   const [file, setFile] = useState(null);
@@ -25,9 +25,10 @@ const Notes = () => {
 
       const data = await response.json();
       console.log(data);
-      if(response.ok) toast.success("Successfully changed welcome notes!");
-      else toast.error("Error: "+data.message);
+      if (response.ok) toast.success("Successfully changed welcome notes!");
+      else toast.error("Error: " + data.message);
     } catch (err) {
+      console.error(err.message);
     }
   };
 
@@ -51,7 +52,7 @@ const Notes = () => {
       </label>
       <br />
       <button onClick={handleUpload}>Upload</button>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };

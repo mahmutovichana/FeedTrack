@@ -84,7 +84,7 @@ router.get(
   }
 );
 
-const uploadDir = path.join(__dirname, "../tmp");
+const uploadDir = "/tmp";
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);

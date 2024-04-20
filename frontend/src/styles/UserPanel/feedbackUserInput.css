@@ -19,6 +19,7 @@
 .feedbackUserInputContainer .logo {
   margin-bottom: 30px;
   filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
+  text-align: center;
 }
 
 .feedbackUserInputContainer .logo-image {
@@ -90,6 +91,5 @@
   .feedbackUserInputContainer .smiley-feedback span {
     margin: 0 8px;
     font-size: 1.5em;
-
   }
 }

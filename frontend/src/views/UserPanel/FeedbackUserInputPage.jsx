@@ -77,7 +77,7 @@ const UserFeedbackInput = () => {
 
   useEffect(() => {
     localStorage.setItem("pageSize", pageSize.toString());
-    fetch(`${deployURLs.backendURL}/api/tmp`, {
+    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
       method: "GET",
     })
       .then((res) => res.json())
@@ -166,7 +166,7 @@ const UserFeedbackInput = () => {
         </div>
         <div className="logo">
           <img
-            src={`${deployURLs.backendURL}/api/tmp/welcome-image.png`}
+            src={`${deployURLs.backendURL}/api/welcomeData/welcome-image.png`}
             className="logo-image"
             alt="FeedTrack logo"
           />
