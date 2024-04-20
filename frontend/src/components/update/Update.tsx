@@ -1,13 +1,12 @@
 import { GridColDef } from "@mui/x-data-grid";
 import "./update.scss";
 import React, { useState, useEffect } from "react";
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Box from "@mui/material/Box";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { deployURLs } from "./../../../public/constants";
-
 
 type Props = {
   slug: string;
@@ -16,12 +15,10 @@ type Props = {
   toggleRefreshData: () => void;
 };
 
-
 interface User {
   id: number;
   [key: string]: any;
 }
-
 
 const Update = (props: Props) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
@@ -29,98 +26,92 @@ const Update = (props: Props) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
 
-
   let slugPlural;
   switch (props.slug) {
-    case 'user':
-      slugPlural = 'users';
+    case "user":
+      slugPlural = "users";
       break;
-    case 'teller':
-      slugPlural = 'tellers';
+    case "teller":
+      slugPlural = "tellers";
       break;
-    case 'branch':
-      slugPlural = 'branches';
+    case "branch":
+      slugPlural = "branches";
       break;
-    case 'feedback':
-      slugPlural = 'feedbacks';
+    case "feedback":
+      slugPlural = "feedbacks";
       break;
-    case 'campaign':
-      slugPlural = 'campaigns';
+    case "campaign":
+      slugPlural = "campaigns";
       break;
     default:
       // Default ako slug ne odgovara nijednoj od opcija
-      console.error('Invalid slug:', props.slug);
+      console.error("Invalid slug:", props.slug);
       return; // Ili postavite default slug
   }
 
-
   useEffect(() => {
-
     // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
-    const userDataString = localStorage.getItem('user');
+    const userDataString = localStorage.getItem("user");
     const userData = JSON.parse(userDataString);
-    const isSuperAdmin = userData.role === 'superAdmin';
+    const isSuperAdmin = userData.role === "superAdmin";
     if (!isSuperAdmin && props.slug == "user") {
       fetch(`${deployURLs.backendURL}/api/userRoles`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${localStorage.token}`,
-          'Content-Type': 'application/json',
-        }
+          Authorization: `Bearer ${localStorage.token}`,
+          "Content-Type": "application/json",
+        },
       })
-        .then(response => {
+        .then((response) => {
           if (response.ok) {
             return response.json(); // Parsiranje odgovora kao JSON
           } else {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
         })
-        .then(data => {
-          console.log('Data received successfully:', data);
+        .then((data) => {
+          console.log("Data received successfully:", data);
           setUsers(data);
         })
-        .catch(error => {
-          console.error('Error fetching data:', error);
+        .catch((error) => {
+          console.error("Error fetching data:", error);
         });
-    }
-    else {
+    } else {
       fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       })
-        .then(response => {
+        .then((response) => {
           if (response.ok) {
             return response.json(); // Parsiranje odgovora kao JSON
           } else {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
           }
         })
-        .then(data => {
-          console.log('Data received successfully:', data);
+        .then((data) => {
+          console.log("Data received successfully:", data);
           setUsers(data);
         })
-        .catch(error => {
-          console.error('Error fetching data:', error);
+        .catch((error) => {
+          console.error("Error fetching data:", error);
         });
     }
   }, []);
 
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-
     // check if admin is superAdmin
     let isSuperAdmin = false;
-    const userDataString = localStorage.getItem('user');
+    const userDataString = localStorage.getItem("user");
     if (!userDataString) {
       console.error("User data not found in localStorage");
     } else {
       const userData = JSON.parse(userDataString);
       if (userData && userData.role) {
-        isSuperAdmin = userData.role === 'superAdmin';
+        isSuperAdmin = userData.role === "superAdmin";
       } else {
         console.error("Role not found in user data");
       }
@@ -130,14 +121,12 @@ const Update = (props: Props) => {
     let validRoles;
     if (isSuperAdmin) {
       validRoles = ["superAdmin", "tellerAdmin", "branchAdmin", "user"];
-    }
-    else {
+    } else {
       validRoles = ["user"];
     }
     const currentErrors: { [key: string]: string } = {};
 
-
-    props.columns.forEach(column => {
+    props.columns.forEach((column) => {
       if (column.field !== "id") {
         const value = formData[column.field];
         if (column.field === "email" && !emailRegex.test(value)) {
@@ -146,12 +135,13 @@ const Update = (props: Props) => {
           currentErrors[column.field] = "Invalid phone number format";
         } else if (column.field === "role" && !validRoles.includes(value)) {
           currentErrors[column.field] = "Invalid role";
-        } else if (column.field === "lastname" && value.length < 2) { // Ovde je promenjeno
-          currentErrors[column.field] = "Last name must be at least 2 characters long";
+        } else if (column.field === "lastname" && value.length < 2) {
+          // Ovde je promenjeno
+          currentErrors[column.field] =
+            "Last name must be at least 2 characters long";
         }
       }
     });
-
 
     if (Object.keys(currentErrors).length > 0) {
       setErrors(currentErrors);
@@ -159,37 +149,34 @@ const Update = (props: Props) => {
     }
 
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedId}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(formData),
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
-          console.log('Data sent successfully');
+          console.log("Data sent successfully");
           props.setOpen(false);
           props.toggleRefreshData();
         } else {
-          console.error('Error sending data:', response.statusText);
+          console.error("Error sending data:", response.statusText);
         }
       })
-      .catch(error => console.error('Error sending data:', error));
+      .catch((error) => console.error("Error sending data:", error));
   };
-
 
   const handleChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
-
 
   const handleUserChange = (event: SelectChangeEvent<string>) => {
     setSelectedId(event.target.value);
   };
-
 
   return (
     <div className="update">
@@ -218,18 +205,27 @@ const Update = (props: Props) => {
         </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "img" && item.field != "verified")
+            .filter(
+              (item) =>
+                item.field !== "id" &&
+                item.field !== "img" &&
+                item.field != "verified"
+            )
             .map((column) => (
               <div className="item" key={column.field}>
-                <label className={errors[column.field] ? 'error-label' : ''}>{column.headerName}</label>
+                <label className={errors[column.field] ? "error-label" : ""}>
+                  {column.headerName}
+                </label>
                 <input
-                  type={column.type}
+                  type={column.field === "date" ? "date" : column.type}
                   name={column.field}
                   placeholder={column.field}
                   onChange={handleChange2}
                   required
                 />
-                {errors[column.field] && <span className="error">{errors[column.field]}</span>}
+                {errors[column.field] && (
+                  <span className="error">{errors[column.field]}</span>
+                )}
               </div>
             ))}
           <button type="submit">Send</button>
@@ -238,6 +234,5 @@ const Update = (props: Props) => {
     </div>
   );
 };
-
 
 export default Update;
