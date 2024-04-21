@@ -125,7 +125,7 @@ const Add = (props: Props) => {
         <h1>Add new {props.slug}</h1>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "img" && item.field != "verified")
+            .filter((item) => item.field !== "id" && item.field!=="rating" && item.field !== "img" && item.field != "verified")
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? 'error-label' : ''}>{column.headerName}</label>
