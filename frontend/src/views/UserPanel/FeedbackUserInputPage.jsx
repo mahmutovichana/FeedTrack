@@ -151,7 +151,6 @@ const UserFeedbackInput = () => {
                         className="logo-image"
                         alt="FeedTrack logo"
                     />
-                    <h1>{welcomeMessage}</h1>
                 </div>
                 <div className="feedback-section">
                     <h2>Your feedback:</h2>

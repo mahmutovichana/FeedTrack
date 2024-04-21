@@ -1,0 +1,71 @@
+.welcomeScreenContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+  }
+  
+  .info {
+    margin-bottom: 20px;
+    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
+    text-align: center;
+    top: 0;
+    margin-left: 50%;
+    position: fixed;
+  }
+  
+  .welcomeScreenContainer .logo {
+    margin-top: 75px;
+    margin-bottom: 30px;
+    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
+    text-align: center;
+  }
+  
+  .welcomeScreenContainer .logo-image {
+    width: 150px;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .welcomeScreenContainer button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .welcomeScreenContainer button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Dodatni stil za responzivnost */
+  @media screen and (max-width: 768px) {
+    .welcomeScreenContainer {
+      padding: 10px;
+    }
+  
+    .welcomeScreenContainer .logo {
+      margin-bottom: 20px;
+    }
+  
+    .welcomeScreenContainer .logo-image {
+      width: 120px;
+    }
+
+  }
+  
