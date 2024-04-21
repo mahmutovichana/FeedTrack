@@ -6,6 +6,8 @@ import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Teller {
     id: number;
@@ -61,6 +63,7 @@ const Tellers = () => {
                     setTellers(updatedTellers);
                 } else {
                     console.error('Error deleting teller:', response.statusText);
+                    toast.error("Error deleting teller. This teller is associated with feedback and cannot be deleted.");
                 }
             })
             .catch((error) => console.error('Error deleting teller:', error));

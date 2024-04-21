@@ -6,6 +6,8 @@ import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Branch {
     id: number;
@@ -63,6 +65,8 @@ const Branches = () => {
                     setBranches(updatedBranches);
                 } else {
                     console.error('Error deleting branch:', response.statusText);
+                    toast.error("Error deleting branch. This branch is associated with tellers and cannot be deleted.");
+        
                 }
             })
             .catch((error) => console.error('Error deleting branch:', error));
