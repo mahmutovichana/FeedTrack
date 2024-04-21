@@ -119,7 +119,7 @@ const UserFeedbackInput = () => {
         console.log("Feedbacks:", feedbacks);
         feedbacks.forEach(obj => {
             console.log(obj);
-            fetch(`http://localhost:5432/api/feedbacks`, {
+            fetch(`${deployURLs.backendURL}/api/feedbacks`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -20,7 +20,7 @@ const Branches = () => {
 
     // Get all branches for the table
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/branches`, {
+        fetch(`${deployURLs.backendURL}/api/branch/view`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.token}`, 
