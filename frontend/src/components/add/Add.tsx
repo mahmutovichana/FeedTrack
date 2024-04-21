@@ -88,6 +88,8 @@ const Add = (props: Props) => {
         console.error('Invalid slug:', props.slug);
         return; // Ili postavite default slug
     }
+    //default rating is 0
+    formData.rating="0";
 
     fetch(`${deployURLs.backendURL}/api/${slugPlural}`, {
       method: 'POST',
