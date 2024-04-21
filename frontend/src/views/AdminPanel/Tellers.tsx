@@ -45,7 +45,7 @@ const Tellers = () => {
                 }
             })
             .catch((error) => console.error('Error fetching tellers:', error));
-    }, []);
+    }, [refreshData]);
 
     const deleteTeller = (id: number) => {
         fetch(`${deployURLs.backendURL}/api/tellers/${id}`, {

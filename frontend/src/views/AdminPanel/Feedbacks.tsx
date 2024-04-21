@@ -46,7 +46,7 @@ const Feedbacks = () => {
                 }
             })
             .catch((error) => console.error('Error fetching feedbacks:', error));
-    }, []);
+    }, [refreshData]);
 
     // handle deleting a feedback
     const deleteFeedback = (id: number) => {
