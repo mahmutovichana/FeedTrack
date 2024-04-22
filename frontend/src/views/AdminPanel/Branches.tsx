@@ -6,7 +6,7 @@ import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Branch {
@@ -104,6 +104,7 @@ const Branches = () => {
             <DataTable slug="branches" columns={columns} rows={branches} onDelete={deleteBranch} />
             {openAdd && <Add slug="branch" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
             {openUpdate && <Update slug="branch" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
+            <ToastContainer />
         </div>
     );
 };

@@ -6,6 +6,7 @@ import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import Update from '../../components/update/Update';
 import { deployURLs } from "./../../../public/constants";
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Campaign {
     id: number;
@@ -63,6 +64,7 @@ const Campaigns = () => {
                     setCampaigns(updatedCampaigns);
                 } else {
                     console.error('Error deleting campaign:', response.statusText);
+                    toast.error("Error deleting campaign. This campaign is associated with branches and cannot be deleted.");
                 }
             })
             .catch((error) => console.error('Error deleting campaign:', error));
@@ -101,6 +103,7 @@ const Campaigns = () => {
             <DataTable slug="campaigns" columns={columns} rows={campaigns} onDelete={deleteCampaign} />
             {openAdd && <Add slug="campaign" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
             {openUpdate && <Update slug="campaign" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData} />}
+            <ToastContainer />
         </div>
     );
 };

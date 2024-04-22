@@ -6,7 +6,7 @@ import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import Update from '../../components/update/Update';
 import { deployURLs } from '../../../public/constants';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface User {
@@ -159,6 +159,7 @@ const Users = () => {
       <DataTable slug="users" columns={columns} rows={users} onDelete={deleteUser} />
       {openAdd && <Add slug="user" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
       {openUpdate && <Update slug="user" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
+      <ToastContainer />
     </div>
   );
 };

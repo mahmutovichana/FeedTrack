@@ -6,7 +6,7 @@ import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Teller {
@@ -103,6 +103,7 @@ const Tellers = () => {
             <DataTable slug="tellers" columns={columns} rows={tellers} onDelete={deleteTeller} />
             {openAdd && <Add slug="teller" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
             {openUpdate && <Update slug="teller" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
+            <ToastContainer />
         </div>
     );
 };
