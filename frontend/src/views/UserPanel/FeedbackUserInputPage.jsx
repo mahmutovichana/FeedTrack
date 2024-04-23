@@ -36,6 +36,7 @@ const UserFeedbackInput = () => {
     const [selectedTellerID, setSelectedTellerID] = useState('');
 
     //Using values stored in localStorage
+    const branchID = localStorage.branchPositionID;
     const campaignID = localStorage.campaignID;
     //const campaignID = 27;
     const tellerPositionID = localStorage.getItem('tellerPositionID');
@@ -44,7 +45,78 @@ const UserFeedbackInput = () => {
 
     //const storedBranchLocation = "Bubasvaba";
 
+    // Function to fetch campaign ID for a single campaign name
+    const fetchCampaignId = async (name) => {
+        try {
+            const response = await fetch(`${deployURLs.backendURL}/api/campaign/view/name/${name}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.token}`
+                }
+            });
+            const data = await response.json();
+            return data.id; // Return the campaign ID
+        } catch (error) {
+            console.error("Problem fetching campaign ids:", error);
+            return null;
+        }
+    };
+
+    // Function to fetch questions for a campaign via campaign ID
+    const fetchQuestionsByCampaignId = async (campaignId) => {
+        try {
+            const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byCampaignID/${campaignId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.token}`
+                }
+            });
+            const data = await response.json();
+            return data; // Return the questions for the campaign ID
+        } catch (error) {
+            console.error("Problem fetching questions:", error);
+            return null;
+        }
+    };
+
     async function fetchQuestionsFromDatabase() {
+
+        const campaignOrderMapString = localStorage.getItem('campaignOrderMap');
+        const campaignOrderMap = campaignOrderMapString ? JSON.parse(campaignOrderMapString) : {};
+        const campaignNames = campaignOrderMap[branchID] || [];
+        // Create an array to store promises for fetching campaign IDs
+        const fetchPromises = campaignNames.map(name => fetchCampaignId(name));
+        // Execute all fetch requests concurrently using Promise.all
+        let campaignIds = await Promise.all(fetchPromises);
+        console.log("idevi kampanja: " + campaignIds);
+        // Check if campaignIds array is empty - means order of campaigns for the branch
+        // wasn't defined, but we should fetch questions from that branch's campaigns anyway
+        if (campaignIds.length === 0) {
+            try {
+                const response = await fetch(`${deployURLs.backendURL}/api/branchCampaign/byBranchID/${branchID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.token}`
+                    }
+                });
+                const data = await response.json();
+                // Extract array of IDs from response object
+                campaignIds = data.map(item => item.id);
+            } catch (error) {
+                console.error("Problem fetching campaign IDs:", error);
+            }
+        }
+        const questionPromises = campaignIds.map(campaignId => fetchQuestionsByCampaignId(campaignId));
+        let questionsByCampaign = await Promise.all(questionPromises);
+        questionsByCampaign = questionsByCampaign.flat();
+       // setQuestions(questionsByCampaign);
+        console.log("questions by each campaign: " + JSON.stringify(questionsByCampaign));
+        /*
+            potrebno za svako pitanje i njegov questionid i spremiti kao id, te question name kao name. ovo ponoviti za svaki
+            campaign ID (Foreach) i to onim redoslijedom datim objektom u localstorage. imam rutu u view svoju getquestion
+            by campaign id.
+        */
+       
         try {
             const response = await fetch(`${deployURLs.backendURL}/api/campaign/view/${campaignID}`, {
                 method: 'GET',
@@ -58,7 +130,6 @@ const UserFeedbackInput = () => {
                 throw new Error('Error fetching questions');
             }
             const data = await response.json();
-            console.log("Fetched questions:", data);
             const extractedValuesArray = data.map(({ questionID:id, qname:name  }) => ({ id, name }));
 
             console.log(extractedValuesArray);
@@ -68,6 +139,7 @@ const UserFeedbackInput = () => {
         } catch (error) {
             console.error("Problem fetching questions:", error);
         }
+       
     }
 
     useEffect(() => {

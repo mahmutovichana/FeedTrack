@@ -45,9 +45,9 @@ router.get('/campaign/byName/:location', async (req, res) => {
 
 
 // Fetch all campaigns from CampaignBranch table via their common branchID foreign key
-const getCampaignByBranchId = async (branchID) => {
+const getCampaignsByBranchId = async (branchID) => {
     try {
-        const query = `SELECT bc.id, bc."branchID", bc."campaignID", c.*
+        const query = `SELECT bc."branchID", bc."campaignID", c.*
                        FROM "BranchCampaign" bc
                        JOIN "Campaign" c ON bc."campaignID" = c.id
                        WHERE bc."branchID" = $1`;
@@ -59,9 +59,43 @@ const getCampaignByBranchId = async (branchID) => {
 };
 
 router.get('/branchCampaign/byBranchID/:branchID', async (req, res) => {
-    try { res.json(await getCampaignByBranchId(req.params.branchID)); }
+    try { res.json(await getCampaignsByBranchId(req.params.branchID)); }
     catch (error) { handleError(res, error); }
 });
 
+// Fetch all questions from CampaignQuestion table via their common campaignID foreign key
+const getQuestionsByCampaignId = async (campaignID) => {
+    try {
+        const query = `SELECT Q.id, Q.name
+                       FROM "CampaignQuestion" AS CQ
+                       JOIN "Question" AS Q ON CQ."questionID" = Q.id
+                       WHERE CQ."campaignID" = $1`;
+        const { rows } = await db.query(query, [campaignID]);
+        return rows;
+    } catch (error) {
+        throw error; 
+    }
+};
+
+router.get('/campaignQuestion/byCampaignID/:campaignID', async (req, res) => {
+    try { res.json(await getQuestionsByCampaignId(req.params.campaignID)); }
+    catch (error) { handleError(res, error); }
+});
+
+// Retrieve a campaign by its name
+const getCampaignByName = async (name) => {
+    try {
+        const query = `SELECT * FROM "Campaign" WHERE name = $1`;
+        const { rows } = await db.query(query, [name]);
+        return rows[0];
+    } catch (error) {
+        throw error;
+    }
+};
+
+router.get('/campaign/view/name/:name', async (req, res) => {
+    try { res.json(await getCampaignByName(req.params.name)); }
+    catch (error) { handleError(res, error); }
+});
 
 module.exports = router;

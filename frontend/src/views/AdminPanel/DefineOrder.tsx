@@ -63,7 +63,15 @@ const DefineOrder = () => {
   };
 
   const finalizeList = () => {
+    // Update localStorage map with the new order of campaigns
+    const branchId = selectedBranch?.id;
+    const campaignOrderMap = JSON.parse(localStorage.getItem('campaignOrderMap')) || {};
+    campaignOrderMap[branchId] = items;
+    localStorage.setItem('campaignOrderMap', JSON.stringify(campaignOrderMap));
+    console.log(JSON.stringify(campaignOrderMap));
+    
     setFinalizedList(items);
+    console.log(items);
     toast(`Successfully assigned order of campaigns for ${selectedBranch.name} branch!`);
   };
 
@@ -87,7 +95,7 @@ const DefineOrder = () => {
         </select>
       </div>
       <div className='dragAndDropContainer'>
-        <SortableContainer2 onSortEnd={onSortEnd}>
+      <SortableContainer2 onSortEnd={onSortEnd}>
           {items.map((value, index) => (
             <SortableItem key={`item-${value}`} index={index} value={value} />
           ))}
