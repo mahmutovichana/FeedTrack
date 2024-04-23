@@ -109,37 +109,8 @@ const UserFeedbackInput = () => {
         const questionPromises = campaignIds.map(campaignId => fetchQuestionsByCampaignId(campaignId));
         let questionsByCampaign = await Promise.all(questionPromises);
         questionsByCampaign = questionsByCampaign.flat();
-       // setQuestions(questionsByCampaign);
+        setQuestions(questionsByCampaign);
         console.log("questions by each campaign: " + JSON.stringify(questionsByCampaign));
-        /*
-            potrebno za svako pitanje i njegov questionid i spremiti kao id, te question name kao name. ovo ponoviti za svaki
-            campaign ID (Foreach) i to onim redoslijedom datim objektom u localstorage. imam rutu u view svoju getquestion
-            by campaign id.
-        */
-       
-        try {
-            const response = await fetch(`${deployURLs.backendURL}/api/campaign/view/${campaignID}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.token}`,
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error fetching questions');
-            }
-            const data = await response.json();
-            const extractedValuesArray = data.map(({ questionID:id, qname:name  }) => ({ id, name }));
-
-            console.log(extractedValuesArray);
-
-            //const modifiedData =
-            setQuestions(extractedValuesArray); // Postavi stanje questions na dobavljene podatke
-        } catch (error) {
-            console.error("Problem fetching questions:", error);
-        }
-       
     }
 
     useEffect(() => {
