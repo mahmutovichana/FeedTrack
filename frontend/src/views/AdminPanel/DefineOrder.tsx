@@ -70,8 +70,6 @@ const DefineOrder = () => {
     localStorage.setItem('campaignOrderMap', JSON.stringify(campaignOrderMap));
     console.log(JSON.stringify(campaignOrderMap));
     
-    setFinalizedList(items);
-    console.log(items);
     toast(`Successfully assigned order of campaigns for ${selectedBranch.name} branch!`);
   };
 
