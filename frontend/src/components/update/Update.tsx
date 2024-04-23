@@ -264,7 +264,11 @@ const Update = (props: Props) => {
                   {column.headerName}
                 </label>
                 <input
-                  type={column.field === "date" ? "date" : column.type}
+                  type={
+                    column.field.toLowerCase().includes("date")
+                      ? "date"
+                      : column.type
+                  }
                   name={column.field}
                   value={formData[column.field] || ''}
                   placeholder={column.field}
