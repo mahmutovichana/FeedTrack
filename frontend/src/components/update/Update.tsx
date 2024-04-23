@@ -5,7 +5,9 @@ import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
+import SelectChangeEvent from "@mui/material/Select";
+
 import { deployURLs } from "./../../../public/constants";
 
 type Props = {
@@ -14,6 +16,24 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   toggleRefreshData: () => void;
 };
+
+const getColumnValue = (user: User, slug: string) => {
+  switch (slug) {
+    case "user":
+      return `${user.name} ${user.lastname}`;
+    case "branch":
+      return user.location;
+    case "teller":
+      return user.id.toString();
+    case "campaign":
+      return user.name;
+    case "question":
+      return user.name;
+    default:
+      return "";
+  }
+};
+
 
 interface User {
   id: number;
@@ -42,6 +62,9 @@ const Update = (props: Props) => {
       break;
     case "campaign":
       slugPlural = "campaigns";
+      break;
+    case "question":
+      slugPlural = "questions";
       break;
     default:
       // Default ako slug ne odgovara nijednoj od opcija
@@ -99,6 +122,30 @@ const Update = (props: Props) => {
         });
     }
   }, []);
+
+  useEffect(() => {
+    if (selectedId) {
+      // Pronalaženje odabranog korisnika
+      const selectedUser = users.find((user) => user.id.toString() === selectedId);
+      if (selectedUser) {
+        // Kreiranje novog objekta koji će sadržavati ažurirane vrijednosti formData
+        const updatedFormData = {};
+        // Iteriranje kroz kolone i postavljanje vrijednosti formData na osnovu odabranog korisnika
+        props.columns.forEach((column) => {
+          // Provjera da li postoji vrijednost u odabranom korisniku za trenutnu kolonu
+          if (selectedUser[column.field] !== undefined) {
+            // Postavljanje vrijednosti formData
+            updatedFormData[column.field] = selectedUser[column.field];
+          }
+        });
+        // Provjeri u konzoli da li su vrijednosti tačno postavljene
+        console.log("Updated Form Data:", updatedFormData);
+        // Postavljanje ažuriranog stanja formData
+        setFormData(updatedFormData);
+      }
+    }
+  }, [selectedId, users]);
+  
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -197,7 +244,7 @@ const Update = (props: Props) => {
               </MenuItem>
               {users.map((user) => (
                 <MenuItem key={user.id} value={user.id.toString()}>
-                  {user.name + " " + user.lastname}
+                  {getColumnValue(user, props.slug)}
                 </MenuItem>
               ))}
             </Select>
@@ -219,6 +266,7 @@ const Update = (props: Props) => {
                 <input
                   type={column.field === "date" ? "date" : column.type}
                   name={column.field}
+                  value={formData[column.field] || ''}
                   placeholder={column.field}
                   onChange={handleChange2}
                   required

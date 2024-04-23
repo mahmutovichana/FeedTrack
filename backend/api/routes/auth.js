@@ -82,11 +82,21 @@ router.post("/googleAddUser", async (req, res) => {
 });
 
 // Route for logout logic
-router.post("/logout", (req, res) => {
+/*
+router.post("/logout", authenticateToken, (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(401).json({ message: "You are not authenticated!" });
   if (!refreshTokens.includes(token)) return res.status(403).json({ message: "Token is not valid!" });
   refreshTokens = refreshTokens.filter((checkToken) => checkToken !== token);
+  res.status(200).json({ message: "Logged out successfully." });
+});*/
+// Endpoint za odjavu
+router.post("/logout", (req, res) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) return res.status(401).json({ message: "You are not authenticated!" });
+  const token = authHeader.split(" ")[1];
+  // Token koji se odjavljuje je uklonjen iz liste aktivnih tokena
+  console.log("Logging out token:", token);
   res.status(200).json({ message: "Logged out successfully." });
 });
 

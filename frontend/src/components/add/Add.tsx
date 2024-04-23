@@ -2,6 +2,7 @@ import { GridColDef } from "@mui/x-data-grid";
 import "./add.scss";
 import React, { useState } from "react";
 import { deployURLs } from "./../../../public/constants";
+import { Select, MenuItem } from "@mui/material";
 
 type Props = {
   slug: string;
@@ -9,6 +10,13 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   toggleRefreshData: () => void;
 };
+
+const roleOptions = [
+  { value: "user", label: "User" },
+  { value: "superAdmin", label: "Super Admin" },
+  { value: "tellerAdmin", label: "Teller Admin" },
+  { value: "branchAdmin", label: "Branch Admin" },
+];
 
 const Add = (props: Props) => {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
@@ -52,7 +60,6 @@ const Add = (props: Props) => {
         } else if (column.field === "role" && !validRoles.includes(value)) {
           currentErrors[column.field] = "Invalid role";
         } else if (column.field === "lastname" && value.length < 2) {
-          // Ovde je promenjeno
           currentErrors[column.field] =
             "Last name must be at least 2 characters long";
         }
@@ -84,10 +91,12 @@ const Add = (props: Props) => {
       case "campaign":
         slugPlural = "campaigns";
         break;
+      case "question":
+        slugPlural = "questions";
+        break;
       default:
-        // Default ako slug ne odgovara nijednoj od opcija
         console.error("Invalid slug:", props.slug);
-        return; // Ili postavite default slug
+        return;
     }
 
     fetch(`${deployURLs.backendURL}/api/${slugPlural}`, {
@@ -109,12 +118,21 @@ const Add = (props: Props) => {
       .catch((error) => console.error("Error sending data:", error));
   };
 
+  // pick up all form data when submitted and save it to formData object
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
+
+  // handles combobox selected value from the list of roles
+  const handleRoleChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      role: e.target.value as string,
+    });
+  }
 
   return (
     <div className="add">
@@ -136,13 +154,29 @@ const Add = (props: Props) => {
                 <label className={errors[column.field] ? "error-label" : ""}>
                   {column.headerName}
                 </label>
-                <input
-                  type={column.field === "date" ? "date" : column.type}
-                  name={column.field}
-                  placeholder={column.field}
-                  onChange={handleChange}
-                  required
-                />
+                {/* Prikaži ComboBox ako je polje role */}
+                {column.field === "role" ? (
+                  <Select
+                    value={formData.role || ""}
+                    onChange={handleRoleChange}
+                    placeholder="Select Role"
+                    displayEmpty
+                  >
+                    {roleOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                ) : (
+                  <input
+                    type={column.field === "date" ? "date" : column.type}
+                    name={column.field}
+                    placeholder={column.field}
+                    onChange={handleChange}
+                    required
+                  />
+                )}
                 {errors[column.field] && (
                   <span className="error">{errors[column.field]}</span>
                 )}
