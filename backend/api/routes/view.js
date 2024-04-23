@@ -44,4 +44,24 @@ router.get('/campaign/byName/:location', async (req, res) => {
 });
 
 
+// Fetch all campaigns from CampaignBranch table via their common branchID foreign key
+const getCampaignByBranchId = async (branchID) => {
+    try {
+        const query = `SELECT bc.id, bc."branchID", bc."campaignID", c.*
+                       FROM "BranchCampaign" bc
+                       JOIN "Campaign" c ON bc."campaignID" = c.id
+                       WHERE bc."branchID" = $1`;
+        const { rows } = await db.query(query, [branchID]);
+        return rows;
+    } catch (error) {
+        throw error; 
+    }
+};
+
+router.get('/branchCampaign/byBranchID/:branchID', async (req, res) => {
+    try { res.json(await getCampaignByBranchId(req.params.branchID)); }
+    catch (error) { handleError(res, error); }
+});
+
+
 module.exports = router;

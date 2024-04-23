@@ -21,6 +21,7 @@
     "@mui/lab": "^5.0.0-alpha.170",
     "@mui/styled-engine": "^5.15.14",
     "@mui/x-data-grid": "^7.1.0",
+    "array-move": "^4.0.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -41,6 +42,7 @@
     "react-notifications-component": "^4.0.1",
     "react-router-dom": "^6.22.3",
     "react-scripts": "^3.0.1",
+    "react-sortable-hoc": "^2.0.0",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.3"
   },

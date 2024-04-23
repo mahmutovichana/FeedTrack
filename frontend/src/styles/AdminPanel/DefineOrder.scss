@@ -1,0 +1,41 @@
+.DragDrop {
+    max-width: 800px;
+    /* Povećajte širinu kontejnera */
+    margin: 0 auto;
+    /* Centrirajte kontejner */
+    text-align: center;
+
+    #root {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .form-group {
+        margin-top: 40px;
+        margin-bottom: 30px;
+        /* Povećajte razmak između form grupa */
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        /* Povećajte razmak ispod labela */
+        font-weight: bold;
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 15px;
+        /* Povećajte padding za select */
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        font-size: 18px;
+        /* Povećajte veličinu fonta */
+    }
+    .dragAndDropContainer{
+        color:black;
+    }
+}

@@ -77,6 +77,7 @@ const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
 const questionRouter = setupRoutes(genericCRUD, "Question");
 const campaignRouter = setupRoutes(genericCRUD, "Campaign");
 const campaignQuestionRouter = setupRoutes(genericCRUD, "CampaignQuestion");
+const branchCampaignRouter = setupRoutes(genericCRUD, "BranchCampaign");
 
 // Adding the routes to the app
 router.use("/users", userRouter);
@@ -87,5 +88,6 @@ router.use("/dummy", dummyRouter); // only for testing
 router.use("/questions", questionRouter);
 router.use("/campaigns", campaignRouter);
 router.use("/campaignQuestions", campaignQuestionRouter);
+router.use("/branchCampaigns", branchCampaignRouter);
 
 module.exports = router;

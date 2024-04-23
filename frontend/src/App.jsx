@@ -13,6 +13,7 @@ import ProfilePage from './views/AdminPanel/Profile'
 import Campaigns from './views/AdminPanel/Campaigns';
 import TellerSetup from './views/UserPanel/TellerSetup';
 import Notes from "./views/AdminPanel/Notes";
+import DefineOrder from './views/AdminPanel/DefineOrder.tsx';
 
 function App() {
 
@@ -73,6 +74,10 @@ function App() {
         {
           path: "/notes",
           element: <Notes />
+        },
+        {
+          path: "/defineOrder",
+          element: <DefineOrder />
         }
       ]
     }
