@@ -50,7 +50,6 @@ router.post("/googleAddUser", async (req, res) => {
         .status(400)
         .json({ message: "User already exists", token: token, user: nestaFino });
     }
-    refreshTokens.push(token);
     console.log(password);
     const hashedPassword = await bcrypt.hash(password, 10);
 

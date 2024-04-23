@@ -45,6 +45,9 @@ const Login = () => {
           email: decodedToken.email,
           image: decodedToken.picture,
           verified: true,
+          password: "defaultPassword",
+          mobilenumber: 123456789,
+          role: "user"
         };
 
         localStorage.setItem("user", JSON.stringify(userData));

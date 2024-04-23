@@ -177,17 +177,6 @@ const Add = (props: Props) => {
                     required
                   />
                 )}
-                <input
-                  type={
-                    column.field.toLowerCase().includes("date")
-                      ? "date"
-                      : column.type
-                  }
-                  name={column.field}
-                  placeholder={column.field}
-                  onChange={handleChange}
-                  required
-                />
                 {errors[column.field] && (
                   <span className="error">{errors[column.field]}</span>
                 )}
