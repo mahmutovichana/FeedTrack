@@ -43,6 +43,8 @@ const UserFeedbackInput = () => {
     //const tellerPositionID = 2;
     const storedBranchLocation = localStorage.getItem('storedBranchLocation');
 
+    let campaignIds; // ids of all campaigns current branch is associated with
+
     //const storedBranchLocation = "Bubasvaba";
 
     // Function to fetch campaign ID for a single campaign name
@@ -87,7 +89,7 @@ const UserFeedbackInput = () => {
         // Create an array to store promises for fetching campaign IDs
         const fetchPromises = campaignNames.map(name => fetchCampaignId(name));
         // Execute all fetch requests concurrently using Promise.all
-        let campaignIds = await Promise.all(fetchPromises);
+        campaignIds = await Promise.all(fetchPromises);
         console.log("idevi kampanja: " + campaignIds);
         // Check if campaignIds array is empty - means order of campaigns for the branch
         // wasn't defined, but we should fetch questions from that branch's campaigns anyway
@@ -136,22 +138,51 @@ const UserFeedbackInput = () => {
         setCurrentPage(pageNumber);
     };
 
-    const handleFeedbackChange = (questionID, level) => {
+    const handleFeedbackChange = async (questionID, level) => {
         const updatedFeedbacks = [...feedbacks];
         const index = updatedFeedbacks.findIndex(item => item.questionID === questionID);
         if (index !== -1) {
             updatedFeedbacks[index].rating = level;
-        } else {
+        } 
+        else {
             updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID, date: formatDate(Date.now())});
         }
+        /*else {
+            try {
+                const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const questionCampaignID = data[0].campaignID;
+                        // Check if the question belongs to any of the displayed campaigns
+                        if (campaignIds.includes(questionCampaignID)) {
+                            updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID: questionCampaignID, date: formatDate(Date.now()) });
+                        } else {
+                            console.error(`Question ID ${questionID} does not belong to any of the displayed campaigns.`);
+                        }
+                    } else {
+                        console.error(`No campaign found for question ID ${questionID}.`);
+                    }
+                } else {
+                    console.error(`Failed to fetch campaign ID for question ID ${questionID}.`);
+                }
+            } catch (error) {
+                console.error("Problem fetching campaign ID:", error);
+            }
+        }*/
         setFeedbacks(updatedFeedbacks);
-
+    
         // Provjeri jesu li sva pitanja na trenutnoj stranici odgovorena
         const startIndex = (currentPage - 1) * pageSize;
         const endIndex = Math.min(startIndex + pageSize, questions.length); // Izračunaj endIndex tako da ne izlazi iz opsega
         const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.id));
         setShowNextButton(allQuestionsAnswered);
-
+    
         // Ako su odgovorena sva pitanja na svim stranicama, prikaži gumb "Submit"
         if (updatedFeedbacks.length === questions.length) {
             setShowSubmitButton(true);
@@ -162,7 +193,7 @@ const UserFeedbackInput = () => {
         console.log("Feedbacks:", feedbacks);
         feedbacks.forEach(obj => {
             console.log(obj);
-            fetch(`http://localhost:5432/api/feedbacks`, {
+            fetch(`${deployURLs.backendURL}/api/feedbacks`, { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

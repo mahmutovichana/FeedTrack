@@ -98,4 +98,22 @@ router.get('/campaign/view/name/:name', async (req, res) => {
     catch (error) { handleError(res, error); }
 });
 
+// Fetch all campaign ids from CampaignQuestion table via their common questionID foreign key
+const getCampaignIdsByQuestionId = async (campaignID) => {
+    try {
+        const query = `SELECT CQ."campaignID"
+                       FROM "CampaignQuestion" AS CQ
+                       WHERE CQ."questionID" = $1`;
+        const { rows } = await db.query(query, [campaignID]);
+        return rows;
+    } catch (error) {
+        throw error; 
+    }
+};
+
+router.get('/campaignQuestion/byQuestionID/:questionID', async (req, res) => {
+    try { res.json(await getCampaignIdsByQuestionId(req.params.questionID)); }
+    catch (error) { handleError(res, error); }
+});
+
 module.exports = router;
