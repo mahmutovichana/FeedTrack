@@ -137,7 +137,9 @@ router.post(
       }
 
       if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
+        // Return default image if no file is uploaded
+        const defaultImageData = fs.readFileSync("./feedtrackLogo.png");
+        return res.status(400).json({ message: "No file uploaded", imageData: defaultImageData });
       }
 
       const data = {
@@ -166,7 +168,7 @@ router.get("/welcomeData", (req, res) => {
     );
     res.status(200).json(message);
   } catch (err) {
-    res.status(200).json({ message: "Default welcome message" });
+    res.status(200).json({ message: "Welcome!" });
   }
 });
 

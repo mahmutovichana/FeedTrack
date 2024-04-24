@@ -153,7 +153,6 @@ const UserFeedbackInput = () => {
                     />
                 </div>
                 <div className="feedback-section">
-                    <h2>Your feedback:</h2>
                     {renderQuestions()}
                     {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
                     {currentPage !== Math.ceil(questions.length / pageSize) && showNextButton &&

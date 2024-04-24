@@ -48,7 +48,7 @@ const WelcomeScreen = () => {
                     <h1>{welcomeMessage}</h1>
                 </div>
                 <form onSubmit={handleSubmit}>
-                    <button type="submit" className="goToFeedback-button">Leave feedback</button>
+                    <button type="submit" className="goToFeedback-button">Leave us a feedback</button>
                 </form>
         </div>
     );

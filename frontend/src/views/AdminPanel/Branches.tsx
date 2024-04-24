@@ -85,6 +85,7 @@ const Branches = () => {
             console.error("Role not found in user data");
         }
     }
+    
     const toggleRefreshData = () => {
         setRefreshData(prevState => !prevState);
     };
