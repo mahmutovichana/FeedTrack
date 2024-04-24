@@ -1,9 +1,6 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
-const express = require("express");
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const isBase64 = require("is-base64");
 const {
   authenticateToken,
   authRole,
@@ -84,91 +81,47 @@ router.get(
   }
 );
 
-const uploadDir = "/tmp";
+router.post("/welcomeData", async (req, res) => {
+  const { image, message } = req.body;
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, "welcome-image.png");
-  },
-});
-const upload = multer({
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype === "image/png" ||
-      file.mimetype === "image/jpg" ||
-      file.mimetype === "image/jpeg"
-    ) {
-      cb(null, true);
-    } else {
-      cb(null, false, req.fileValidationError);
-    }
-  },
-});
-
-router.use("/welcomeData", express.static(uploadDir));
-
-router.post(
-  "/welcomeData",
-  //authenticateToken,
-  //authRole("superAdmin", "tellerAdmin", "branchAdmin"),
-  upload.single("file"),
-  async (req, res) => {
-    if (req.fileValidationError) {
-      return res.status(400).json({ message: "Invalid file type" });
-    }
-
-    try {
-      if (!req.headers["content-type"].includes("multipart/form-data")) {
-        return res
-          .status(400)
-          .json({ message: "Content-Type must be multipart/form-data" });
-      }
-
-      if (!req.body.message) {
-        return res.status(400).json({ message: "Message is required" });
-      }
-
-      if (!req.file) {
-        // Return default image if no file is uploaded
-        const defaultImageData = fs.readFileSync("./feedtrackLogo.png");
-        return res.status(400).json({ message: "No file uploaded", imageData: defaultImageData });
-      }
-
-      const data = {
-        message: req.body.message,
-      };
-
-      fs.writeFileSync(
-        `${uploadDir}/welcome-message.json`,
-        JSON.stringify(data)
-      );
-
-      res
-        .status(200)
-        .json({ message: "File and message uploaded successfully" });
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ message: "Internal server error" });
-    }
+  if (!message) {
+    return res.status(400).json({ message: "Message is required" });
   }
-);
 
-router.get("/welcomeData", (req, res) => {
+  if (!image) {
+    return res.status(400).json({ message: "Image is required" });
+  }
+
+  if (!isBase64(image, { mimeRequired: true })) {
+    return res.status(400).json({ message: "File needs to be image" });
+  }
+
   try {
-    const message = JSON.parse(
-      fs.readFileSync(`${uploadDir}/welcome-message.json`)
+    const existingData = await db.query('SELECT * FROM "WelcomeData"');
+
+    if (existingData.rowCount !== 0) {
+      await db.query('DELETE FROM "WelcomeData"');
+    }
+
+    const { rows } = await db.query(
+      'INSERT INTO "WelcomeData" (image, message) VALUES ($1, $2) RETURNING *',
+      [image, message]
     );
-    res.status(200).json(message);
+
+    res.status(200).json({ message: "File and message uploaded successfully" });
   } catch (err) {
-    res.status(200).json({ message: "Welcome!" });
+    console.log(err);
+    return res.status(500).json({ message: "Error uploading welcome data" });
+  }
+});
+
+router.get("/welcomeData", async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM "WelcomeData"');
+
+    res.status(200).json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ message: "Error while retrieving welcome data" });
   }
 });
 
