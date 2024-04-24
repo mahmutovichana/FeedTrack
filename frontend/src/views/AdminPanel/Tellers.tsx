@@ -6,6 +6,8 @@ import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Teller {
     id: number;
@@ -45,7 +47,7 @@ const Tellers = () => {
                 }
             })
             .catch((error) => console.error('Error fetching tellers:', error));
-    }, []);
+    }, [refreshData]);
 
     const deleteTeller = (id: number) => {
         fetch(`${deployURLs.backendURL}/api/tellers/${id}`, {
@@ -61,6 +63,7 @@ const Tellers = () => {
                     setTellers(updatedTellers);
                 } else {
                     console.error('Error deleting teller:', response.statusText);
+                    toast.error("Error deleting teller. This teller is associated with feedback and cannot be deleted.");
                 }
             })
             .catch((error) => console.error('Error deleting teller:', error));
@@ -100,6 +103,7 @@ const Tellers = () => {
             <DataTable slug="tellers" columns={columns} rows={tellers} onDelete={deleteTeller} />
             {openAdd && <Add slug="teller" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData}/>}
             {openUpdate && <Update slug="teller" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
+            <ToastContainer />
         </div>
     );
 };

@@ -6,6 +6,8 @@ import DataTable from '../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import { deployURLs } from "./../../../public/constants.js";
 import Update from '../../components/update/Update';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Branch {
     id: number;
@@ -17,6 +19,7 @@ const Branches = () => {
     const [openUpdate, setOpenUpdate] = useState(false);
     const [branches, setBranches] = useState<Branch[]>([]);
     const [columns, setColumns] = useState<GridColDef[]>([]);
+    const [refreshData, setRefreshData] = useState(false);
 
     // Get all branches for the table
     useEffect(() => {
@@ -45,7 +48,7 @@ const Branches = () => {
                 }
             })
             .catch((error) => console.error('Error fetching branches:', error));
-    }, []);
+    }, [refreshData]);
 
     // handle deleting a branch
     const deleteBranch = (id: number) => {
@@ -62,6 +65,8 @@ const Branches = () => {
                     setBranches(updatedBranches);
                 } else {
                     console.error('Error deleting branch:', response.statusText);
+                    toast.error("Error deleting branch. This branch is associated with tellers and cannot be deleted.");
+        
                 }
             })
             .catch((error) => console.error('Error deleting branch:', error));
@@ -81,6 +86,9 @@ const Branches = () => {
             console.error("Role not found in user data");
         }
     }
+    const toggleRefreshData = () => {
+        setRefreshData(prevState => !prevState);
+    };
 
     return (
         <div className="branches">
@@ -94,8 +102,9 @@ const Branches = () => {
                 )}
             </div>
             <DataTable slug="branches" columns={columns} rows={branches} onDelete={deleteBranch} />
-            {openAdd && <Add slug="branch" columns={columns} setOpen={setOpenAdd} />}
-            {openUpdate && <Update slug="branch" columns={columns} setOpen={setOpenUpdate} />}
+            {openAdd && <Add slug="branch" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
+            {openUpdate && <Update slug="branch" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData}/>}
+            <ToastContainer />
         </div>
     );
 };
