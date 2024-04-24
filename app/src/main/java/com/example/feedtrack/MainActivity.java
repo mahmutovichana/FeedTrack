@@ -17,6 +17,6 @@ public class MainActivity extends AppCompatActivity {
         feedtrack = findViewById(R.id.feedtrack);
         feedtrack.getSettings().setJavaScriptEnabled(true);
         feedtrack.setWebViewClient(new WebViewClient());
-        feedtrack.loadUrl("https://feedtrack.vercel.app/userFeedback");
+        feedtrack.loadUrl("https://feedtrack.vercel.app/tellerSetup");
     }
 }
