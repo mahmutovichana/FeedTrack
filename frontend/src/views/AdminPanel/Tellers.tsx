@@ -63,7 +63,7 @@ const Tellers = () => {
                     setTellers(updatedTellers);
                 } else {
                     console.error('Error deleting teller:', response.statusText);
-                    toast.error("Error deleting teller. This teller is associated with feedback and cannot be deleted.");
+                    toast.error("Error deleting teller. This teller is associated with feedbacks and cannot be deleted.");
                 }
             })
             .catch((error) => console.error('Error deleting teller:', error));

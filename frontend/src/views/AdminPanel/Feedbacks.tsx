@@ -66,7 +66,6 @@ const Feedbacks = () => {
                 } else {
                     console.error('Error deleting feedback:', response.statusText);
                     toast.error("Error deleting feedback. This feedback cannot be deleted.");
-        
                 }
             })
             .catch((error) => console.error('Error deleting feedback:', error));
