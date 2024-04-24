@@ -24,16 +24,23 @@ router.get('/campaigns/:campaignID/questionsPerPage', async (req, res) => {
 router.get('/campaigns/:campaignID/campaignQuestions', async (req, res) => {
     try {
         const { campaignID } = req.params;
-        const query = 'SELECT * FROM "CampaignQuestion" WHERE "campaignID" = $1';
+        const query = `
+            SELECT "Question".id, "Question".name
+            FROM "CampaignQuestion"
+            JOIN "Question" ON "CampaignQuestion"."questionID" = "Question".id
+            WHERE "CampaignQuestion"."campaignID" = $1
+        `;
         const { rows } = await db.query(query, [campaignID]);
-        if (rows.length === 0) {
-            throw new Error('Campaign questions not found');
-        }
-        res.json(rows);
+        const questions = rows.map(row => ({
+            id: row.id,
+            name: row.name
+        }));
+        res.json(questions);
     } catch (error) {
         console.error('Error fetching campaign questions:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 module.exports = router;
