@@ -27,10 +27,18 @@ const Notes = () => {
   };
 
   const handleUpload = async () => {
+    let compressedFile;
+
     try {
-      const compressedFile = await imageCompression(file, {
+      compressedFile = await imageCompression(file, {
         maxWidthOrHeight: 200,
       });
+    } catch (err) {
+      toast.error("Error: File is required");
+      return;
+    }
+
+    try {
       const base64 = await convertToBase64(compressedFile);
 
       const response = await fetch(`${deployURLs.backendURL}/api/welcomeData`, {
