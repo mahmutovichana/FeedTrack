@@ -66,8 +66,8 @@ router.post(
 // only users with 'user' role are fetched
 router.get(
   "/userRoles",
-  authenticateToken,
-  authRole("branchAdmin", "tellerAdmin"),
+  // authenticateToken,
+  // authRole("branchAdmin", "tellerAdmin"),
   async (req, res) => {
     const query = `SELECT * FROM "Person" WHERE role = 'user'`;
     try { 
