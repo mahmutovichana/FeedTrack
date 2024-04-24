@@ -25,6 +25,8 @@ const getColumnValue = (user: User, slug: string) => {
       return user.location;
     case "teller":
       return user.id.toString();
+    case "feedback":
+      return user.id.toString();
     case "campaign":
       return user.name;
     case "question":
@@ -33,7 +35,6 @@ const getColumnValue = (user: User, slug: string) => {
       return "";
   }
 };
-
 
 interface User {
   id: number;
@@ -67,9 +68,8 @@ const Update = (props: Props) => {
       slugPlural = "questions";
       break;
     default:
-      // Default ako slug ne odgovara nijednoj od opcija
       console.error("Invalid slug:", props.slug);
-      return; // Ili postavite default slug
+      return; 
   }
 
   useEffect(() => {
@@ -252,12 +252,7 @@ const Update = (props: Props) => {
         </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter(
-              (item) =>
-                item.field !== "id" &&
-                item.field !== "img" &&
-                item.field != "verified"
-            )
+            .filter((item) => item.field !== "id" && item.field!=="rating" &&  item.field !== "img" && item.field != "verified")
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? "error-label" : ""}>

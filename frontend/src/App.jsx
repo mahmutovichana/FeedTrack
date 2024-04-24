@@ -13,6 +13,7 @@ import ProfilePage from './views/AdminPanel/Profile'
 import Campaigns from './views/AdminPanel/Campaigns';
 import TellerSetup from './views/UserPanel/TellerSetup';
 import Notes from "./views/AdminPanel/Notes";
+import WelcomeScreen from './views/UserPanel/WelcomeScreen.jsx';
 import Questions from "./views/AdminPanel/Questions";
 
 function App() {
@@ -21,6 +22,10 @@ function App() {
     {
       path: "/",
       element: <Login />
+    },
+    {
+      path: "/welcomeScreen",
+      element: <WelcomeScreen />
     },
     {
       path: "/userFeedback",

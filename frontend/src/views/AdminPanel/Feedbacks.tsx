@@ -6,6 +6,8 @@ import DataTable from './../../components/dataTable/DataTable';
 import Add from '../../components/add/Add';
 import Update from '../../components/update/Update';
 import { deployURLs } from "./../../../public/constants";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Feedback {
     id: number;
@@ -21,7 +23,7 @@ const Feedbacks = () => {
 
     // get all feedbacks for the table
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/feedbacks`, {
+        fetch(`${deployURLs.backendURL}/api/feedback/view`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.token}`,
@@ -46,7 +48,7 @@ const Feedbacks = () => {
                 }
             })
             .catch((error) => console.error('Error fetching feedbacks:', error));
-    }, []);
+    }, [refreshData]);
 
     // handle deleting a feedback
     const deleteFeedback = (id: number) => {
@@ -63,6 +65,7 @@ const Feedbacks = () => {
                     setFeedbacks(updatedFeedbacks);
                 } else {
                     console.error('Error deleting feedback:', response.statusText);
+                    toast.error("Error deleting feedback. This feedback cannot be deleted.");
                 }
             })
             .catch((error) => console.error('Error deleting feedback:', error));
@@ -101,6 +104,7 @@ const Feedbacks = () => {
             <DataTable slug="feedbacks" columns={columns} rows={feedbacks} onDelete={deleteFeedback} />
             {openAdd && <Add slug="feedback" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
             {openUpdate && <Update slug="feedback" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData} />}
+            <ToastContainer />
         </div>
     );
 };

@@ -60,7 +60,7 @@ const Questions = () => {
                 }
             })
             .catch((error) => console.error('Error fetching questions:', error));
-    }, []);
+    }, [refreshData]);
 
     // display all the campaign names
     useEffect(() => {
@@ -137,6 +137,7 @@ const Questions = () => {
                     setQuestions(updatedQuestions);
                 } else {
                     console.error('Error deleting question:', response.statusText);
+                    toast.error("Error deleting question. This question is a part of some campaigns and cannot be deleted.");
                 }
             })
             .catch((error) => console.error('Error deleting question:', error));

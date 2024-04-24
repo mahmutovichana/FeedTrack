@@ -31,7 +31,7 @@ const UserFeedbackInput = () => {
   const [showSubmitButton, setShowSubmitButton] = useState(false);
   const [showNextButton, setShowNextButton] = useState(false);
   const [questions, setQuestions] = useState([]);
-  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [welcomeData, setWelcomeData] = useState({});
   const [branchLocation, setBranchLocation] = useState("");
   const [selectedTellerID, setSelectedTellerID] = useState("");
 
@@ -81,8 +81,11 @@ const UserFeedbackInput = () => {
       method: "GET",
     })
       .then((res) => res.json())
-      .then((data) => {
-        setWelcomeMessage(data.message);
+      .then(({ image, message }) => {
+        setWelcomeData({ image, message });
+      })
+      .catch(() => {
+        setWelcomeData({ ...welcomeData, message: "Hello World!" });
       });
     //const storedBranch = localStorage.getItem("selectedBranch");
     //const storedTeller = localStorage.getItem("selectedTeller");
@@ -132,7 +135,7 @@ const UserFeedbackInput = () => {
     console.log("Feedbacks:", feedbacks);
     feedbacks.forEach((obj) => {
       console.log(obj);
-      fetch(`http://localhost:5432/api/feedbacks`, {
+      fetch(`${deployURLs.backendURL}/api/feedbacks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -166,14 +169,12 @@ const UserFeedbackInput = () => {
         </div>
         <div className="logo">
           <img
-            src={`${deployURLs.backendURL}/api/welcomeData/welcome-image.png`}
+            src={welcomeData.image}
             className="logo-image"
             alt="FeedTrack logo"
           />
-          <h1>{welcomeMessage}</h1>
         </div>
         <div className="feedback-section">
-          <h2>Your feedback:</h2>
           {renderQuestions()}
           {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
           {currentPage !== Math.ceil(questions.length / pageSize) &&

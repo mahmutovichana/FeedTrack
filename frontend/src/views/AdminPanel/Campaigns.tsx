@@ -6,6 +6,7 @@ import DataTable from "./../../components/dataTable/DataTable";
 import Add from "../../components/add/Add";
 import Update from "../../components/update/Update";
 import { deployURLs } from "./../../../public/constants";
+import { ToastContainer, toast } from 'react-toastify';
 
 interface Campaign {
   id: number;
@@ -49,28 +50,27 @@ const Campaigns = () => {
       })
       .catch((error) => console.error("Error fetching campaigns:", error));
   }, []);
-
+                  
   // handle deleting a campaign
-  const deleteCampaign = (id: number) => {
-    fetch(`${deployURLs.backendURL}/api/campaigns/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          const updatedCampaigns = campaigns.filter(
-            (campaign) => campaign.id !== id
-          );
-          setCampaigns(updatedCampaigns);
-        } else {
-          console.error("Error deleting campaign:", response.statusText);
-        }
-      })
-      .catch((error) => console.error("Error deleting campaign:", error));
-  };
+    const deleteCampaign = (id: number) => {
+        fetch(`${deployURLs.backendURL}/api/campaigns/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.token}`,
+                'Content-Type': 'application/json',
+            }
+        })
+            .then((response) => {
+                if (response.ok) {
+                    const updatedCampaigns = campaigns.filter(campaign => campaign.id !== id);
+                    setCampaigns(updatedCampaigns);
+                } else {
+                    console.error('Error deleting campaign:', response.statusText);
+                    toast.error("Error deleting campaign. This campaign is associated with branches and cannot be deleted.");
+                }
+            })
+            .catch((error) => console.error('Error deleting campaign:', error));
+    };
 
   // check if admin is authorized to see and use CRUD
   let isValidAdmin = false;
@@ -94,41 +94,23 @@ const Campaigns = () => {
     setRefreshData((prevState) => !prevState);
   };
 
-  return (
-    <div className="campaigns">
-      <div className="info">
-        <h1>Campaigns</h1>
-        {isValidAdmin && (
-          <>
-            <button onClick={() => setOpenAdd(true)}>Add</button>
-            <button onClick={() => setOpenUpdate(true)}>Update</button>
-          </>
-        )}
-      </div>
-      <DataTable
-        slug="campaigns"
-        columns={columns}
-        rows={campaigns}
-        onDelete={deleteCampaign}
-      />
-      {openAdd && (
-        <Add
-          slug="campaign"
-          columns={columns}
-          setOpen={setOpenAdd}
-          toggleRefreshData={toggleRefreshData}
-        />
-      )}
-      {openUpdate && (
-        <Update
-          slug="campaign"
-          columns={columns}
-          setOpen={setOpenUpdate}
-          toggleRefreshData={toggleRefreshData}
-        />
-      )}
-    </div>
-  );
+    return (
+        <div className="campaigns">
+            <div className="info">
+                <h1>Campaigns</h1>
+                {isValidAdmin && (
+                    <>
+                        <button onClick={() => setOpenAdd(true)}>Add</button>
+                        <button onClick={() => setOpenUpdate(true)}>Update</button>
+                    </>
+                )}
+            </div>
+            <DataTable slug="campaigns" columns={columns} rows={campaigns} onDelete={deleteCampaign} />
+            {openAdd && <Add slug="campaign" columns={columns} setOpen={setOpenAdd} toggleRefreshData={toggleRefreshData} />}
+            {openUpdate && <Update slug="campaign" columns={columns} setOpen={setOpenUpdate} toggleRefreshData={toggleRefreshData} />}
+            <ToastContainer />
+        </div>
+    );
 };
 
 export default Campaigns;
