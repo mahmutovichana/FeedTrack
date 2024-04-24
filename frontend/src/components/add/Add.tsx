@@ -72,8 +72,6 @@ const Add = (props: Props) => {
       return;
     }
 
-    console.log(JSON.stringify(formData));
-
     let slugPlural;
     switch (props.slug) {
       case "user":
@@ -98,8 +96,8 @@ const Add = (props: Props) => {
         console.error("Invalid slug:", props.slug);
         return;
     }
-    //default rating is 0
-    formData.rating="0";
+
+    console.log(JSON.stringify(formData));
 
     fetch(`${deployURLs.backendURL}/api/${slugPlural}`, {
       method: "POST",
@@ -134,7 +132,7 @@ const Add = (props: Props) => {
       ...formData,
       role: e.target.value as string,
     });
-  }
+  };
 
   return (
     <div className="add">
@@ -145,7 +143,13 @@ const Add = (props: Props) => {
         <h1>Add new {props.slug}</h1>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field!=="rating" && item.field !== "img" && item.field != "verified")
+            .filter(
+              (item) =>
+                item.field !== "id" &&
+                item.field !== "rating" &&
+                item.field !== "img" &&
+                item.field != "verified"
+            )
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? "error-label" : ""}>
@@ -167,7 +171,11 @@ const Add = (props: Props) => {
                   </Select>
                 ) : (
                   <input
-                    type={column.field === "date" ? "date" : column.type}
+                    type={
+                      column.field.toLowerCase().includes("date")
+                        ? "date"
+                        : column.type
+                    }
                     name={column.field}
                     placeholder={column.field}
                     onChange={handleChange}
