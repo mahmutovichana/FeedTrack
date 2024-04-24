@@ -65,8 +65,7 @@ const Branches = () => {
                     setBranches(updatedBranches);
                 } else {
                     console.error('Error deleting branch:', response.statusText);
-                    toast.error("Error deleting branch. This branch is associated with tellers and cannot be deleted.");
-        
+                    toast.error("Error deleting branch. This branch is associated with tellers and cannot be deleted.");        
                 }
             })
             .catch((error) => console.error('Error deleting branch:', error));

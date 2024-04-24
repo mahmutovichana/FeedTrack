@@ -130,7 +130,7 @@ const Users = () => {
           setUsers(updatedUsers);
         } else {
           console.error('Error deleting user:', response.statusText);
-          toast.error("Error deleting user. This user is associated with feedback and cannot be deleted.");
+          toast.error("Error deleting user. This user is associated with branches, tellers or feedbacks and cannot be deleted.");
         }
       })
       .catch((error) => console.error('Error deleting user:', error));
