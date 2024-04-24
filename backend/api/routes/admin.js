@@ -5,7 +5,8 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const {
-  authenticateToken, authRole,
+  authenticateToken,
+  authRole,
 } = require("../middlewares/authMiddleware");
 const db = require("../db");
 
@@ -33,7 +34,10 @@ router.post(
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const existingUser = await db.query('SELECT * FROM "Person" WHERE email = $1', [email]);
+    const existingUser = await db.query(
+      'SELECT * FROM "Person" WHERE email = $1',
+      [email]
+    );
 
     if (existingUser.rowCount !== 0) {
       return res.status(400).json({ message: "User already exists" });
@@ -70,19 +74,17 @@ router.get(
   authRole("branchAdmin", "tellerAdmin"),
   async (req, res) => {
     const query = `SELECT * FROM "Person" WHERE role = 'user'`;
-    try { 
-      const { rows } = await db.query(query); 
-      res.status(200).json(rows); 
-    }
-    catch (err) {
+    try {
+      const { rows } = await db.query(query);
+      res.status(200).json(rows);
+    } catch (err) {
       console.log(err);
       return res.status(500).json({ message: "Error fetching users" });
     }
   }
 );
 
-
-const uploadDir = path.join(__dirname, "../welcome-data");
+const uploadDir = "/tmp";
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);

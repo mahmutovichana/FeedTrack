@@ -18,6 +18,11 @@
     background-color: $main-bg;
     position: relative;
 
+    #root > div > div > div.container > div.contentContainer > div > div.update > div > div > div > div > div {
+      width: unset;
+      margin: 2%;
+    }
+
     h1 {
       margin-bottom: 40px;
       font-size: calc(24px + 1vw);
