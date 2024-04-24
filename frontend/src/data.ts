@@ -65,18 +65,24 @@ export const menu = [
         },
         {
           id: 2,
+          title: "Define Campaign Order",
+          url: "/defineOrder",
+          icon: "defineOrder.png",
+        },
+        {
+          id: 3,
           title: "Notes",
           url: "/notes",
           icon: "note.svg",
         },
         {
-          id: 3,
+          id: 4,
           title: "Forms",
           url: "/forms",
           icon: "form.svg",
         },
         {
-          id: 4,
+          id: 5,
           title: "Calendar",
           url: "/home",
           icon: "calendar.svg",
