@@ -23,7 +23,7 @@ const Feedbacks = () => {
 
     // get all feedbacks for the table
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/feedbacks`, {
+        fetch(`${deployURLs.backendURL}/api/feedback/view`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.token}`,

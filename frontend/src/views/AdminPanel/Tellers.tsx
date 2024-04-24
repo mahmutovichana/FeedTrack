@@ -22,7 +22,7 @@ const Tellers = () => {
     const [refreshData, setRefreshData] = useState(false);
 
     useEffect(() => {
-        fetch(`${deployURLs.backendURL}/api/tellers`, {
+        fetch(`${deployURLs.backendURL}/api/teller/view`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.token}`, 
