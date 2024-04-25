@@ -145,9 +145,6 @@ const UserFeedbackInput = () => {
             updatedFeedbacks[index].rating = level;
         } 
         else {
-            updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID, date: formatDate(Date.now())});
-        }
-        /*else {
             try {
                 const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`, {
                     method: 'GET',
@@ -159,12 +156,7 @@ const UserFeedbackInput = () => {
                     const data = await response.json();
                     if (data && data.length > 0) {
                         const questionCampaignID = data[0].campaignID;
-                        // Check if the question belongs to any of the displayed campaigns
-                        if (campaignIds.includes(questionCampaignID)) {
-                            updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID: questionCampaignID, date: formatDate(Date.now()) });
-                        } else {
-                            console.error(`Question ID ${questionID} does not belong to any of the displayed campaigns.`);
-                        }
+                        updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID: questionCampaignID, date: formatDate(Date.now()) });
                     } else {
                         console.error(`No campaign found for question ID ${questionID}.`);
                     }
@@ -174,7 +166,7 @@ const UserFeedbackInput = () => {
             } catch (error) {
                 console.error("Problem fetching campaign ID:", error);
             }
-        }*/
+        }
         setFeedbacks(updatedFeedbacks);
     
         // Provjeri jesu li sva pitanja na trenutnoj stranici odgovorena
@@ -189,19 +181,37 @@ const UserFeedbackInput = () => {
         }
     };
 
-    const handleSubmit = () => {
-        console.log("Feedbacks:", feedbacks);
-        feedbacks.forEach(obj => {
-            console.log(obj);
-            fetch(`${deployURLs.backendURL}/api/feedbacks`, { 
+    const handleSubmit = async () => {
+        try {
+            console.log("Feedbacks:", feedbacks);
+            // Combine all feedbacks into a single array
+            const allFeedbacks = feedbacks.map(obj => ({
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.token}`
                 },
                 body: JSON.stringify(obj)
-            })
-        });
+            }));
+    
+            // Send all feedbacks in a single HTTP request using Promise.all
+            const responses = await Promise.all(allFeedbacks.map(feedback =>
+                fetch(`${deployURLs.backendURL}/api/feedbacks/insertFeedback`, feedback) // `${deployURLs.backendURL}/api/feedbacks`
+            ));
+    
+            // Check responses and handle errors if necessary
+            responses.forEach(response => {
+                if (!response.ok) {
+                    // Handle error for failed request
+                    console.error("Failed to submit feedback:", response.statusText);
+                }
+            });
+    
+            // Optionally, reset feedbacks state after successful submission
+         //   setFeedbacks([]);
+        } catch (error) {
+            console.error("Error submitting feedbacks:", error);
+        }
     };
 
     const renderQuestions = () => {
