@@ -32,7 +32,7 @@ module.exports = {
     const countQuery = `SELECT MAX(id) FROM "${tableName}"`;
     const { rows: countRows } = await db.query(countQuery);
     console.log(countRows[0]);
-    const id = parseInt(countRows[0].max) + 1;
+    const id = isNaN(parseInt(countRows[0].max)) ? 1 : parseInt(countRows[0].max) + 1;
     console.log(id);
 
     // Adding the ID to the inserted row

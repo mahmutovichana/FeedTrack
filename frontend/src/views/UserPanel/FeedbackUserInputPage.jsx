@@ -22,60 +22,100 @@ function formatDate(timestamp) {
 }
 
 const UserFeedbackInput = () => {
-  const [pageSize, setPageSize] = useState(() => {
-    const storedPageSize = localStorage.getItem("pageSize");
-    return storedPageSize ? parseInt(storedPageSize) : 5;
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [showSubmitButton, setShowSubmitButton] = useState(false);
-  const [showNextButton, setShowNextButton] = useState(false);
-  const [questions, setQuestions] = useState([]);
-  const [welcomeData, setWelcomeData] = useState({});
-  const [branchLocation, setBranchLocation] = useState("");
-  const [selectedTellerID, setSelectedTellerID] = useState("");
+    const [pageSize, setPageSize] = useState(() => {
+        const storedPageSize = localStorage.getItem('pageSize');
+        return storedPageSize ? parseInt(storedPageSize) : 5;
+    });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [feedbacks, setFeedbacks] = useState([]);
+    const [showSubmitButton, setShowSubmitButton] = useState(false);
+    const [showNextButton, setShowNextButton] = useState(false);
+    const [questions, setQuestions] = useState([]);
+    const [welcomeData, setWelcomeData] = useState({});
+    const [branchLocation, setBranchLocation] = useState('');
+    const [selectedTellerID, setSelectedTellerID] = useState('');
 
-  //Using values stored in localStorage
-  const campaignID = localStorage.campaignID;
-  //const campaignID = 27;
-  const tellerPositionID = localStorage.getItem("tellerPositionID");
-  //const tellerPositionID = 2;
-  const storedBranchLocation = localStorage.getItem("storedBranchLocation");
+    //Using values stored in localStorage
+    const branchID = localStorage.branchPositionID;
+    const campaignID = localStorage.campaignID;
+    //const campaignID = 27;
+    const tellerPositionID = localStorage.getItem('tellerPositionID');
+    //const tellerPositionID = 2;
+    const storedBranchLocation = localStorage.getItem('storedBranchLocation');
 
-  //const storedBranchLocation = "Bubasvaba";
+    let campaignIds; // ids of all campaigns current branch is associated with
 
-  async function fetchQuestionsFromDatabase() {
-    try {
-      const response = await fetch(
-        `${deployURLs.backendURL}/api/campaign/view/${campaignID}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-            "Content-Type": "application/json",
-          },
+    //const storedBranchLocation = "Bubasvaba";
+
+    // Function to fetch campaign ID for a single campaign name
+    const fetchCampaignId = async (name) => {
+        try {
+            const response = await fetch(`${deployURLs.backendURL}/api/campaign/view/name/${name}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.token}`
+                }
+            });
+            const data = await response.json();
+            return data.id; // Return the campaign ID
+        } catch (error) {
+            console.error("Problem fetching campaign ids:", error);
+            return null;
         }
-      );
+    };
 
-      if (!response.ok) {
-        throw new Error("Error fetching questions");
-      }
-      const data = await response.json();
-      console.log("Fetched questions:", data);
-      const extractedValuesArray = data.map(
-        ({ questionID: id, qname: name }) => ({ id, name })
-      );
+    // Function to fetch questions for a campaign via campaign ID
+    const fetchQuestionsByCampaignId = async (campaignId) => {
+        try {
+            const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byCampaignID/${campaignId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.token}`
+                }
+            });
+            const data = await response.json();
+            return data; // Return the questions for the campaign ID
+        } catch (error) {
+            console.error("Problem fetching questions:", error);
+            return null;
+        }
+    };
 
-      console.log(extractedValuesArray);
+    async function fetchQuestionsFromDatabase() {
 
-      //const modifiedData =
-      setQuestions(extractedValuesArray); // Postavi stanje questions na dobavljene podatke
-    } catch (error) {
-      console.error("Problem fetching questions:", error);
+        const campaignOrderMapString = localStorage.getItem('campaignOrderMap');
+        const campaignOrderMap = campaignOrderMapString ? JSON.parse(campaignOrderMapString) : {};
+        const campaignNames = campaignOrderMap[branchID] || [];
+        // Create an array to store promises for fetching campaign IDs
+        const fetchPromises = campaignNames.map(name => fetchCampaignId(name));
+        // Execute all fetch requests concurrently using Promise.all
+        campaignIds = await Promise.all(fetchPromises);
+        console.log("idevi kampanja: " + campaignIds);
+        // Check if campaignIds array is empty - means order of campaigns for the branch
+        // wasn't defined, but we should fetch questions from that branch's campaigns anyway
+        if (campaignIds.length === 0) {
+            try {
+                const response = await fetch(`${deployURLs.backendURL}/api/branchCampaign/byBranchID/${branchID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.token}`
+                    }
+                });
+                const data = await response.json();
+                // Extract array of IDs from response object
+                campaignIds = data.map(item => item.id);
+            } catch (error) {
+                console.error("Problem fetching campaign IDs:", error);
+            }
+        }
+        const questionPromises = campaignIds.map(campaignId => fetchQuestionsByCampaignId(campaignId));
+        let questionsByCampaign = await Promise.all(questionPromises);
+        questionsByCampaign = questionsByCampaign.flat();
+        setQuestions(questionsByCampaign);
+        console.log("questions by each campaign: " + JSON.stringify(questionsByCampaign));
     }
-  }
 
-  useEffect(() => {
+    useEffect(() => {
     localStorage.setItem("pageSize", pageSize.toString());
     fetch(`${deployURLs.backendURL}/api/welcomeData`, {
       method: "GET",
@@ -95,98 +135,117 @@ const UserFeedbackInput = () => {
     setShowNextButton(false);
   }, [currentPage, pageSize]);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
-  const handleFeedbackChange = (questionID, level) => {
-    const updatedFeedbacks = [...feedbacks];
-    const index = updatedFeedbacks.findIndex(
-      (item) => item.questionID === questionID
+    const handleFeedbackChange = async (questionID, level) => {
+        const updatedFeedbacks = [...feedbacks];
+        const index = updatedFeedbacks.findIndex(item => item.questionID === questionID);
+        if (index !== -1) {
+            updatedFeedbacks[index].rating = level;
+        } 
+        else {
+            try {
+                const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const questionCampaignID = data[0].campaignID;
+                        updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID: questionCampaignID, date: formatDate(Date.now()) });
+                    } else {
+                        console.error(`No campaign found for question ID ${questionID}.`);
+                    }
+                } else {
+                    console.error(`Failed to fetch campaign ID for question ID ${questionID}.`);
+                }
+            } catch (error) {
+                console.error("Problem fetching campaign ID:", error);
+            }
+        }
+        setFeedbacks(updatedFeedbacks);
+    
+        // Provjeri jesu li sva pitanja na trenutnoj stranici odgovorena
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, questions.length); // Izračunaj endIndex tako da ne izlazi iz opsega
+        const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.id));
+        setShowNextButton(allQuestionsAnswered);
+    
+        // Ako su odgovorena sva pitanja na svim stranicama, prikaži gumb "Submit"
+        if (updatedFeedbacks.length === questions.length) {
+            setShowSubmitButton(true);
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            console.log("Feedbacks:", feedbacks);
+            // Combine all feedbacks into a single array
+            const allFeedbacks = feedbacks.map(obj => ({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.token}`
+                },
+                body: JSON.stringify(obj)
+            }));
+    
+            // Send all feedbacks in a single HTTP request using Promise.all
+            const responses = await Promise.all(allFeedbacks.map(feedback =>
+                fetch(`${deployURLs.backendURL}/api/feedbacks/insertFeedback`, feedback) // `${deployURLs.backendURL}/api/feedbacks`
+            ));
+    
+            // Check responses and handle errors if necessary
+            responses.forEach(response => {
+                if (!response.ok) {
+                    // Handle error for failed request
+                    console.error("Failed to submit feedback:", response.statusText);
+                }
+            });
+    
+            // Optionally, reset feedbacks state after successful submission
+         //   setFeedbacks([]);
+        } catch (error) {
+            console.error("Error submitting feedbacks:", error);
+        }
+    };
+
+    const renderQuestions = () => {
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, questions.length);
+        return questions.slice(startIndex, endIndex).map(question => (
+            <FeedbackContainer key={question.id} question={question} onFeedbackChange={handleFeedbackChange} />
+        ));
+    };
+
+    return (
+        <div className='feedbackUserInputContainer'>
+            <div className="container">
+                <div className='info'>
+                    <h3>Branch: {branchLocation}</h3>
+                    <h3>Teller ID: {tellerPositionID}</h3>
+                </div>
+                <div className="logo">
+                    <img
+                      src={welcomeData.image}
+                      className="logo-image"
+                      alt="FeedTrack logo"
+                    />
+                </div>
+                <div className="feedback-section">
+                    {renderQuestions()}
+                    {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
+                    {currentPage !== Math.ceil(questions.length / pageSize) && showNextButton &&
+                        <button onClick={() => handlePageChange(currentPage + 1)}>Next</button>}
+                </div>
+            </div>
+        </div>
     );
-    if (index !== -1) {
-      updatedFeedbacks[index].rating = level;
-    } else {
-      updatedFeedbacks.push({
-        questionID,
-        rating: level,
-        tellerPositionID,
-        campaignID,
-        date: formatDate(Date.now()),
-      });
-    }
-    setFeedbacks(updatedFeedbacks);
-
-    // Provjeri jesu li sva pitanja na trenutnoj stranici odgovorena
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, questions.length); // Izračunaj endIndex tako da ne izlazi iz opsega
-    const allQuestionsAnswered = questions
-      .slice(startIndex, endIndex)
-      .every((q) => updatedFeedbacks.some((f) => f.questionID === q.id));
-    setShowNextButton(allQuestionsAnswered);
-
-    // Ako su odgovorena sva pitanja na svim stranicama, prikaži gumb "Submit"
-    if (updatedFeedbacks.length === questions.length) {
-      setShowSubmitButton(true);
-    }
-  };
-
-  const handleSubmit = () => {
-    console.log("Feedbacks:", feedbacks);
-    feedbacks.forEach((obj) => {
-      console.log(obj);
-      fetch(`${deployURLs.backendURL}/api/feedbacks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.token}`,
-        },
-        body: JSON.stringify(obj),
-      });
-    });
-  };
-
-  const renderQuestions = () => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, questions.length);
-    return questions
-      .slice(startIndex, endIndex)
-      .map((question) => (
-        <FeedbackContainer
-          key={question.id}
-          question={question}
-          onFeedbackChange={handleFeedbackChange}
-        />
-      ));
-  };
-
-  return (
-    <div className="feedbackUserInputContainer">
-      <div className="container">
-        <div className="info">
-          <h3>Branch: {branchLocation}</h3>
-          <h3>Teller ID: {tellerPositionID}</h3>
-        </div>
-        <div className="logo">
-          <img
-            src={welcomeData.image}
-            className="logo-image"
-            alt="FeedTrack logo"
-          />
-        </div>
-        <div className="feedback-section">
-          {renderQuestions()}
-          {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
-          {currentPage !== Math.ceil(questions.length / pageSize) &&
-            showNextButton && (
-              <button onClick={() => handlePageChange(currentPage + 1)}>
-                Next
-              </button>
-            )}
-        </div>
-      </div>
-    </div>
-  );
 };
 
 const FeedbackContainer = ({ question, onFeedbackChange }) => {

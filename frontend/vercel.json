@@ -1,4 +1,5 @@
 {
+  "installCommand": "npm ci --force",
   "version": 2,
   "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }

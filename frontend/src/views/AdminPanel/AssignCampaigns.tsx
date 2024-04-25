@@ -176,12 +176,12 @@ const AssignCampaigns = () => {
                 const branchIds = selectedBranches[area];
                 await Promise.all(branchIds.map(async branchId => {
                     try {
-                        const response = await fetch(`${deployURLs.backendURL}/api/branches/${branchId}`, {
-                            method: 'PUT',
+                        const response = await fetch(`${deployURLs.backendURL}/api/branchCampaigns/`, {
+                            method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ campaignID: selectedCampaign.id })
+                            body: JSON.stringify({ branchID: branchId, campaignID: selectedCampaign.id })
                         });
                         if (!response.ok) {
                             throw new Error('Failed to update branch');
