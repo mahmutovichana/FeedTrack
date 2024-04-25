@@ -6,7 +6,8 @@ import Button from '@mui/material/Button';
 import "./../../styles/AdminPanel/assignCampaigns.scss";
 
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from "@mui/material/Select";
+import SelectChangeEvent from "@mui/material/Select";
 import MenuItem from '@mui/material/MenuItem';
 import "./../../styles/AdminPanel/forms.scss";
 import { ToastContainer, toast } from 'react-toastify';

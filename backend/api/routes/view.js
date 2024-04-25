@@ -7,6 +7,33 @@ router.get('/campaign/view/:id', async (req, res) => {
     catch (error) { handleError(res, error); }
 });
 
+router.get('/branch/view', async (req, res) => {
+    try { res.json(await getView("branch_view")); }
+    catch (error) { handleError(res, error); }
+});
+
+router.get('/teller/view', async (req, res) => {
+    try { res.json(await getView("teller_view")); }
+    catch (error) { handleError(res, error); }
+});
+
+router.get('/feedback/view', async (req, res) => {
+    try { res.json(await getView("feedback_view")); }
+    catch (error) { handleError(res, error); }
+});
+
+const getView = async (tableName) => {
+    try{
+        const query = `SELECT * FROM "${tableName}"`;
+        console.log("getAll query:", query);
+        const { rows } = await db.query(query);
+        return rows;
+    } catch (error) {
+        console.error("Error in getView: ",error);
+        throw error;
+    }
+}
+
 const handleError = (res, error) => {
     res.status(500).json({ error: error.message });
 };

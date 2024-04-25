@@ -11,9 +11,7 @@ function setupRoutes(genericModel, tableName) {
     res.status(500).json({ error: error.message });
   };
 
-  // needs to be optimized to be used, getting 504 error for using this
-  // aka too slow functions: authenticateToken, authRole
-  // subRouter.use(authenticateToken, authRole);
+  // subRouter.use(authenticateToken, authRole("superAdmin", "branchAdmin", "tellerAdmin"));
   
   subRouter.get('/', async (req, res) => {
     try { res.json(await genericModel.getAll(tableName)); }
@@ -30,7 +28,6 @@ function setupRoutes(genericModel, tableName) {
     }
   });
   
-
   subRouter.post('/id', async (req, res) => {
     try {
       const { id } = req.body;
@@ -41,7 +38,6 @@ function setupRoutes(genericModel, tableName) {
     }
   });
   
-
   subRouter.post('/', async (req, res) => {
     try { res.status(201).json(await genericModel.add(tableName, req.body)); }
     catch (error) { handleError(res, error); }
@@ -64,6 +60,25 @@ function setupRoutes(genericModel, tableName) {
     try { await genericModel.deleteAll(tableName); res.sendStatus(204); }
     catch (error) { handleError(res, error); }
   });
+
+  /* subRouter.use((req, res, next) => {
+    const { user } = req.authUser;
+    // if the current user wanting to use any of these routes is a superAdmin, then everything is allowed
+    if (user.role === 'superAdmin') {
+      next();
+    } else {
+      // if the user is not a superAdmin, check if it is a POST /users route with body role: someAdmin
+      // we must not allow this, only if its a body role: user (only superAdmins can create other admins) 
+      if (req.method === 'POST' && req.path === '/') {
+        const { role: newRole } = req.body;
+        // check for the submitted role of the new user
+        if (newRole === 'user') next();
+        else {
+            res.status(403).json({ error: 'Unauthorized' });
+        }
+      } else next();
+    }
+  }); */
 
   return subRouter; // Returning the subrouter filled with routes for one "generic" table
 }

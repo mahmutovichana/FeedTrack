@@ -24,6 +24,7 @@ const Navbar = () => {
             const response = await fetch(`${deployURLs.backendURL}/api/logout`, {
                 method: 'POST',
                 headers: {
+                    Authorization: `Bearer ${localStorage.token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ "token": localStorage.getItem("token") })

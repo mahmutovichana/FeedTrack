@@ -50,6 +50,12 @@ export const menu = [
           title: "Campaigns",
           url: "/campaigns",
           icon: "megaphone.png",
+        },
+        {
+          id: 5,
+          title: "Questions",
+          url: "/questions",
+          icon: "messages-question.png",
         }
       ],
     },

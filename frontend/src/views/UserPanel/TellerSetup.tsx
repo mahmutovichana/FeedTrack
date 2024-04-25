@@ -94,7 +94,7 @@ const TellerSetup = () => {
         localStorage.setItem('selectedTeller', JSON.stringify(selectedTeller));
 
         // Redirect to /userFeedback after submission
-        navigate('/userFeedback');
+        navigate('/welcomeScreen');
     };
 
     return (

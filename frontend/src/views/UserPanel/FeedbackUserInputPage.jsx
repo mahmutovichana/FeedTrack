@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import './../../styles/UserPanel/feedbackUserInput.css';
+import React, { useState, useEffect } from "react";
+import "./../../styles/UserPanel/feedbackUserInput.css";
 import feedtrackLogo from "./../../assets/feedtrackLogoBlack.svg";
 import { deployURLs } from "../../../public/constants.js";
-import './../../styles/UserPanel/feedbackUserInput.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import "./../../styles/UserPanel/feedbackUserInput.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 //function for conversion of date
 function formatDate(timestamp) {
-    const padZero = (num) => (num < 10 ? '0' + num : num);
+  const padZero = (num) => (num < 10 ? "0" + num : num);
 
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = padZero(date.getMonth() + 1); // Mjeseci počinju od 0
-    const day = padZero(date.getDate());
-    const hours = padZero(date.getHours());
-    const minutes = padZero(date.getMinutes());
-    const seconds = padZero(date.getSeconds());
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = padZero(date.getMonth() + 1); // Mjeseci počinju od 0
+  const day = padZero(date.getDate());
+  const hours = padZero(date.getHours());
+  const minutes = padZero(date.getMinutes());
+  const seconds = padZero(date.getSeconds());
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 const UserFeedbackInput = () => {
@@ -31,7 +31,7 @@ const UserFeedbackInput = () => {
     const [showSubmitButton, setShowSubmitButton] = useState(false);
     const [showNextButton, setShowNextButton] = useState(false);
     const [questions, setQuestions] = useState([]);
-    const [welcomeMessage, setWelcomeMessage] = useState("");
+    const [welcomeData, setWelcomeData] = useState({});
     const [branchLocation, setBranchLocation] = useState('');
     const [selectedTellerID, setSelectedTellerID] = useState('');
 
@@ -116,23 +116,24 @@ const UserFeedbackInput = () => {
     }
 
     useEffect(() => {
-        localStorage.setItem('pageSize', pageSize.toString());
-        fetch(`${deployURLs.backendURL}/api/welcomeData`, {
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setWelcomeMessage(data.message);
-            });
-        //const storedBranch = localStorage.getItem("selectedBranch");
-        //const storedTeller = localStorage.getItem("selectedTeller");
-        setBranchLocation(storedBranchLocation);
-        setSelectedTellerID(tellerPositionID);
-        fetchQuestionsFromDatabase();
-        setShowNextButton(false);
-    }, [currentPage, pageSize]);
-
-
+    localStorage.setItem("pageSize", pageSize.toString());
+    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then(({ image, message }) => {
+        setWelcomeData({ image, message });
+      })
+      .catch(() => {
+        setWelcomeData({ ...welcomeData, message: "Hello World!" });
+      });
+    //const storedBranch = localStorage.getItem("selectedBranch");
+    //const storedTeller = localStorage.getItem("selectedTeller");
+    setBranchLocation(storedBranchLocation);
+    setSelectedTellerID(tellerPositionID);
+    fetchQuestionsFromDatabase();
+    setShowNextButton(false);
+  }, [currentPage, pageSize]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -231,14 +232,12 @@ const UserFeedbackInput = () => {
                 </div>
                 <div className="logo">
                     <img
-                        src={`${deployURLs.backendURL}/api/welcomeData/welcome-image.png`}
-                        className="logo-image"
-                        alt="FeedTrack logo"
+                      src={welcomeData.image}
+                      className="logo-image"
+                      alt="FeedTrack logo"
                     />
-                    <h1>{welcomeMessage}</h1>
                 </div>
                 <div className="feedback-section">
-                    <h2>Your feedback:</h2>
                     {renderQuestions()}
                     {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
                     {currentPage !== Math.ceil(questions.length / pageSize) && showNextButton &&
@@ -249,52 +248,57 @@ const UserFeedbackInput = () => {
     );
 };
 
-const FeedbackContainer = ({question, onFeedbackChange}) => {
-    const [rating, setrating] = useState(null);
+const FeedbackContainer = ({ question, onFeedbackChange }) => {
+  const [rating, setrating] = useState(null);
 
-    const handleSmileyClick = (level) => {
-        setrating(level);
-        onFeedbackChange(question.id, level);
-    };
+  const handleSmileyClick = (level) => {
+    setrating(level);
+    onFeedbackChange(question.id, level);
+  };
 
-    return (
-        <div className="feedback-container">
-            <h3>{question.name}</h3>
-            <SmileyFeedback onClick={handleSmileyClick}/>
-        </div>
-    );
+  return (
+    <div className="feedback-container">
+      <h3>{question.name}</h3>
+      <SmileyFeedback onClick={handleSmileyClick} />
+    </div>
+  );
 };
 
-const SmileyFeedback = ({onClick}) => {
-    const smileys = [
-        { level: 1, color: 'red', symbol: '😡' },
-        { level: 2, color: 'orange', symbol: '😐' },
-        { level: 3, color: 'yellow', symbol: '😊' },
-        { level: 4, color: 'lightgreen', symbol: '😃' },
-        { level: 5, color: 'green', symbol: '😍' },
-    ];
+const SmileyFeedback = ({ onClick }) => {
+  const smileys = [
+    { level: 1, color: "red", symbol: "😡" },
+    { level: 2, color: "orange", symbol: "😐" },
+    { level: 3, color: "yellow", symbol: "😊" },
+    { level: 4, color: "lightgreen", symbol: "😃" },
+    { level: 5, color: "green", symbol: "😍" },
+  ];
 
-    const [clickedIndex, setClickedIndex] = useState(null);
+  const [clickedIndex, setClickedIndex] = useState(null);
 
-    const handleSmileyClick = (level, index) => {
-        onClick(level);
-        setClickedIndex(index);
-    };
+  const handleSmileyClick = (level, index) => {
+    onClick(level);
+    setClickedIndex(index);
+  };
 
-    return (
-        <div className="smiley-feedback">
-            {smileys.map((smiley, index) => (
-                <span
-                    key={smiley.level}
-                    className={clickedIndex === index ? 'clicked' : ''}
-                    style={{ color: smiley.color, cursor: 'pointer', fontSize: '2em', marginRight: '10px' }}
-                    onClick={() => handleSmileyClick(smiley.level, index)}
-                >
-                    {smiley.symbol}
-                </span>
-            ))}
-        </div>
-    );
+  return (
+    <div className="smiley-feedback">
+      {smileys.map((smiley, index) => (
+        <span
+          key={smiley.level}
+          className={clickedIndex === index ? "clicked" : ""}
+          style={{
+            color: smiley.color,
+            cursor: "pointer",
+            fontSize: "2em",
+            marginRight: "10px",
+          }}
+          onClick={() => handleSmileyClick(smiley.level, index)}
+        >
+          {smiley.symbol}
+        </span>
+      ))}
+    </div>
+  );
 };
 
 export default UserFeedbackInput;

@@ -12,6 +12,11 @@
   align-items: center;
   justify-content: center;
 
+  #root>div>div>div.container>div.contentContainer>div>div.update {
+    width: unset;
+    margin: 2%;
+  }
+
   .modal {
     padding: 50px;
     border-radius: 10px;
@@ -50,7 +55,7 @@
 
         .error-label {
           color: red;
-        }       
+        }
 
         input {
           padding: 10px;

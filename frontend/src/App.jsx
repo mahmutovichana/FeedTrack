@@ -14,14 +14,19 @@ import Campaigns from './views/AdminPanel/Campaigns';
 import TellerSetup from './views/UserPanel/TellerSetup';
 import Notes from "./views/AdminPanel/Notes";
 import DefineOrder from './views/AdminPanel/DefineOrder.tsx';
+import WelcomeScreen from './views/UserPanel/WelcomeScreen.jsx';
+import Questions from "./views/AdminPanel/Questions";
 
 function App() {
-
 
   const router = createBrowserRouter([
     {
       path: "/",
       element: <Login />
+    },
+    {
+      path: "/welcomeScreen",
+      element: <WelcomeScreen />
     },
     {
       path: "/userFeedback",
@@ -78,6 +83,10 @@ function App() {
         {
           path: "/defineOrder",
           element: <DefineOrder />
+        },
+        {
+          path: "/questions",
+          element: <Questions />
         }
       ]
     }
