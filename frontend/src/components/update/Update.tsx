@@ -6,9 +6,11 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import SelectChangeEvent from "@mui/material/Select";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 import { deployURLs } from "./../../../public/constants";
+import internal from "stream";
+import branches from "../../views/AdminPanel/Branches";
 
 type Props = {
   slug: string;
@@ -16,6 +18,13 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   toggleRefreshData: () => void;
 };
+
+const roleOptions = [
+  { value: "user", label: "User" },
+  { value: "superAdmin", label: "Super Admin" },
+  { value: "tellerAdmin", label: "Teller Admin" },
+  { value: "branchAdmin", label: "Branch Admin" },
+];
 
 const getColumnValue = (user: User, slug: string) => {
   switch (slug) {
@@ -41,11 +50,20 @@ interface User {
   [key: string]: any;
 }
 
+type FormData = {
+  [key: string]: string;
+  startDate?: string;
+  endDate?: string;
+  date?: string;
+};
+
 const Update = (props: Props) => {
-  const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [formData, setFormData] = useState<FormData>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [managers, setManagers] = useState<{ id: number; name: string; lastname: string, role: string }[]>([]);
+  const [questions, setQuestions] = useState<{ id: number; name: string; }[]>([]);
 
   let slugPlural;
   switch (props.slug) {
@@ -69,8 +87,122 @@ const Update = (props: Props) => {
       break;
     default:
       console.error("Invalid slug:", props.slug);
-      return; 
+      return;
   }
+
+  const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
+  const [branches, setBranches] = useState<{ id: number; location: string }[]>([]);
+  const [tellers, setTellers] = useState<{ id: number; }[]>([]);
+
+  useEffect(() => {
+
+    // Fetch tellers from the backend
+    fetch(`${deployURLs.backendURL}/api/tellers/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Tellers received successfully:", data);
+        setTellers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching tellers:", error);
+      });
+    // Dohvaćanje kampanja sa servera
+    fetch(`${deployURLs.backendURL}/api/campaigns/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Campaigns received successfully:", data);
+        setCampaigns(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching campaigns:", error);
+      });
+
+    // Dohvaćanje pitanja sa servera
+    fetch(`${deployURLs.backendURL}/api/questions/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Questions received successfully:", data);
+        setQuestions(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching questions:", error);
+      });
+    // Dohvacanje brancheva sa servera
+    fetch(`${deployURLs.backendURL}/api/branches/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Campaigns received successfully:", data);
+        setBranches(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching campaigns:", error);
+      });
+    // Fetch managers from the backend
+    fetch(`${deployURLs.backendURL}/api/users/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Managers received successfully:", data);
+        setManagers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching managers:", error);
+      });
+  }, []);
 
   useEffect(() => {
     // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
@@ -127,25 +259,91 @@ const Update = (props: Props) => {
     if (selectedId) {
       // Pronalaženje odabranog korisnika
       const selectedUser = users.find((user) => user.id.toString() === selectedId);
+      console.log(selectedUser);
       if (selectedUser) {
         // Kreiranje novog objekta koji će sadržavati ažurirane vrijednosti formData
-        const updatedFormData = {};
+        const updatedFormData: FormData = {};
         // Iteriranje kroz kolone i postavljanje vrijednosti formData na osnovu odabranog korisnika
         props.columns.forEach((column) => {
           // Provjera da li postoji vrijednost u odabranom korisniku za trenutnu kolonu
-          if (selectedUser[column.field] !== undefined) {
-            // Postavljanje vrijednosti formData
-            updatedFormData[column.field] = selectedUser[column.field];
+          console.log(column.field + " " + column.field.valueOf());
+          // Postavljanje vrijednosti formData
+          // Ako je naziv polja u formData različit od naziva kolone u tabeli, koristi mapiranje
+          const formDataFieldName = mapColumnNameToFormDataField(column.field);
+
+          if (selectedUser[formDataFieldName] !== undefined) {
+
+            console.log("formData field name:" + formDataFieldName);
+            console.log("selected user field name:" + selectedUser[formDataFieldName]);
+            updatedFormData[formDataFieldName] = selectedUser[formDataFieldName];
           }
         });
         // Provjeri u konzoli da li su vrijednosti tačno postavljene
         console.log("Updated Form Data:", updatedFormData);
+
+        // Prilagodite format datuma u formData, ako je potrebno
+        if (updatedFormData.startDate) {
+          updatedFormData.startDate = new Date(updatedFormData.startDate).toISOString().split('T')[0];
+        }
+        if (updatedFormData.endDate) {
+          updatedFormData.endDate = new Date(updatedFormData.endDate).toISOString().split('T')[0];
+        }
+        if (updatedFormData.date) {
+          updatedFormData.date = new Date(updatedFormData.date).toISOString().split('T')[0];
+        }
+
         // Postavljanje ažuriranog stanja formData
         setFormData(updatedFormData);
       }
     }
   }, [selectedId, users]);
-  
+
+  // Funkcija koja mapira nazive kolona u formData polja
+  const mapColumnNameToFormDataField = (columnName: string): string => {
+    switch (columnName) {
+      case "id":
+        return "id";
+      case "location":
+        return "location";
+      case "manager":
+        return "managerID";
+      case "rating":
+        return "rating";
+      case "area":
+        return "area";
+      case "campaign":
+        return "campaignID";
+      case "date":
+        return "date";
+      case "startDate":
+        return "startDate";
+      case "endDate":
+        return "endDate";
+      case "teller ID":
+        return "tellerPositionID";
+      case "question":
+        return "questionID";
+      case "branch":
+        return "branchID";
+      case "name":
+        return "name";
+      case "lastname":
+        return "lastname";
+      case "image":
+        return "image";
+      case "email":
+        return "email";
+      case "mobilenumber":
+        return "mobilenumber";
+      case "role":
+        return "role";
+      case "questionsperpage":
+        return "questionsperpage";
+      default:
+        return "";
+    }
+  };
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -195,6 +393,16 @@ const Update = (props: Props) => {
       return;
     }
 
+    if (props.slug != ("question" || "teller")) {
+
+      // Postavljanje campaignID u formData
+      setFormData({
+        ...formData,
+        campaignID: formData.campaign,
+      });
+    }
+
+    console.log("Form Data after setting campaign ID:", formData);
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedId}`, {
       method: "PUT",
       headers: {
@@ -221,16 +429,67 @@ const Update = (props: Props) => {
     });
   };
 
-  const handleUserChange = (event: SelectChangeEvent<string>) => {
-    setSelectedId(event.target.value);
+  const handleTellerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      tellerPositionID: e.target.value as string,
+    });
+  };
+
+  // Filter managers based on their role
+  // Filter managers based on the current slug
+  const filteredManagers = managers.filter(manager => {
+    if (props.slug === 'branch') {
+      return manager.role === 'branchAdmin';
+    } else if (props.slug === 'teller') {
+      return manager.role === 'tellerAdmin';
+    }
+    // Dodajte druge slučajeve slug-a po potrebi
+    return true; // Ako slug nije 'branch' ili 'teller', prikaži sve managere
+  });
+
+
+  const handleManagerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      managerID: e.target.value as string,
+    });
+  };
+
+  const handleBranchChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      branchID: e.target.value as string,
+    });
+  };
+
+  const handleQuestionChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      questionID: e.target.value as string,
+    });
+  };
+
+  const handleCampaignChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      campaignID: e.target.value as string,
+    });
+  };
+
+  // Define a custom type for the event
+  type UserSelectChangeEvent = SelectChangeEvent<string>;
+
+  const handleUserChange = (event: UserSelectChangeEvent) => {
+    const value = event.target.value;
+    setSelectedId(value === "" ? null : value);
+
   };
 
   return (
     <div className="update">
       <div className="modal">
-        <span className="close" onClick={() => props.setOpen(false)}>
-          X
-        </span>
+        <span className="close" onClick={() => props.setOpen(false)}>X</span>
         <h1>Update {props.slug}</h1>
         <Box sx={{ minWidth: 120 }}>
           <FormControl fullWidth>
@@ -252,26 +511,113 @@ const Update = (props: Props) => {
         </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field!=="rating" &&  item.field !== "img" && item.field != "verified")
+            .filter((item) => item.field !== "id" && item.field !== "rating" && item.field !== "img" && item.field !== "verified")
             .map((column) => (
               <div className="item" key={column.field}>
                 <label className={errors[column.field] ? "error-label" : ""}>
                   {column.headerName}
                 </label>
-                <input
-                  type={
-                    column.field.toLowerCase().includes("date")
-                      ? "date"
-                      : column.type
-                  }
-                  name={column.field}
-                  value={formData[column.field] || ''}
-                  placeholder={column.field}
-                  onChange={handleChange2}
-                  required
-                />
-                {errors[column.field] && (
-                  <span className="error">{errors[column.field]}</span>
+                {/* Provjera da li je polje "campaign" */}
+                {column.field === "campaign" ? (
+                  <div>
+
+                    <FormControl fullWidth>
+                      <Select
+                        value={formData.campaignID || ""}
+                        onChange={handleCampaignChange}
+                      //placeholder
+                      >
+                        <MenuItem value="" disabled>
+                          Select {column.headerName}
+                        </MenuItem>
+                        {campaigns.map((campaign) => (
+                          <MenuItem key={campaign.id} value={campaign.id.toString()}>
+                            {campaign.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </div>
+                ) : column.field === "teller ID" ? (
+                  <Select
+                    value={formData.tellerPositionID || ""}
+                    onChange={handleTellerChange}
+                  //placeholder="Select Teller"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {tellers.map((teller) => (
+                      <MenuItem key={teller.id} value={teller.id.toString()}>
+                        {teller.id}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                ) : column.field === "manager" ? (
+                  <Select
+                    value={formData.managerID || ""}
+                    onChange={handleManagerChange}
+                  //placeholder="Select Manager"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {filteredManagers.map((manager) => (
+                      <MenuItem key={manager.id} value={manager.id.toString()}>
+                        {manager.name} {manager.lastname}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                ) : column.field === "branch" ? (
+                  <Select
+                    value={formData.branchID || ""}
+                    onChange={handleBranchChange}
+                  //placeholder="Select Branch"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {branches.map((branch) => (
+                      <MenuItem key={branch.id} value={branch.id.toString()}>
+                        {branch.location}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                ) : column.field === "question" ? (
+                  <Select
+                    value={formData.questionID || ""}
+                    onChange={handleQuestionChange}
+                  //placeholder="Select Question"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {questions.map((question) => (
+                      <MenuItem key={question.id} value={question.id.toString()}>
+                        {question.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                ) : (
+                  // Ako nije polje "campaign", prikaži običan input
+                  <div>
+
+                    <input
+                      type={
+                        column.field.toLowerCase().includes("date")
+                          ? "date"
+                          : column.type
+                      }
+                      name={column.field}
+                      value={formData[column.field] || ''}
+                      placeholder={column.field}
+                      onChange={handleChange2}
+                      required
+                    />
+                    {errors[column.field] && (
+                      <span className="error">{errors[column.field]}</span>
+                    )}
+                  </div>
                 )}
               </div>
             ))}
@@ -283,3 +629,4 @@ const Update = (props: Props) => {
 };
 
 export default Update;
+

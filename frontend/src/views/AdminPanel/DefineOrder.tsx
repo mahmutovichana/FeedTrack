@@ -3,7 +3,7 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { arrayMoveImmutable } from 'array-move';
 import { deployURLs } from "../../../public/constants";
 import './../../styles/AdminPanel/DefineOrder.scss';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 const SortableItem = SortableElement(({ value }) => (
   <div style={cardStyle}>{value}</div> // Stilizacija kao kartica
@@ -110,6 +110,7 @@ const DefineOrder = () => {
           </ul>
         </div>
       )}
+      <ToastContainer/>
     </div>
   );
 };
