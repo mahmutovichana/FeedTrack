@@ -5,6 +5,7 @@ import { deployURLs } from "../../../public/constants.js";
 import "./../../styles/UserPanel/feedbackUserInput.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {useNavigate} from "react-router-dom";
 
 //function for conversion of date
 function formatDate(timestamp) {
@@ -32,6 +33,7 @@ const UserFeedbackInput = () => {
     const [welcomeData, setWelcomeData] = useState({});
     const [branchLocation, setBranchLocation] = useState('');
     const [selectedTellerID, setSelectedTellerID] = useState('');
+    const navigate = useNavigate();
 
     // useEffect hook za praćenje promjena u feedbacks varijabli
     useEffect(() => {
@@ -225,7 +227,7 @@ const UserFeedbackInput = () => {
                     console.error("Failed to submit feedback:", response.statusText);
                 }
             });
-
+            navigate('/welcomeScreen');
             // Optionally, reset feedbacks state after successful submission
             // setFeedbacks([]);
         } catch (error) {
