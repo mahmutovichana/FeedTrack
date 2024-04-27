@@ -10,6 +10,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 
 import { deployURLs } from "./../../../public/constants";
 import internal from "stream";
+import branches from "../../views/AdminPanel/Branches";
 
 type Props = {
   slug: string;
@@ -89,6 +90,7 @@ const Update = (props: Props) => {
   }
 
   const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
+  const [branches, setBranches] = useState<{ id: number; location: string }[]>([]);
 
   useEffect(() => {
     // Dohvaćanje kampanja sa servera
@@ -112,6 +114,27 @@ const Update = (props: Props) => {
       .catch((error) => {
         console.error("Error fetching campaigns:", error);
       });
+    // Dohvacanje brancheva sa servera
+    fetch(`${deployURLs.backendURL}/api/branches/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parsiranje odgovora kao JSON
+          } else {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then((data) => {
+          console.log("Campaigns received successfully:", data);
+          setBranches(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching campaigns:", error);
+        });
 // Fetch managers from the backend
 fetch(`${deployURLs.backendURL}/api/users/`, {
   method: "GET",
@@ -272,12 +295,12 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
 
     if(props.slug!=("question" || "teller")){
     
-    // Postavljanje campaignID u formData
-    setFormData({
-      ...formData,
-      campaignID: formData.campaign, 
-    });
-  }
+      // Postavljanje campaignID u formData
+      setFormData({
+        ...formData,
+        campaignID: formData.campaign,
+      });
+    }
 
     console.log("Form Data after setting campaign ID:", formData);
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedId}`, {
@@ -318,10 +341,18 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
     return true; // Ako slug nije 'branch' ili 'teller', prikaži sve managere
   });
 
+
   const handleManagerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     setFormData({
       ...formData,
       managerID: e.target.value as string,
+    });
+  };
+
+  const handleBranchChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      branchID: e.target.value as string,
     });
   };
 
@@ -396,16 +427,35 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                   <Select
                     value={formData.managerID || ""}
                     onChange={handleManagerChange}
-                    placeholder="Select Manager"
+                    //placeholder="Select Manager"
                     displayEmpty
                   >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
                     {filteredManagers.map((manager) => (
                       <MenuItem key={manager.id} value={manager.id.toString()}>
                         {manager.name} {manager.lastname}
                       </MenuItem>
                     ))}
                   </Select>
-                ) : (
+                ) : column.field === "branch" ? (
+                        <Select
+                            value={formData.branchID || ""}
+                            onChange={handleBranchChange}
+                            //placeholder="Select Branch"
+                            displayEmpty
+                        >
+                          <MenuItem value="" disabled>
+                            Select {column.headerName}
+                          </MenuItem>
+                          {branches.map((branch) => (
+                              <MenuItem key={branch.id} value={branch.id.toString()}>
+                                {branch.location}
+                              </MenuItem>
+                          ))}
+                        </Select>
+                  ) : (
                   // Ako nije polje "campaign", prikaži običan input
                   <div>
           
@@ -436,3 +486,4 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
 };
 
 export default Update;
+
