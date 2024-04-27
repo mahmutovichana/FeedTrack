@@ -9,6 +9,7 @@ import Select from "@mui/material/Select";
 import { SelectChangeEvent } from "@mui/material/Select";
 
 import { deployURLs } from "./../../../public/constants";
+import internal from "stream";
 
 type Props = {
   slug: string;
@@ -270,22 +271,13 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
     }
 
     if(props.slug!=("question" || "teller")){
-    console.log("Form Data before finding campaign ID:", formData);
-
-    // Prvo pronađi id kampanje na osnovu njenog imena
-    const selectedCampaign = campaigns.find((campaign) => campaign.name === formData.name);
-    if (!selectedCampaign) {
-      console.error("Selected campaign not found");
-      return;
-    }
-
-    console.log("Selected campaign:", selectedCampaign);
-
+    
     // Postavljanje campaignID u formData
     setFormData({
       ...formData,
-      campaignID: selectedCampaign.id.toString(),
-    });}
+      campaignID: formData.campaign, 
+    });
+  }
 
     console.log("Form Data after setting campaign ID:", formData);
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedId}`, {
@@ -330,6 +322,13 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
     setFormData({
       ...formData,
       managerID: e.target.value as string,
+    });
+  };
+
+  const handleCampaignChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      campaignID: e.target.value as string,
     });
   };
 
@@ -379,19 +378,14 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                     <FormControl fullWidth>
                       <Select
                         value={formData[column.field] || ""}
-                        onChange={(e) => {
-                          setFormData({
-                            ...formData,
-                            [column.field]: e.target.value as string,
-                          });
-                        }}
+                        onChange={handleCampaignChange}
                         displayEmpty
                       >
                         <MenuItem value="" disabled>
                           Select {column.headerName}
                         </MenuItem>
                         {campaigns.map((campaign) => (
-                          <MenuItem key={campaign.id} value={campaign.name}>
+                          <MenuItem key={campaign.id} value={campaign.id.toString()}>
                             {campaign.name}
                           </MenuItem>
                         ))}
