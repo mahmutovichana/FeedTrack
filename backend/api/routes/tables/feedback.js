@@ -24,7 +24,7 @@ router.post('/feedbacks/insertFeedback', async (req, res) => {
         await insertFeedback(feedbackData);
         res.status(201).send("Feedback inserted successfully");
     } catch (error) {
-        handleError(res, error);
+        throw error;
     }
 });
 

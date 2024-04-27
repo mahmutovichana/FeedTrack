@@ -63,7 +63,7 @@ const Update = (props: Props) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [managers, setManagers] = useState<{ id: number; name: string; lastname: string, role: string }[]>([]);
-  const [questions, setQuestions] = useState<{ id: number; name: string;  }[]>([]);
+  const [questions, setQuestions] = useState<{ id: number; name: string; }[]>([]);
 
   let slugPlural;
   switch (props.slug) {
@@ -139,7 +139,7 @@ const Update = (props: Props) => {
         console.error("Error fetching campaigns:", error);
       });
 
-      // Dohvaćanje pitanja sa servera
+    // Dohvaćanje pitanja sa servera
     fetch(`${deployURLs.backendURL}/api/questions/`, {
       method: "GET",
       headers: {
@@ -167,42 +167,42 @@ const Update = (props: Props) => {
         "Content-Type": "application/json",
       },
     })
-        .then((response) => {
-          if (response.ok) {
-            return response.json(); // Parsiranje odgovora kao JSON
-          } else {
-            throw new Error("Network response was not ok");
-          }
-        })
-        .then((data) => {
-          console.log("Campaigns received successfully:", data);
-          setBranches(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching campaigns:", error);
-        });
-// Fetch managers from the backend
-fetch(`${deployURLs.backendURL}/api/users/`, {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-  },
-})
-  .then((response) => {
-    if (response.ok) {
-      return response.json(); // Parse the response as JSON
-    } else {
-      throw new Error("Network response was not ok");
-    }
-  })
-  .then((data) => {
-    console.log("Managers received successfully:", data);
-    setManagers(data);
-  })
-  .catch((error) => {
-    console.error("Error fetching managers:", error);
-  });
-}, []);
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Campaigns received successfully:", data);
+        setBranches(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching campaigns:", error);
+      });
+    // Fetch managers from the backend
+    fetch(`${deployURLs.backendURL}/api/users/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Managers received successfully:", data);
+        setManagers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching managers:", error);
+      });
+  }, []);
 
   useEffect(() => {
     // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
@@ -259,15 +259,23 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
     if (selectedId) {
       // Pronalaženje odabranog korisnika
       const selectedUser = users.find((user) => user.id.toString() === selectedId);
+      console.log(selectedUser);
       if (selectedUser) {
         // Kreiranje novog objekta koji će sadržavati ažurirane vrijednosti formData
         const updatedFormData: FormData = {};
         // Iteriranje kroz kolone i postavljanje vrijednosti formData na osnovu odabranog korisnika
         props.columns.forEach((column) => {
           // Provjera da li postoji vrijednost u odabranom korisniku za trenutnu kolonu
-          if (selectedUser[column.field] !== undefined) {
-            // Postavljanje vrijednosti formData
-            updatedFormData[column.field] = selectedUser[column.field];
+          console.log(column.field + " " + column.field.valueOf());
+          // Postavljanje vrijednosti formData
+          // Ako je naziv polja u formData različit od naziva kolone u tabeli, koristi mapiranje
+          const formDataFieldName = mapColumnNameToFormDataField(column.field);
+
+          if (selectedUser[formDataFieldName] !== undefined) {
+
+            console.log("formData field name:" + formDataFieldName);
+            console.log("selected user field name:" + selectedUser[formDataFieldName]);
+            updatedFormData[formDataFieldName] = selectedUser[formDataFieldName];
           }
         });
         // Provjeri u konzoli da li su vrijednosti tačno postavljene
@@ -289,6 +297,52 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
       }
     }
   }, [selectedId, users]);
+
+  // Funkcija koja mapira nazive kolona u formData polja
+  const mapColumnNameToFormDataField = (columnName: string): string => {
+    switch (columnName) {
+      case "id":
+        return "id";
+      case "location":
+        return "location";
+      case "manager":
+        return "managerID";
+      case "rating":
+        return "rating";
+      case "area":
+        return "area";
+      case "campaign":
+        return "campaignID";
+      case "date":
+        return "date";
+      case "startDate":
+        return "startDate";
+      case "endDate":
+        return "endDate";
+      case "teller ID":
+        return "tellerPositionID";
+      case "question":
+        return "questionID";
+      case "branch":
+        return "branchID";
+      case "name":
+        return "name";
+      case "lastname":
+        return "lastname";
+      case "image":
+        return "image";
+      case "email":
+        return "email";
+      case "mobilenumber":
+        return "mobilenumber";
+      case "role":
+        return "role";
+      case "questionsperpage":
+        return "questionsperpage";
+      default:
+        return "";
+    }
+  };
 
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -339,8 +393,8 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
       return;
     }
 
-    if(props.slug!=("question" || "teller")){
-    
+    if (props.slug != ("question" || "teller")) {
+
       // Postavljanje campaignID u formData
       setFormData({
         ...formData,
@@ -429,6 +483,7 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
   const handleUserChange = (event: UserSelectChangeEvent) => {
     const value = event.target.value;
     setSelectedId(value === "" ? null : value);
+
   };
 
   return (
@@ -465,11 +520,12 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                 {/* Provjera da li je polje "campaign" */}
                 {column.field === "campaign" ? (
                   <div>
+
                     <FormControl fullWidth>
                       <Select
                         value={formData.campaignID || ""}
                         onChange={handleCampaignChange}
-                        displayEmpty
+                      //placeholder
                       >
                         <MenuItem value="" disabled>
                           Select {column.headerName}
@@ -482,28 +538,26 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                       </Select>
                     </FormControl>
                   </div>
-                ): column.field === "teller ID" ? (
-                    <Select
-                      value={formData.tellerPositionID || ""}
-                      onChange={handleTellerChange}
-                      //placeholder="Select Teller"
-                      displayEmpty
-                    >
-                      <MenuItem value="" disabled>
-                        Select {column.headerName}
+                ) : column.field === "teller ID" ? (
+                  <Select
+                    value={formData.tellerPositionID || ""}
+                    onChange={handleTellerChange}
+                  //placeholder="Select Teller"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {tellers.map((teller) => (
+                      <MenuItem key={teller.id} value={teller.id.toString()}>
+                        {teller.id}
                       </MenuItem>
-                      {tellers.map((teller) => (
-                        <MenuItem key={teller.id} value={teller.id.toString()}>
-                          {teller.id}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  ): column.field === "manager" ? (
+                    ))}
+                  </Select>
+                ) : column.field === "manager" ? (
                   <Select
                     value={formData.managerID || ""}
                     onChange={handleManagerChange}
-                    //placeholder="Select Manager"
-                    displayEmpty
+                  //placeholder="Select Manager"
                   >
                     <MenuItem value="" disabled>
                       Select {column.headerName}
@@ -515,41 +569,39 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                     ))}
                   </Select>
                 ) : column.field === "branch" ? (
-                        <Select
-                            value={formData.branchID || ""}
-                            onChange={handleBranchChange}
-                            placeholder="Select Branch"
-                            displayEmpty
-                        >
-                          <MenuItem value="" disabled>
-                            Select {column.headerName}
-                          </MenuItem>
-                          {branches.map((branch) => (
-                              <MenuItem key={branch.id} value={branch.id.toString()}>
-                                {branch.location}
-                              </MenuItem>
-                          ))}
-                        </Select>
-                  ) : column.field === "question" ? (
-                    <Select
-                        value={formData.questionID || ""}
-                        onChange={handleQuestionChange}
-                        placeholder="Select Question"
-                        displayEmpty
-                    >
-                      <MenuItem value="" disabled>
-                        Select {column.headerName}
+                  <Select
+                    value={formData.branchID || ""}
+                    onChange={handleBranchChange}
+                  //placeholder="Select Branch"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {branches.map((branch) => (
+                      <MenuItem key={branch.id} value={branch.id.toString()}>
+                        {branch.location}
                       </MenuItem>
-                      {questions.map((question) => (
-                          <MenuItem key={question.id} value={question.id.toString()}>
-                            {question.name}
-                          </MenuItem>
-                      ))}
-                    </Select>
-              ) : (
+                    ))}
+                  </Select>
+                ) : column.field === "question" ? (
+                  <Select
+                    value={formData.questionID || ""}
+                    onChange={handleQuestionChange}
+                  //placeholder="Select Question"
+                  >
+                    <MenuItem value="" disabled>
+                      Select {column.headerName}
+                    </MenuItem>
+                    {questions.map((question) => (
+                      <MenuItem key={question.id} value={question.id.toString()}>
+                        {question.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                ) : (
                   // Ako nije polje "campaign", prikaži običan input
                   <div>
-          
+
                     <input
                       type={
                         column.field.toLowerCase().includes("date")
