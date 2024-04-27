@@ -465,10 +465,9 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                 {/* Provjera da li je polje "campaign" */}
                 {column.field === "campaign" ? (
                   <div>
-                    
                     <FormControl fullWidth>
                       <Select
-                        value={formData[column.field] || ""}
+                        value={formData.campaignID || ""}
                         onChange={handleCampaignChange}
                         displayEmpty
                       >
@@ -485,11 +484,14 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                   </div>
                 ): column.field === "teller ID" ? (
                     <Select
-                      value={formData.tellerID || ""}
+                      value={formData.tellerPositionID || ""}
                       onChange={handleTellerChange}
-                      placeholder="Select Teller"
+                      //placeholder="Select Teller"
                       displayEmpty
                     >
+                      <MenuItem value="" disabled>
+                        Select {column.headerName}
+                      </MenuItem>
                       {tellers.map((teller) => (
                         <MenuItem key={teller.id} value={teller.id.toString()}>
                           {teller.id}
