@@ -63,6 +63,7 @@ const Update = (props: Props) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [managers, setManagers] = useState<{ id: number; name: string; lastname: string, role: string }[]>([]);
+  const [questions, setQuestions] = useState<{ id: number; name: string;  }[]>([]);
 
   let slugPlural;
   switch (props.slug) {
@@ -91,8 +92,31 @@ const Update = (props: Props) => {
 
   const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
   const [branches, setBranches] = useState<{ id: number; location: string }[]>([]);
+  const [tellers, setTellers] = useState<{ id: number; }[]>([]);
 
   useEffect(() => {
+
+    // Fetch tellers from the backend
+    fetch(`${deployURLs.backendURL}/api/tellers/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Tellers received successfully:", data);
+        setTellers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching tellers:", error);
+      });
     // Dohvaćanje kampanja sa servera
     fetch(`${deployURLs.backendURL}/api/campaigns/`, {
       method: "GET",
@@ -113,6 +137,28 @@ const Update = (props: Props) => {
       })
       .catch((error) => {
         console.error("Error fetching campaigns:", error);
+      });
+
+      // Dohvaćanje pitanja sa servera
+    fetch(`${deployURLs.backendURL}/api/questions/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Questions received successfully:", data);
+        setQuestions(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching questions:", error);
       });
     // Dohvacanje brancheva sa servera
     fetch(`${deployURLs.backendURL}/api/branches/`, {
@@ -329,6 +375,13 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
     });
   };
 
+  const handleTellerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      tellerPositionID: e.target.value as string,
+    });
+  };
+
   // Filter managers based on their role
   // Filter managers based on the current slug
   const filteredManagers = managers.filter(manager => {
@@ -353,6 +406,13 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
     setFormData({
       ...formData,
       branchID: e.target.value as string,
+    });
+  };
+
+  const handleQuestionChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      questionID: e.target.value as string,
     });
   };
 
@@ -423,7 +483,20 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                       </Select>
                     </FormControl>
                   </div>
-                ): column.field === "manager" ? (
+                ): column.field === "teller ID" ? (
+                    <Select
+                      value={formData.tellerID || ""}
+                      onChange={handleTellerChange}
+                      placeholder="Select Teller"
+                      displayEmpty
+                    >
+                      {tellers.map((teller) => (
+                        <MenuItem key={teller.id} value={teller.id.toString()}>
+                          {teller.id}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ): column.field === "manager" ? (
                   <Select
                     value={formData.managerID || ""}
                     onChange={handleManagerChange}
@@ -443,7 +516,7 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                         <Select
                             value={formData.branchID || ""}
                             onChange={handleBranchChange}
-                            //placeholder="Select Branch"
+                            placeholder="Select Branch"
                             displayEmpty
                         >
                           <MenuItem value="" disabled>
@@ -455,7 +528,23 @@ fetch(`${deployURLs.backendURL}/api/users/`, {
                               </MenuItem>
                           ))}
                         </Select>
-                  ) : (
+                  ) : column.field === "question" ? (
+                    <Select
+                        value={formData.questionID || ""}
+                        onChange={handleQuestionChange}
+                        placeholder="Select Question"
+                        displayEmpty
+                    >
+                      <MenuItem value="" disabled>
+                        Select {column.headerName}
+                      </MenuItem>
+                      {questions.map((question) => (
+                          <MenuItem key={question.id} value={question.id.toString()}>
+                            {question.name}
+                          </MenuItem>
+                      ))}
+                    </Select>
+              ) : (
                   // Ako nije polje "campaign", prikaži običan input
                   <div>
           
