@@ -185,20 +185,25 @@ const UserFeedbackInput = () => {
     const handleSubmit = async () => {
         try {
             console.log("Feedbacks:", feedbacks);
-            // Combine all feedbacks into a single array
-            const allFeedbacks = feedbacks.map(obj => ({
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.token}`
-                },
-                body: JSON.stringify(obj)
-            }));
     
-            // Send all feedbacks in a single HTTP request using Promise.all
-            const responses = await Promise.all(allFeedbacks.map(feedback =>
-                fetch(`${deployURLs.backendURL}/api/feedbacks/insertFeedback`, feedback) // `${deployURLs.backendURL}/api/feedbacks`
-            ));
+            // Create an array to hold all promises for HTTP requests
+            const allPromises = [];
+    
+            // Iterate over each feedback and create a promise for each request
+            feedbacks.forEach(feedback => {
+                const promise = fetch(`${deployURLs.backendURL}/api/feedbacks/insertFeedback`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.token}`
+                    },
+                    body: JSON.stringify(feedback)
+                });
+                allPromises.push(promise); // Add the promise to the array
+            });
+    
+            // Wait for all promises to resolve using Promise.all
+            const responses = await Promise.all(allPromises);
     
             // Check responses and handle errors if necessary
             responses.forEach(response => {
@@ -209,11 +214,12 @@ const UserFeedbackInput = () => {
             });
     
             // Optionally, reset feedbacks state after successful submission
-         //   setFeedbacks([]);
+            // setFeedbacks([]);
         } catch (error) {
             console.error("Error submitting feedbacks:", error);
         }
     };
+    
 
     const renderQuestions = () => {
         const startIndex = (currentPage - 1) * pageSize;
