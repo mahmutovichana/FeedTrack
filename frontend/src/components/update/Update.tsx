@@ -6,7 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import SelectChangeEvent from "@mui/material/Select";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 import { deployURLs } from "./../../../public/constants";
 
@@ -16,6 +16,13 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   toggleRefreshData: () => void;
 };
+
+const roleOptions = [
+  { value: "user", label: "User" },
+  { value: "superAdmin", label: "Super Admin" },
+  { value: "tellerAdmin", label: "Teller Admin" },
+  { value: "branchAdmin", label: "Branch Admin" },
+];
 
 const getColumnValue = (user: User, slug: string) => {
   switch (slug) {
@@ -41,8 +48,15 @@ interface User {
   [key: string]: any;
 }
 
+type FormData = {
+  [key: string]: string;
+  startDate?: string;
+  endDate?: string;
+  date?: string;
+};
+
 const Update = (props: Props) => {
-  const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [formData, setFormData] = useState<FormData>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -69,8 +83,34 @@ const Update = (props: Props) => {
       break;
     default:
       console.error("Invalid slug:", props.slug);
-      return; 
+      return;
   }
+
+  const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
+
+  useEffect(() => {
+    // Dohvaćanje kampanja sa servera
+    fetch(`${deployURLs.backendURL}/api/campaigns/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parsiranje odgovora kao JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Campaigns received successfully:", data);
+        setCampaigns(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching campaigns:", error);
+      });
+  }, []);
 
   useEffect(() => {
     // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
@@ -129,7 +169,7 @@ const Update = (props: Props) => {
       const selectedUser = users.find((user) => user.id.toString() === selectedId);
       if (selectedUser) {
         // Kreiranje novog objekta koji će sadržavati ažurirane vrijednosti formData
-        const updatedFormData = {};
+        const updatedFormData: FormData = {};
         // Iteriranje kroz kolone i postavljanje vrijednosti formData na osnovu odabranog korisnika
         props.columns.forEach((column) => {
           // Provjera da li postoji vrijednost u odabranom korisniku za trenutnu kolonu
@@ -140,12 +180,24 @@ const Update = (props: Props) => {
         });
         // Provjeri u konzoli da li su vrijednosti tačno postavljene
         console.log("Updated Form Data:", updatedFormData);
+
+        // Prilagodite format datuma u formData, ako je potrebno
+        if (updatedFormData.startDate) {
+          updatedFormData.startDate = new Date(updatedFormData.startDate).toISOString().split('T')[0];
+        }
+        if (updatedFormData.endDate) {
+          updatedFormData.endDate = new Date(updatedFormData.endDate).toISOString().split('T')[0];
+        }
+        if (updatedFormData.date) {
+          updatedFormData.date = new Date(updatedFormData.date).toISOString().split('T')[0];
+        }
+
         // Postavljanje ažuriranog stanja formData
         setFormData(updatedFormData);
       }
     }
   }, [selectedId, users]);
-  
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -195,6 +247,25 @@ const Update = (props: Props) => {
       return;
     }
 
+    if(props.slug!=("question" || "teller")){
+    console.log("Form Data before finding campaign ID:", formData);
+
+    // Prvo pronađi id kampanje na osnovu njenog imena
+    const selectedCampaign = campaigns.find((campaign) => campaign.name === formData.name);
+    if (!selectedCampaign) {
+      console.error("Selected campaign not found");
+      return;
+    }
+
+    console.log("Selected campaign:", selectedCampaign);
+
+    // Postavljanje campaignID u formData
+    setFormData({
+      ...formData,
+      campaignID: selectedCampaign.id.toString(),
+    });}
+
+    console.log("Form Data after setting campaign ID:", formData);
     fetch(`${deployURLs.backendURL}/api/${slugPlural}/${selectedId}`, {
       method: "PUT",
       headers: {
@@ -221,16 +292,18 @@ const Update = (props: Props) => {
     });
   };
 
-  const handleUserChange = (event: SelectChangeEvent<string>) => {
-    setSelectedId(event.target.value);
+  // Define a custom type for the event
+  type UserSelectChangeEvent = SelectChangeEvent<string>;
+
+  const handleUserChange = (event: UserSelectChangeEvent) => {
+    const value = event.target.value;
+    setSelectedId(value === "" ? null : value);
   };
 
   return (
     <div className="update">
       <div className="modal">
-        <span className="close" onClick={() => props.setOpen(false)}>
-          X
-        </span>
+        <span className="close" onClick={() => props.setOpen(false)}>X</span>
         <h1>Update {props.slug}</h1>
         <Box sx={{ minWidth: 120 }}>
           <FormControl fullWidth>
@@ -252,26 +325,57 @@ const Update = (props: Props) => {
         </Box>
         <form onSubmit={handleSubmit}>
           {props.columns
-            .filter((item) => item.field !== "id" && item.field!=="rating" &&  item.field !== "img" && item.field != "verified")
+            .filter((item) => item.field !== "id" && item.field !== "rating" && item.field !== "img" && item.field !== "verified")
             .map((column) => (
               <div className="item" key={column.field}>
-                <label className={errors[column.field] ? "error-label" : ""}>
-                  {column.headerName}
-                </label>
-                <input
-                  type={
-                    column.field.toLowerCase().includes("date")
-                      ? "date"
-                      : column.type
-                  }
-                  name={column.field}
-                  value={formData[column.field] || ''}
-                  placeholder={column.field}
-                  onChange={handleChange2}
-                  required
-                />
-                {errors[column.field] && (
-                  <span className="error">{errors[column.field]}</span>
+                {/* Provjera da li je polje "campaign" */}
+                {column.field === "campaign" ? (
+                  <div>
+                    <label>{column.headerName}</label>
+                    <FormControl fullWidth>
+                      <Select
+                        value={formData[column.field] || ""}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            [column.field]: e.target.value as string,
+                          });
+                        }}
+                        displayEmpty
+                      >
+                        <MenuItem value="" disabled>
+                          Select {column.headerName}
+                        </MenuItem>
+                        {campaigns.map((campaign) => (
+                          <MenuItem key={campaign.id} value={campaign.name}>
+                            {campaign.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </div>
+                ) : (
+                  // Ako nije polje "campaign", prikaži običan input
+                  <div>
+                    <label className={errors[column.field] ? "error-label" : ""}>
+                      {column.headerName}
+                    </label>
+                    <input
+                      type={
+                        column.field.toLowerCase().includes("date")
+                          ? "date"
+                          : column.type
+                      }
+                      name={column.field}
+                      value={formData[column.field] || ''}
+                      placeholder={column.field}
+                      onChange={handleChange2}
+                      required
+                    />
+                    {errors[column.field] && (
+                      <span className="error">{errors[column.field]}</span>
+                    )}
+                  </div>
                 )}
               </div>
             ))}

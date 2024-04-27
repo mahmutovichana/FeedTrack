@@ -21,8 +21,8 @@ function setupRoutes(genericModel, tableName) {
   subRouter.post('/name', async (req, res) => {
     try {
       const { name } = req.body;
-      const existingQuestion = await genericModel.getByName(tableName, name);
-      res.json({ question: existingQuestion });
+      const result = await genericModel.getByName(tableName, name);
+      res.json({ result });
     } catch (error) {
       handleError(res, error);
     }
@@ -31,8 +31,8 @@ function setupRoutes(genericModel, tableName) {
   subRouter.post('/id', async (req, res) => {
     try {
       const { id } = req.body;
-      const existingQuestion = await genericModel.getById(tableName, id);
-      res.json({ question: existingQuestion });
+      const result = await genericModel.getById(tableName, id);
+      res.json({ result });
     } catch (error) {
       handleError(res, error);
     }
