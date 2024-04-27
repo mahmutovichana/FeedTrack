@@ -29,6 +29,8 @@ const Add = (props: Props) => {
   const [managers, setManagers] = useState<{ id: number; name: string; lastname: string, role: string }[]>([]);
   const [campaigns, setCampaigns] = useState<{ id: number; name: string }[]>([]);
   const [branches, setBranches] = useState<{ id: number; location: string }[]>([]);
+  const [questions, setQuestions] = useState<{ id: number; name: string }[]>([]);
+  const [tellers, setTellers] = useState<{ id: number; }[]>([]);
   const [dateValue, setDateValue] = React.useState<Dayjs | null>(dayjs());
 
   useEffect(() => {
@@ -98,17 +100,70 @@ const Add = (props: Props) => {
       .catch((error) => {
         console.error("Error fetching managers:", error);
       });
+    // Fetch tellers from the backend
+    fetch(`${deployURLs.backendURL}/api/tellers/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Tellers received successfully:", data);
+        setTellers(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching tellers:", error);
+      });
+    // Fetch questions from the backend
+    fetch(`${deployURLs.backendURL}/api/questions/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        console.log("Questions received successfully:", data);
+        setQuestions(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching questions:", error);
+      });
   }, []);
 
   const handleDateChange = (newValue: Dayjs | null) => {
+    console.log("date value: "+newValue);
     setDateValue(newValue);
-    setFormData({ ...formData, date: newValue ? newValue.toISOString() : "" });
-  };  
+    setFormData({ 
+      ...formData, 
+      date: newValue ? newValue.toISOString() : "" 
+    });
+  };
 
   const handleCampaignChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     setFormData({
       ...formData,
       campaignID: e.target.value as string,
+    });
+  };
+
+  const handleQuestionChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      questionID: e.target.value as string,
     });
   };
 
@@ -129,7 +184,7 @@ const Add = (props: Props) => {
   const handleTellerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     setFormData({
       ...formData,
-      tellerID: e.target.value as string,
+      tellerPositionID: e.target.value as string,
     });
   };
 
@@ -259,108 +314,134 @@ const Add = (props: Props) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-    <div className="add">
-      <div className="modal">
-        <span className="close" onClick={() => props.setOpen(false)}>
-          X
-        </span>
-        <h1>Add new {props.slug}</h1>
-        <form onSubmit={handleSubmit}>
-          {props.columns
-            .filter(
-              (item) =>
-                item.field !== "id" &&
-                item.field !== "rating" &&
-                item.field !== "img" &&
-                item.field != "verified"
-            )
-            .map((column) => (
-              <div className="item" key={column.field}>
-                <label className={errors[column.field] ? "error-label" : ""}>
-                  {column.headerName}
-                </label>
-                {/* Prikaži ComboBox ako je polje role */}
-                {column.field === "role" ? (
-                  <Select
-                    value={formData.role || ""}
-                    onChange={handleRoleChange}
-                    placeholder="Select Role"
-                    displayEmpty
-                  >
-                    {roleOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "campaign" ? (
-                  <Select
-                    value={formData.campaignID || ""}
-                    onChange={handleCampaignChange}
-                    placeholder="Select Campaign"
-                    displayEmpty
-                  >
-                    {campaigns.map((campaign) => (
-                      <MenuItem key={campaign.id} value={campaign.id.toString()}>
-                        {campaign.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "manager" ? (
-                  <Select
-                    value={formData.managerID || ""}
-                    onChange={handleManagerChange}
-                    placeholder="Select Manager"
-                    displayEmpty
-                  >
-                    {filteredManagers.map((manager) => (
-                      <MenuItem key={manager.id} value={manager.id.toString()}>
-                        {manager.name} {manager.lastname}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "branch" ? (
-                  <Select
-                    value={formData.branchID || ""}
-                    onChange={handleBranchChange}
-                    placeholder="Select Branch"
-                    displayEmpty
-                  >
-                    {branches.map((branch) => (
-                      <MenuItem key={branch.id} value={branch.id.toString()}>
-                        {branch.location}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "date" && props.slug === "feedback" ? (
-                  <DateTimePicker
-                    label={column.field}
-                    value={dateValue}
-                    onChange={handleDateChange}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                ) : (
-                  <input
-                    type={
-                      column.field.toLowerCase().includes("date")
-                        ? "date"
-                        : column.type
-                    }
-                    name={column.field}
-                    placeholder={column.field}
-                    onChange={handleChange}
-                    required
-                  />
-                )}
-                {errors[column.field] && (
-                  <span className="error">{errors[column.field]}</span>
-                )}
-              </div>
-            ))}
-          <button type="submit">Send</button>
-        </form>
+      <div className="add">
+        <div className="modal">
+          <span className="close" onClick={() => props.setOpen(false)}>
+            X
+          </span>
+          <h1>Add new {props.slug}</h1>
+          <form onSubmit={handleSubmit}>
+            {props.columns
+              .filter(
+                (item) =>
+                  item.field !== "id" &&
+                  item.field !== "rating" &&
+                  item.field !== "img" &&
+                  item.field != "verified"
+              )
+              .map((column) => (
+                <div className="item" key={column.field}>
+                  <label className={errors[column.field] ? "error-label" : ""}>
+                    {column.headerName}
+                  </label>
+                  {/* Prikaži ComboBox ako je polje role */}
+                  {column.field === "role" ? (
+                    <Select
+                      value={formData.role || ""}
+                      onChange={handleRoleChange}
+                      placeholder="Select Role"
+                      displayEmpty
+                    >
+                      {roleOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : column.field === "campaign" ? (
+                    <Select
+                      value={formData.campaignID || ""}
+                      onChange={handleCampaignChange}
+                      placeholder="Select Campaign"
+                      displayEmpty
+                    >
+                      {campaigns.map((campaign) => (
+                        <MenuItem key={campaign.id} value={campaign.id.toString()}>
+                          {campaign.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : column.field === "question" ? (
+                    <Select
+                      value={formData.questionID || ""}
+                      onChange={handleQuestionChange}
+                      placeholder="Select Question"
+                      displayEmpty
+                    >
+                      {questions.map((question) => (
+                        <MenuItem key={question.id} value={question.id.toString()}>
+                          {question.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : column.field === "manager" ? (
+                    <Select
+                      value={formData.managerID || ""}
+                      onChange={handleManagerChange}
+                      placeholder="Select Manager"
+                      displayEmpty
+                    >
+                      {filteredManagers.map((manager) => (
+                        <MenuItem key={manager.id} value={manager.id.toString()}>
+                          {manager.name} {manager.lastname}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : column.field === "branch" ? (
+                    <Select
+                      value={formData.branchID || ""}
+                      onChange={handleBranchChange}
+                      placeholder="Select Branch"
+                      displayEmpty
+                    >
+                      {branches.map((branch) => (
+                        <MenuItem key={branch.id} value={branch.id.toString()}>
+                          {branch.location}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : column.field === "teller ID" ? (
+                    <Select
+                      value={formData.tellerID || ""}
+                      onChange={handleTellerChange}
+                      placeholder="Select Teller"
+                      displayEmpty
+                    >
+                      {tellers.map((teller) => (
+                        <MenuItem key={teller.id} value={teller.id.toString()}>
+                          {teller.id}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : column.field === "date" && props.slug === "feedback" ? (
+                    <DateTimePicker
+                      label={column.field}
+                      value={dateValue}
+                      onChange={handleDateChange}
+                      renderInput={(params) => <TextField {...params} />}
+                    />
+                  ) : (
+                    <input
+                      type={
+                        column.field.toLowerCase().includes("date")
+                          ? "date"
+                          : column.type
+                      }
+                      name={column.field}
+                      placeholder={column.field}
+                      onChange={handleChange}
+                      required
+                    />
+                  )}
+                  {errors[column.field] && (
+                    <span className="error">{errors[column.field]}</span>
+                  )}
+                </div>
+              ))}
+            <button type="submit">Send</button>
+          </form>
+        </div>
       </div>
-    </div>
     </LocalizationProvider>
   );
 };
