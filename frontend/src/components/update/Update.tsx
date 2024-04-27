@@ -60,6 +60,7 @@ const Update = (props: Props) => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [managers, setManagers] = useState<{ id: number; name: string; lastname: string, role: string }[]>([]);
 
   let slugPlural;
   switch (props.slug) {
@@ -110,7 +111,28 @@ const Update = (props: Props) => {
       .catch((error) => {
         console.error("Error fetching campaigns:", error);
       });
-  }, []);
+// Fetch managers from the backend
+fetch(`${deployURLs.backendURL}/api/users/`, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+  .then((response) => {
+    if (response.ok) {
+      return response.json(); // Parse the response as JSON
+    } else {
+      throw new Error("Network response was not ok");
+    }
+  })
+  .then((data) => {
+    console.log("Managers received successfully:", data);
+    setManagers(data);
+  })
+  .catch((error) => {
+    console.error("Error fetching managers:", error);
+  });
+}, []);
 
   useEffect(() => {
     // when updating users as branch or teller admin, we need to show only users with 'user' role, provided by userRoles route
@@ -292,6 +314,25 @@ const Update = (props: Props) => {
     });
   };
 
+  // Filter managers based on their role
+  // Filter managers based on the current slug
+  const filteredManagers = managers.filter(manager => {
+    if (props.slug === 'branch') {
+      return manager.role === 'branchAdmin';
+    } else if (props.slug === 'teller') {
+      return manager.role === 'tellerAdmin';
+    }
+    // Dodajte druge slučajeve slug-a po potrebi
+    return true; // Ako slug nije 'branch' ili 'teller', prikaži sve managere
+  });
+
+  const handleManagerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData({
+      ...formData,
+      managerID: e.target.value as string,
+    });
+  };
+
   // Define a custom type for the event
   type UserSelectChangeEvent = SelectChangeEvent<string>;
 
@@ -328,10 +369,13 @@ const Update = (props: Props) => {
             .filter((item) => item.field !== "id" && item.field !== "rating" && item.field !== "img" && item.field !== "verified")
             .map((column) => (
               <div className="item" key={column.field}>
+                <label className={errors[column.field] ? "error-label" : ""}>
+                  {column.headerName}
+                </label>
                 {/* Provjera da li je polje "campaign" */}
                 {column.field === "campaign" ? (
                   <div>
-                    <label>{column.headerName}</label>
+                    
                     <FormControl fullWidth>
                       <Select
                         value={formData[column.field] || ""}
@@ -354,12 +398,23 @@ const Update = (props: Props) => {
                       </Select>
                     </FormControl>
                   </div>
+                ): column.field === "manager" ? (
+                  <Select
+                    value={formData.managerID || ""}
+                    onChange={handleManagerChange}
+                    placeholder="Select Manager"
+                    displayEmpty
+                  >
+                    {filteredManagers.map((manager) => (
+                      <MenuItem key={manager.id} value={manager.id.toString()}>
+                        {manager.name} {manager.lastname}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 ) : (
                   // Ako nije polje "campaign", prikaži običan input
                   <div>
-                    <label className={errors[column.field] ? "error-label" : ""}>
-                      {column.headerName}
-                    </label>
+          
                     <input
                       type={
                         column.field.toLowerCase().includes("date")
