@@ -5,20 +5,21 @@ import { deployURLs } from "../../../public/constants.js";
 import "./../../styles/UserPanel/feedbackUserInput.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
-//function for conversion of date
+// function for date conversion
 function formatDate(timestamp) {
-  const padZero = (num) => (num < 10 ? "0" + num : num);
+    const padZero = (num) => (num < 10 ? "0" + num : num);
 
-  const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = padZero(date.getMonth() + 1); // Mjeseci počinju od 0
-  const day = padZero(date.getDate());
-  const hours = padZero(date.getHours());
-  const minutes = padZero(date.getMinutes());
-  const seconds = padZero(date.getSeconds());
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = padZero(date.getMonth() + 1); // Months are zero based
+    const day = padZero(date.getDate());
+    const hours = padZero(date.getHours());
+    const minutes = padZero(date.getMinutes());
+    const seconds = padZero(date.getSeconds());
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 const UserFeedbackInput = () => {
@@ -28,24 +29,26 @@ const UserFeedbackInput = () => {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [feedbacks, setFeedbacks] = useState([]);
-    const [showSubmitButton, setShowSubmitButton] = useState(false);
-    const [showNextButton, setShowNextButton] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [welcomeData, setWelcomeData] = useState({});
     const [branchLocation, setBranchLocation] = useState('');
     const [selectedTellerID, setSelectedTellerID] = useState('');
+    const navigate = useNavigate();
+    const [thankYouData, setThankYouData] = useState({});
 
-    //Using values stored in localStorage
+    // Adding state for timer
+    const [timer, setTimer] = useState(null);
+    const [remainingTime, setRemainingTime] = useState(null);
+
+    // Adding state for showing Thank You message
+    const [showThankYouMessage, setShowThankYouMessage] = useState(false);
+
+    // Using values stored in localStorage
     const branchID = localStorage.branchPositionID;
-    const campaignID = localStorage.campaignID;
-    //const campaignID = 27;
     const tellerPositionID = localStorage.getItem('tellerPositionID');
-    //const tellerPositionID = 2;
     const storedBranchLocation = localStorage.getItem('storedBranchLocation');
 
     let campaignIds; // ids of all campaigns current branch is associated with
-
-    //const storedBranchLocation = "Bubasvaba";
 
     // Function to fetch campaign ID for a single campaign name
     const fetchCampaignId = async (name) => {
@@ -114,39 +117,96 @@ const UserFeedbackInput = () => {
         setQuestions(questionsByCampaign);
         console.log("questions by each campaign: " + JSON.stringify(questionsByCampaign));
     }
+    /*
+        this is only for demonstration purposes new route for
+        thankYouData needs to be made and page for editing that data also
+        */
+    /*
+    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+        method: "GET",
+    })
+        .then((res) => res.json())
+        .then(({ image, message }) => {
+            //just the idea
+            //setThankYouData({ image, message });
+        })
+        .catch(() => {
+            setThankYouData({ ...thankYouData, message: "Thank you!" });
+        });*/
+
+
+
+    //thankYouData.image = "FeedTrack logo";
 
     useEffect(() => {
-    localStorage.setItem("pageSize", pageSize.toString());
-    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then(({ image, message }) => {
-        setWelcomeData({ image, message });
-      })
-      .catch(() => {
-        setWelcomeData({ ...welcomeData, message: "Hello World!" });
-      });
-    //const storedBranch = localStorage.getItem("selectedBranch");
-    //const storedTeller = localStorage.getItem("selectedTeller");
-    setBranchLocation(storedBranchLocation);
-    setSelectedTellerID(tellerPositionID);
-    fetchQuestionsFromDatabase();
-    setShowNextButton(false);
-  }, [currentPage, pageSize]);
+        /*
+        * Inside of this useEffect thankYouData should be fetched
+        */
+        localStorage.setItem("pageSize", pageSize.toString());
+        fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then(({ image, message }) => {
+                setWelcomeData({ image, message });
+            })
+            .catch(() => {
+                setWelcomeData({ ...welcomeData, message: "Hello World!" });
+            });
+        setBranchLocation(storedBranchLocation);
+        setSelectedTellerID(tellerPositionID);
+        //this is hardcoded for now to have difference beside welcomeData
+        setThankYouData({image: "FeedTrack logo", message: "Thank you!"});
+        fetchQuestionsFromDatabase();
+    }, [currentPage, pageSize]);
 
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
+    useEffect(() => {
+        if (timer) clearInterval(timer); // Reset previous timer
+
+        // Define time limit based on number of questions per page
+        const questionsPerPage = pageSize;
+        let timeLimitPerPage = questionsPerPage * 10; // For example, set 10 seconds per question
+
+        // Add extra 5 seconds on last page
+        if (currentPage === Math.ceil(questions.length / pageSize)) {
+            timeLimitPerPage += 5;
+        }
+
+        // Add extra 4 seconds on first page
+        if (currentPage === 1) {
+            timeLimitPerPage += 4;
+        }
+
+        setRemainingTime(timeLimitPerPage);
+        const interval = setInterval(() => {
+            setRemainingTime(prevTime => {
+                console.log("Remaining time:", prevTime); // Log remaining time to console
+                return prevTime - 1;
+            });
+        }, 1000);
+
+        setTimer(interval);
+
+        return () => clearInterval(interval); // Reset timer when component unmounts or when user submits answers
+    }, [currentPage, pageSize, questions.length]);
+
+    useEffect(() => {
+        // Check if remaining time has expired and redirect user if so
+        if (remainingTime === 0) {
+            clearInterval(timer); // Stop the timer
+            // Redirect user to another page here
+            navigate('/welcomeScreen');
+        }
+    }, [remainingTime]);
 
     const handleFeedbackChange = async (questionID, level) => {
         const updatedFeedbacks = [...feedbacks];
         const index = updatedFeedbacks.findIndex(item => item.questionID === questionID);
         if (index !== -1) {
             updatedFeedbacks[index].rating = level;
-        } 
-        else {
+        } else {
             try {
+
                 const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`, {
                     method: 'GET',
                     headers: {
@@ -169,28 +229,32 @@ const UserFeedbackInput = () => {
             }
         }
         setFeedbacks(updatedFeedbacks);
-    
-        // Provjeri jesu li sva pitanja na trenutnoj stranici odgovorena
+
         const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, questions.length); // Izračunaj endIndex tako da ne izlazi iz opsega
+        const endIndex = Math.min(startIndex + pageSize, questions.length);
         const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.id));
-        setShowNextButton(allQuestionsAnswered);
-    
-        // Ako su odgovorena sva pitanja na svim stranicama, prikaži gumb "Submit"
-        if (updatedFeedbacks.length === questions.length) {
-            setShowSubmitButton(true);
+
+        if (allQuestionsAnswered && currentPage < Math.ceil((questions.length) / pageSize)) {
+            handlePageChange(currentPage + 1);
+        }
+        if (allQuestionsAnswered && currentPage === Math.ceil((questions.length) / pageSize)) {
+            handleSubmit(updatedFeedbacks);
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (updatedFeedbacks) => {
         try {
-            console.log("Feedbacks:", feedbacks);
-    
+
+            // Log data being sent to console
+            updatedFeedbacks.forEach(feedback => {
+                console.log("Data to be sent:", feedback);
+            });
+
             // Create an array to hold all promises for HTTP requests
             const allPromises = [];
-    
+
             // Iterate over each feedback and create a promise for each request
-            feedbacks.forEach(feedback => {
+            updatedFeedbacks.forEach(feedback => {
                 const promise = fetch(`${deployURLs.backendURL}/api/feedbacks/insertFeedback`, {
                     method: 'POST',
                     headers: {
@@ -201,10 +265,11 @@ const UserFeedbackInput = () => {
                 });
                 allPromises.push(promise); // Add the promise to the array
             });
-    
+            setShowThankYouMessage(true); // Show Thank You message after successful submission
+
             // Wait for all promises to resolve using Promise.all
             const responses = await Promise.all(allPromises);
-    
+
             // Check responses and handle errors if necessary
             responses.forEach(response => {
                 if (!response.ok) {
@@ -212,14 +277,20 @@ const UserFeedbackInput = () => {
                     console.error("Failed to submit feedback:", response.statusText);
                 }
             });
-    
             // Optionally, reset feedbacks state after successful submission
-            // setFeedbacks([]);
+            // setFeedbacks([]);/*
+            const timeout = setTimeout(() => {
+                navigate('/welcomeScreen'); // Zamijenite '/redirectedPage' sa putanjom na koju želite preusmjeriti korisnika
+            }, 5000); // 10000 milisekundi = 10 sekundi*/
+
         } catch (error) {
             console.error("Error submitting feedbacks:", error);
         }
     };
-    
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
     const renderQuestions = () => {
         const startIndex = (currentPage - 1) * pageSize;
@@ -238,73 +309,85 @@ const UserFeedbackInput = () => {
                 </div>
                 <div className="logo">
                     <img
-                      src={welcomeData.image}
-                      className="logo-image"
-                      alt="FeedTrack logo"
+                        src={welcomeData.image}
+                        className="logo-image"
+                        alt="FeedTrack logo"
                     />
                 </div>
                 <div className="feedback-section">
                     {renderQuestions()}
-                    {showSubmitButton && <button onClick={handleSubmit}>Submit</button>}
-                    {currentPage !== Math.ceil(questions.length / pageSize) && showNextButton &&
-                        <button onClick={() => handlePageChange(currentPage + 1)}>Next</button>}
                 </div>
+                {showThankYouMessage && (
+                    <div className="thankYouScreenContainer">
+                        <div className={"info"}>
+                            <h1>Thank you!</h1>
+                        </div>
+                        <div className="logo">
+                            <img
+                                src={thankYouData.image}
+                                className="logo-image"
+                                alt="FeedTrack logo"
+                            />
+                            <h1>{thankYouData.message}</h1>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-const FeedbackContainer = ({ question, onFeedbackChange }) => {
-  const [rating, setrating] = useState(null);
+const FeedbackContainer = ({question, onFeedbackChange}) => {
+    const [rating, setRating] = useState(null);
 
-  const handleSmileyClick = (level) => {
-    setrating(level);
-    onFeedbackChange(question.id, level);
-  };
+    const handleSmileyClick = (level) => {
+        setRating(level);
+        onFeedbackChange(question.id, level);
+    };
 
-  return (
-    <div className="feedback-container">
-      <h3>{question.name}</h3>
-      <SmileyFeedback onClick={handleSmileyClick} />
-    </div>
-  );
+    return (
+        <div className="feedback-container">
+            <h3>{question.name}</h3>
+            <SmileyFeedback onClick={handleSmileyClick} />
+        </div>
+    );
 };
 
 const SmileyFeedback = ({ onClick }) => {
-  const smileys = [
-    { level: 1, color: "red", symbol: "😡" },
-    { level: 2, color: "orange", symbol: "😐" },
-    { level: 3, color: "yellow", symbol: "😊" },
-    { level: 4, color: "lightgreen", symbol: "😃" },
-    { level: 5, color: "green", symbol: "😍" },
-  ];
+    const smileys = [
+        { level: 1, color: "red", symbol: "😡" },
+        { level: 2, color: "orange", symbol: "😐" },
+        { level: 3, color: "yellow", symbol: "😊" },
+        { level: 4, color: "lightgreen", symbol: "😃" },
+        { level: 5, color: "green", symbol: "😍" },
+    ];
 
-  const [clickedIndex, setClickedIndex] = useState(null);
+    const [clickedIndex, setClickedIndex] = useState(null);
 
-  const handleSmileyClick = (level, index) => {
-    onClick(level);
-    setClickedIndex(index);
-  };
+    const handleSmileyClick = (level, index) => {
+        onClick(level);
+        setClickedIndex(index);
+    };
 
-  return (
-    <div className="smiley-feedback">
-      {smileys.map((smiley, index) => (
-        <span
-          key={smiley.level}
-          className={clickedIndex === index ? "clicked" : ""}
-          style={{
-            color: smiley.color,
-            cursor: "pointer",
-            fontSize: "2em",
-            marginRight: "10px",
-          }}
-          onClick={() => handleSmileyClick(smiley.level, index)}
-        >
-          {smiley.symbol}
-        </span>
-      ))}
-    </div>
-  );
+    return (
+        <div className="smiley-feedback">
+            {smileys.map((smiley, index) => (
+                <span
+                    key={smiley.level}
+                    className={clickedIndex === index ? "clicked" : ""}
+                    style={{
+                        color: smiley.color,
+                        cursor: "pointer",
+                        fontSize: "2em",
+                        marginRight: "10px",
+                    }}
+                    onClick={() => handleSmileyClick(smiley.level, index)}
+                >
+                    {smiley.symbol}
+                </span>
+            ))}
+        </div>
+    );
 };
 
 export default UserFeedbackInput;
