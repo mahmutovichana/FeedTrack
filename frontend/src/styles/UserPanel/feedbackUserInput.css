@@ -73,7 +73,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255); /* Dodana bijela boja bez prozirnosti */
+  background-color: rgba(255, 105, 180, 1); /* Roza boja s prozirnošću 1 (nepostojeca) */
+
   z-index: 9999; /* Visok z-index kako bi bio iznad ostalog sadržaja */
   padding: 20px;
   box-sizing: border-box; /* Dodano kako bi padding bio uračunat u dimenzije */
