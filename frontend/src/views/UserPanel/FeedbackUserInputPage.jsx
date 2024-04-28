@@ -35,10 +35,10 @@ const UserFeedbackInput = () => {
     const [selectedTellerID, setSelectedTellerID] = useState('');
     const navigate = useNavigate();
 
-    // useEffect hook za praćenje promjena u feedbacks varijabli
-    useEffect(() => {
-        console.log("Updated feedbacks:", feedbacks);
-    }, [feedbacks]);
+    // Dodajemo stanje za tajmer
+    const [timer, setTimer] = useState(null);
+    const [remainingTime, setRemainingTime] = useState(null);
+
 
     //Using values stored in localStorage
     const branchID = localStorage.branchPositionID;
@@ -132,6 +132,48 @@ const UserFeedbackInput = () => {
         fetchQuestionsFromDatabase();
     }, [currentPage, pageSize]);
 
+    useEffect(() => {
+        // Postavljamo tajmer kada se promijeni currentPage
+        if (timer) clearInterval(timer); // Resetujemo prethodni tajmer
+
+        // Definiramo vremenski limit na osnovu broja pitanja na stranici
+        const questionsPerPage = pageSize;
+        let timeLimitPerPage = questionsPerPage * 10; // Na primjer, postavimo 10 sekundi po pitanju
+
+        // Dodajemo dodatnih 5 sekundi na posljednjoj stranici
+        if (currentPage === Math.ceil(questions.length / pageSize)) {
+            timeLimitPerPage += 5;
+        }
+
+        // Dodajemo dodatnih 4 sekunde na prvoj stranici
+        if (currentPage === 1) {
+            timeLimitPerPage += 4;
+        }
+
+        setRemainingTime(timeLimitPerPage);
+        const interval = setInterval(() => {
+            setRemainingTime(prevTime => {
+                console.log("Preostalo vrijeme:", prevTime); // Ispisujemo preostalo vrijeme u konzoli
+                return prevTime - 1;
+            });
+        }, 1000);
+
+        setTimer(interval);
+
+        return () => clearInterval(interval); // Resetujemo tajmer kada se komponenta unmountuje ili kada korisnik podnese odgovore
+    }, [currentPage, pageSize, questions.length]);
+
+
+
+    useEffect(() => {
+        // Provjeravamo da li je preostalo vrijeme isteklo i preusmjeravamo korisnika ako jeste
+        if (remainingTime === 0) {
+            clearInterval(timer); // Zaustavljamo tajmer
+            // Ovdje preusmjerite korisnika na drugu stranicu
+            navigate('/welcomeScreen');
+        }
+    }, [remainingTime]);
+
     const handleFeedbackChange = async (questionID, level) => {
         // Stvaramo kopiju trenutnih povratnih informacija
         const updatedFeedbacks = [...feedbacks];
@@ -155,7 +197,6 @@ const UserFeedbackInput = () => {
                     if (data && data.length > 0) {
                         const questionCampaignID = data[0].campaignID;
                         updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID: questionCampaignID, date: formatDate(Date.now()) });
-                        console.log("Dohvacam");
                     } else {
                         console.error(`No campaign found for question ID ${questionID}.`);
                     }
@@ -166,13 +207,7 @@ const UserFeedbackInput = () => {
                 console.error("Problem fetching campaign ID:", error);
             }
         }
-        console.log(updatedFeedbacks);
-        //setTimeout(handleSubmit, 1000);
-        // Postavljamo ažurirane povratne informacije
-        console.log("prije: ",feedbacks);
         setFeedbacks(updatedFeedbacks);
-        //setTimeout(function() {console.log(feedbacks)}, 5000);
-        //console.log(feedbacks);
 
         // Provjeravamo jesu li sva pitanja na trenutnoj stranici odgovorena
         const startIndex = (currentPage - 1) * pageSize;
@@ -189,12 +224,10 @@ const UserFeedbackInput = () => {
             //setTimeout(() => handleSubmit(updatedFeedbacks), 2000);
             handleSubmit(updatedFeedbacks);
         }
-        console.log("poslije:",feedbacks);
     };
 
     const handleSubmit = async (updatedFeedbacks) => {
         try {
-            console.log("Feedbacks:", updatedFeedbacks);
 
             // Ispis podataka koji se šalju u konzolu
             updatedFeedbacks.forEach(feedback => {
