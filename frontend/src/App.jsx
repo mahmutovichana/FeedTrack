@@ -16,7 +16,6 @@ import Notes from "./views/AdminPanel/Notes";
 import DefineOrder from './views/AdminPanel/DefineOrder.tsx';
 import WelcomeScreen from './views/UserPanel/WelcomeScreen.jsx';
 import Questions from "./views/AdminPanel/Questions";
-import ThankYouScreen from './views/UserPanel/ThankYouScreen.jsx';
 
 function App() {
 
@@ -28,10 +27,6 @@ function App() {
     {
       path: "/welcomeScreen",
       element: <WelcomeScreen />
-    },
-    {
-      path: "/thankYouScreen",
-      element: <ThankYouScreen />
     },
     {
       path: "/userFeedback",
