@@ -34,10 +34,14 @@ const UserFeedbackInput = () => {
     const [branchLocation, setBranchLocation] = useState('');
     const [selectedTellerID, setSelectedTellerID] = useState('');
     const navigate = useNavigate();
+    const [thankYouData, setThankYouData] = useState({});
 
     // Adding state for timer
     const [timer, setTimer] = useState(null);
     const [remainingTime, setRemainingTime] = useState(null);
+
+    // Adding state for showing Thank You message
+    const [showThankYouMessage, setShowThankYouMessage] = useState(false);
 
     // Using values stored in localStorage
     const branchID = localStorage.branchPositionID;
@@ -113,9 +117,31 @@ const UserFeedbackInput = () => {
         setQuestions(questionsByCampaign);
         console.log("questions by each campaign: " + JSON.stringify(questionsByCampaign));
     }
+    /*
+        this is only for demonstration purposes new route for
+        thankYouData needs to be made and page for editing that data also
+        */
+    /*
+    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+        method: "GET",
+    })
+        .then((res) => res.json())
+        .then(({ image, message }) => {
+            //just the idea
+            //setThankYouData({ image, message });
+        })
+        .catch(() => {
+            setThankYouData({ ...thankYouData, message: "Thank you!" });
+        });*/
 
+
+
+    //thankYouData.image = "FeedTrack logo";
 
     useEffect(() => {
+        /*
+        * Inside of this useEffect thankYouData should be fetched
+        */
         localStorage.setItem("pageSize", pageSize.toString());
         fetch(`${deployURLs.backendURL}/api/welcomeData`, {
             method: "GET",
@@ -129,9 +155,10 @@ const UserFeedbackInput = () => {
             });
         setBranchLocation(storedBranchLocation);
         setSelectedTellerID(tellerPositionID);
+        //this is hardcoded for now to have difference beside welcomeData
+        setThankYouData({image: "FeedTrack logo", message: "Thank you!"});
         fetchQuestionsFromDatabase();
     }, [currentPage, pageSize]);
-
 
     useEffect(() => {
         if (timer) clearInterval(timer); // Reset previous timer
@@ -238,6 +265,7 @@ const UserFeedbackInput = () => {
                 });
                 allPromises.push(promise); // Add the promise to the array
             });
+            setShowThankYouMessage(true); // Show Thank You message after successful submission
 
             // Wait for all promises to resolve using Promise.all
             const responses = await Promise.all(allPromises);
@@ -250,8 +278,11 @@ const UserFeedbackInput = () => {
                 }
             });
             // Optionally, reset feedbacks state after successful submission
-            // setFeedbacks([]);
-            navigate('/thankYouScreen');
+            // setFeedbacks([]);/*
+            const timeout = setTimeout(() => {
+                navigate('/welcomeScreen'); // Zamijenite '/redirectedPage' sa putanjom na koju želite preusmjeriti korisnika
+            }, 5000); // 10000 milisekundi = 10 sekundi*/
+
         } catch (error) {
             console.error("Error submitting feedbacks:", error);
         }
@@ -286,12 +317,27 @@ const UserFeedbackInput = () => {
                 <div className="feedback-section">
                     {renderQuestions()}
                 </div>
+                {showThankYouMessage && (
+                    <div className="thankYouScreenContainer">
+                        <div className={"info"}>
+                            <h1>Thank you!</h1>
+                        </div>
+                        <div className="logo">
+                            <img
+                                src={thankYouData.image}
+                                className="logo-image"
+                                alt="FeedTrack logo"
+                            />
+                            <h1>{thankYouData.message}</h1>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
-const FeedbackContainer = ({ question, onFeedbackChange }) => {
+const FeedbackContainer = ({question, onFeedbackChange}) => {
     const [rating, setRating] = useState(null);
 
     const handleSmileyClick = (level) => {
