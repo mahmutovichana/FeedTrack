@@ -260,7 +260,7 @@ const UserFeedbackInput = () => {
                     console.error("Failed to submit feedback:", response.statusText);
                 }
             });
-            navigate('/welcomeScreen');
+            navigate('/thankYouScreen');
             // Optionally, reset feedbacks state after successful submission
             // setFeedbacks([]);
         } catch (error) {
