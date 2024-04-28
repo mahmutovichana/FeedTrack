@@ -5,15 +5,15 @@ import { deployURLs } from "../../../public/constants.js";
 import "./../../styles/UserPanel/feedbackUserInput.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-//function for conversion of date
+// function for date conversion
 function formatDate(timestamp) {
     const padZero = (num) => (num < 10 ? "0" + num : num);
 
     const date = new Date(timestamp);
     const year = date.getFullYear();
-    const month = padZero(date.getMonth() + 1); // Mjeseci počinju od 0
+    const month = padZero(date.getMonth() + 1); // Months are zero based
     const day = padZero(date.getDate());
     const hours = padZero(date.getHours());
     const minutes = padZero(date.getMinutes());
@@ -35,12 +35,11 @@ const UserFeedbackInput = () => {
     const [selectedTellerID, setSelectedTellerID] = useState('');
     const navigate = useNavigate();
 
-    // Dodajemo stanje za tajmer
+    // Adding state for timer
     const [timer, setTimer] = useState(null);
     const [remainingTime, setRemainingTime] = useState(null);
 
-
-    //Using values stored in localStorage
+    // Using values stored in localStorage
     const branchID = localStorage.branchPositionID;
     const tellerPositionID = localStorage.getItem('tellerPositionID');
     const storedBranchLocation = localStorage.getItem('storedBranchLocation');
@@ -115,6 +114,7 @@ const UserFeedbackInput = () => {
         console.log("questions by each campaign: " + JSON.stringify(questionsByCampaign));
     }
 
+
     useEffect(() => {
         localStorage.setItem("pageSize", pageSize.toString());
         fetch(`${deployURLs.backendURL}/api/welcomeData`, {
@@ -132,20 +132,20 @@ const UserFeedbackInput = () => {
         fetchQuestionsFromDatabase();
     }, [currentPage, pageSize]);
 
+
     useEffect(() => {
-        // Postavljamo tajmer kada se promijeni currentPage
-        if (timer) clearInterval(timer); // Resetujemo prethodni tajmer
+        if (timer) clearInterval(timer); // Reset previous timer
 
-        // Definiramo vremenski limit na osnovu broja pitanja na stranici
+        // Define time limit based on number of questions per page
         const questionsPerPage = pageSize;
-        let timeLimitPerPage = questionsPerPage * 10; // Na primjer, postavimo 10 sekundi po pitanju
+        let timeLimitPerPage = questionsPerPage * 10; // For example, set 10 seconds per question
 
-        // Dodajemo dodatnih 5 sekundi na posljednjoj stranici
+        // Add extra 5 seconds on last page
         if (currentPage === Math.ceil(questions.length / pageSize)) {
             timeLimitPerPage += 5;
         }
 
-        // Dodajemo dodatnih 4 sekunde na prvoj stranici
+        // Add extra 4 seconds on first page
         if (currentPage === 1) {
             timeLimitPerPage += 4;
         }
@@ -153,37 +153,31 @@ const UserFeedbackInput = () => {
         setRemainingTime(timeLimitPerPage);
         const interval = setInterval(() => {
             setRemainingTime(prevTime => {
-                console.log("Preostalo vrijeme:", prevTime); // Ispisujemo preostalo vrijeme u konzoli
+                console.log("Remaining time:", prevTime); // Log remaining time to console
                 return prevTime - 1;
             });
         }, 1000);
 
         setTimer(interval);
 
-        return () => clearInterval(interval); // Resetujemo tajmer kada se komponenta unmountuje ili kada korisnik podnese odgovore
+        return () => clearInterval(interval); // Reset timer when component unmounts or when user submits answers
     }, [currentPage, pageSize, questions.length]);
 
-
-
     useEffect(() => {
-        // Provjeravamo da li je preostalo vrijeme isteklo i preusmjeravamo korisnika ako jeste
+        // Check if remaining time has expired and redirect user if so
         if (remainingTime === 0) {
-            clearInterval(timer); // Zaustavljamo tajmer
-            // Ovdje preusmjerite korisnika na drugu stranicu
+            clearInterval(timer); // Stop the timer
+            // Redirect user to another page here
             navigate('/welcomeScreen');
         }
     }, [remainingTime]);
 
     const handleFeedbackChange = async (questionID, level) => {
-        // Stvaramo kopiju trenutnih povratnih informacija
         const updatedFeedbacks = [...feedbacks];
-        // Pronalazimo indeks odgovora za trenutno pitanje, ako postoji
         const index = updatedFeedbacks.findIndex(item => item.questionID === questionID);
-        // Ažuriramo odgovor ili dodajemo novi ako ne postoji
         if (index !== -1) {
             updatedFeedbacks[index].rating = level;
         } else {
-            // Fetchamo informacije o kampanji kako bismo dobili ID kampanje za trenutno pitanje
             try {
 
                 const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`, {
@@ -209,19 +203,14 @@ const UserFeedbackInput = () => {
         }
         setFeedbacks(updatedFeedbacks);
 
-        // Provjeravamo jesu li sva pitanja na trenutnoj stranici odgovorena
         const startIndex = (currentPage - 1) * pageSize;
         const endIndex = Math.min(startIndex + pageSize, questions.length);
         const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.id));
 
-        // Provjeravamo jesmo li na posljednjoj stranici i jesu li sva pitanja odgovorena prije nego što podnesemo podatke
         if (allQuestionsAnswered && currentPage < Math.ceil((questions.length) / pageSize)) {
-            // Ako jesmo na posljednjoj stranici, ali sva pitanja nisu odgovorena, prelazimo na sljedeću stranicu
             handlePageChange(currentPage + 1);
         }
-        if (allQuestionsAnswered && currentPage === Math.ceil((questions.length)/ pageSize)) {
-            // Ako jesmo na posljednjoj stranici i sva pitanja su odgovorena, podnosimo podatke
-            //setTimeout(() => handleSubmit(updatedFeedbacks), 2000);
+        if (allQuestionsAnswered && currentPage === Math.ceil((questions.length) / pageSize)) {
             handleSubmit(updatedFeedbacks);
         }
     };
@@ -229,7 +218,7 @@ const UserFeedbackInput = () => {
     const handleSubmit = async (updatedFeedbacks) => {
         try {
 
-            // Ispis podataka koji se šalju u konzolu
+            // Log data being sent to console
             updatedFeedbacks.forEach(feedback => {
                 console.log("Data to be sent:", feedback);
             });
@@ -260,9 +249,9 @@ const UserFeedbackInput = () => {
                     console.error("Failed to submit feedback:", response.statusText);
                 }
             });
-            navigate('/thankYouScreen');
             // Optionally, reset feedbacks state after successful submission
             // setFeedbacks([]);
+            navigate('/thankYouScreen');
         } catch (error) {
             console.error("Error submitting feedbacks:", error);
         }
@@ -303,10 +292,10 @@ const UserFeedbackInput = () => {
 };
 
 const FeedbackContainer = ({ question, onFeedbackChange }) => {
-    const [rating, setrating] = useState(null);
+    const [rating, setRating] = useState(null);
 
     const handleSmileyClick = (level) => {
-        setrating(level);
+        setRating(level);
         onFeedbackChange(question.id, level);
     };
 
