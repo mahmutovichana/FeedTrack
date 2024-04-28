@@ -7,7 +7,8 @@ import imageCompression from "browser-image-compression";
 
 const Notes = () => {
   const [file, setFile] = useState(null);
-  const [message, setMessage] = useState("");
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [thankYouMessage, setThankYouMessage] = useState("");
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -26,7 +27,7 @@ const Notes = () => {
     setFile(e.target.files[0]);
   };
 
-  const handleUpload = async () => {
+  const handleWelcomeDataUpload = async () => {
     let compressedFile;
 
     try {
@@ -46,12 +47,38 @@ const Notes = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ image: base64, message }),
+        body: JSON.stringify({ image: base64, message: welcomeMessage }),
       });
       const data = await response.json();
       console.log(data);
-      if (response.ok) toast.success("Successfully changed welcome notes!");
-      else toast.error("Error: " + data.message);
+      if (response.ok) {
+        toast.success("Successfully changed welcome notes!");
+        setFile(null);
+        setWelcomeMessage("");
+      } else toast.error("Error: " + data.message);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const handleThankYouDataUpload = async () => {
+    try {
+      const response = await fetch(
+        `${deployURLs.backendURL}/api/thankYouData`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: thankYouMessage }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        toast.success("Successfully changed thank you notes!");
+        setThankYouMessage("");
+      } else toast.error("Error: " + data.message);
     } catch (err) {
       console.error(err.message);
     }
@@ -66,8 +93,8 @@ const Notes = () => {
           type="text"
           id="message"
           placeholder="Message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={welcomeMessage}
+          onChange={(e) => setWelcomeMessage(e.target.value)}
         />
       </label>
       <br />
@@ -81,8 +108,23 @@ const Notes = () => {
         />
       </label>
       <br />
-      <button onClick={handleUpload}>Upload</button>
+      <button onClick={handleWelcomeDataUpload}>Upload</button>
       <ToastContainer />
+      <br />
+      <br />
+      <h1>Thank you screen notes</h1>
+      <label>
+        Thank you message:{" "}
+        <input
+          type="text"
+          id="thank-you-message"
+          placeholder="Message"
+          value={thankYouMessage}
+          onChange={(e) => setThankYouMessage(e.target.value)}
+        />
+      </label>
+      <br />
+      <button onClick={handleThankYouDataUpload}>Upload</button>
     </div>
   );
 };
