@@ -19,250 +19,13 @@
     }
   ],
   "paths": {
-    "/api/token": {
-      "post": {
-        "summary": "Refresh JWT access token",
-        "description": "Get a new access token by passing refresh token in the request body",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshToken"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "New access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AccessToken"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authenticated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "You are not authenticated!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Invalid refresh token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Token is not valid!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/login": {
-      "post": {
-        "summary": "User login",
-        "description": "Get new access and refresh tokens for successful login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Logged in successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Incorrect email or password",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Email or password incorrect!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/logout": {
-      "post": {
-        "summary": "User logout",
-        "description": "Logout current user by providing access token in the request body",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefreshToken"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Logged out successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Logged out successfully."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authenticated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "You are not authenticated!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Invalid refresh token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Token is not valid!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/dashboard": {
+    "/api/users": {
       "get": {
-        "summary": "User dashboard",
-        "description": "Authenticated users can view the dashboard",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "description": "Access token for user that's logged in (\"Bearer eyJhbGciOi...sOeF7OuJMZs\")",
-            "required": true,
-            "schema": {
-              "properties": {
-                "authorization": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
+        "summary": "Get all users",
+        "description": "Get a list of all users",
         "responses": {
           "200": {
-            "description": "A successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "id": {
-                      "type": "number",
-                      "example": 1
-                    },
-                    "username": {
-                      "type": "string",
-                      "example": "user123"
-                    },
-                    "email": {
-                      "type": "string",
-                      "example": "example@etf.unsa.ba"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authenticated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "You are not authenticated!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Invalid refresh token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Token is not valid!"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/userRoles": {
-      "get": {
-        "summary": "Get users with 'user' role",
-        "description": "Returns an array of users with the 'user' role.",
-        "responses": {
-          "200": {
-            "description": "A list of users with 'user' role",
+            "description": "A list of users",
             "content": {
               "application/json": {
                 "schema": {
@@ -274,33 +37,163 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized - Invalid or missing token",
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "You are not authenticated!"
+                      "example": "Error fetching users"
                     }
                   }
                 }
               }
             }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new user",
+        "description": "Create a new admin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin successfully created.",
+            "items": {
+              "type": "string",
+              "example": "Admin successfully created."
+            }
           },
-          "403": {
-            "description": "Forbidden - User token invalid",
+          "400": {
+            "description": "Bad request",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "enum": ["Missing required fields", "User already exists", "Invalid role"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "Missing required fields"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },          
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Token is not valid!"
+                      "example": "Internal Server Error"
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all users",
+        "description": "Delete all users from the system",
+        "responses": {
+          "204": {
+            "description": "Users deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "delete": {
+        "summary": "Delete user by id",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "ID of the user to delete"
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "User successfully deleted"
+        },
+        "500": {
+          "description": "Internal server error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Error deleting user"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      }
+    },
+    "/api/userRoles": {
+      "get": {
+        "summary": "Get users with specific roles",
+        "description": "Fetch users with specific roles",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               }
@@ -311,7 +204,6 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
                   "properties": {
                     "message": {
                       "type": "string",
@@ -324,107 +216,2152 @@
           }
         }
       }
+    },
+    "/api/admin": {
+      "post": {
+        "summary": "Create admin",
+        "description": "Create a new admin user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "mobileNumber": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": ["tellerAdmin", "branchAdmin"]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "enum": ["Missing required fields", "User already exists", "Invalid role"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "Missing required fields"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }, 
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },   
+    "/api/feedbacks": {
+      "get": {
+        "summary": "Get all feedbacks",
+        "description": "Get a list of all feedbacks",
+        "responses": {
+          "200": {
+            "description": "A list of feedbacks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Feedback"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching feedbacks"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new feedback",
+        "description": "Create a new feedback",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Feedback"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback created successfully"
+          },
+          "400": {
+            "description": "Bad request - Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error creating feedback"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all feedbacks",
+        "description": "Delete all feedbacks from the system",
+        "responses": {
+          "204": {
+            "description": "Feedbacks deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting feedback:"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/branches": {
+      "get": {
+        "summary": "Get all branches",
+        "description": "Get a list of all branches",
+        "responses": {
+          "200": {
+            "description": "A list of branches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Branch"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching branches"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new branch",
+        "description": "Create a new branch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Branch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Branch created successfully"
+          },
+          "400": {
+            "description": "Bad request - Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error creating branch"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all branches",
+        "description": "Delete all branches from the system",
+        "responses": {
+          "204": {
+            "description": "Branches deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting branches"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tellers": {
+      "get": {
+        "summary": "Get all tellers",
+        "description": "Get a list of all tellers",
+        "responses": {
+          "200": {
+            "description": "A list of tellers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Teller"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching tellers"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new teller",
+        "description": "Create a new teller",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Teller"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Teller created successfully"
+          },
+          "400": {
+            "description": "Bad request - Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error creating teller"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all tellers",
+        "description": "Delete all tellers from the system",
+        "responses": {
+          "204": {
+            "description": "Tellers deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting tellers"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/questions": {
+      "get": {
+        "summary": "Get all questions",
+        "description": "Get a list of all questions",
+        "responses": {
+          "200": {
+            "description": "A list of questions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Question"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching questions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new question",
+        "description": "Create a new question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Question created successfully"
+          },
+          "400": {
+            "description": "Bad request - Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error creating question"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all questions",
+        "description": "Delete all questions from the system",
+        "responses": {
+          "204": {
+            "description": "Questions deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting questions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns": {
+      "get": {
+        "summary": "Get all campaigns",
+        "description": "Get a list of all campaigns",
+        "responses": {
+          "200": {
+            "description": "A list of campaigns",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Campaign"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching campaigns"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new campaign",
+        "description": "Create a new campaign",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Campaign"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Campaign created successfully"
+          },
+          "400": {
+            "description": "Bad request - Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error creating campaign"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all campaigns",
+        "description": "Delete all campaigns from the system",
+        "responses": {
+          "204": {
+            "description": "Campaigns deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting campaigns"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaignQuestions": {
+      "get": {
+        "summary": "Get all campaign questions",
+        "description": "Get a list of all campaign questions",
+        "responses": {
+          "200": {
+            "description": "A list of campaign questions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CampaignQuestion"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching campaign questions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new campaign question",
+        "description": "Create a new campaign question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignQuestion"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Campaign question created successfully"
+          },
+          "400": {
+            "description": "Bad request - Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required fields"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error creating campaign question"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete all campaign questions",
+        "description": "Delete all campaign questions from the system",
+        "responses": {
+          "204": {
+            "description": "Campaign questions deleted successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting campaign questions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tables": {
+      "get": {
+        "summary": "Get data from multiple tables",
+        "description": "Get data from multiple tables and display in HTML",
+        "responses": {
+          "200": {
+            "description": "HTML representation of table data",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching table data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/getMaxUserId": {
+      "get": {
+        "summary": "Get maximum user ID",
+        "description": "Get the maximum user ID from the database",
+        "responses": {
+          "200": {
+            "description": "Maximum user ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "maxId": {
+                      "type": "integer",
+                      "example": 112
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching max user ID:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tableName}": {
+      "get": {
+        "summary": "Get all items from a table",
+        "description": "Get all items from a specific table by table name",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "description": "Name of the table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of items from the table",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GenericItem"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching items from the table"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add an item to a table",
+        "description": "Add an item to a specific table by table name",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "description": "Name of the table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Item added successfully"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error adding item to the table"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tableName}/{id}": {
+      "get": {
+        "summary": "Get an item by ID from a table",
+        "description": "Get an item by ID from a specific table by table name",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "description": "Name of the table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the item",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An item from the table",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericItem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Item not found in the table"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error fetching item from the table"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an item in a table",
+        "description": "Update an item in a specific table by table name and item ID",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "description": "Name of the table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the item",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericItem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Item not found in the table"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error updating item in the table"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an item from a table",
+        "description": "Delete an item from a specific table by table name and item ID",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "description": "Name of the table",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the item",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item deleted successfully"
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Item not found in the table"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error deleting item from the table"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaign/{id}": {
+      "get": {
+        "summary": "Get test by ID",
+        "description": "Get test data by ID from the 'test' table",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the test",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Test data for the given ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Campaign"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error in getTestById:"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "User login",
+        "description": "Endpoint for user authentication and login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "User email address"
+                },
+                "number": {
+                  "type": "string",
+                  "description": "User mobile number"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "User password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "User successfully logged in"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "description": "JWT token for user authentication"
+                },
+                "secret": {
+                  "type": "object",
+                  "description": "2FA secret for generating QR code",
+                  "properties": {
+                    "ascii": {
+                      "type": "string",
+                      "description": "ASCII representation of the secret"
+                    },
+                    "hex": {
+                      "type": "string",
+                      "description": "Hexadecimal representation of the secret"
+                    },
+                    "base32": {
+                      "type": "string",
+                      "description": "Base32 representation of the secret"
+                    },
+                    "otpauth_url": {
+                      "type": "string",
+                      "description": "URL for OTP authentication setup"
+                    }
+                  }
+                },
+                "verified": {
+                  "type": "boolean",
+                  "description": "Flag indicating if user is verified"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email or mobile number, or incorrect password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "enum": ["Email or mobile number incorrect!", "Email or mobile number is required!", "Password incorrect!"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "Email or mobile number incorrect!"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/googleAddUser": {
+      "post": {
+        "summary": "Add user via Google",
+        "description": "Endpoint for adding a new user to the database using Google authentication",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "User ID"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "User first name"
+                },
+                "lastname": {
+                  "type": "string",
+                  "description": "User last name"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "User email address"
+                },
+                "image": {
+                  "type": "string",
+                  "description": "User profile image URL"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "User password"
+                },
+                "mobilenumber": {
+                  "type": "string",
+                  "description": "User mobile number"
+                },
+                "role": {
+                  "type": "string",
+                  "description": "User role (optional, default: superAdmin)"
+                },
+                "verified": {
+                  "type": "boolean",
+                  "description": "Flag indicating if user is verified"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User successfully added",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "User added successfully"
+                },
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "description": "JWT token for user authentication"
+                },
+                "secret": {
+                  "type": "object",
+                  "description": "2FA secret for generating QR code",
+                  "properties": {
+                    "ascii": {
+                      "type": "string",
+                      "description": "ASCII representation of the secret"
+                    },
+                    "hex": {
+                      "type": "string",
+                      "description": "Hexadecimal representation of the secret"
+                    },
+                    "base32": {
+                      "type": "string",
+                      "description": "Base32 representation of the secret"
+                    },
+                    "otpauth_url": {
+                      "type": "string",
+                      "description": "URL for OTP authentication setup"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email address or user already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "enum": ["Invalid email address", "User already exists"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "Invalid email address"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "User logout",
+        "description": "Endpoint for user logout and token invalidation",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User token",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "JWT token for user authentication"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully logged out",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Logged out successfully."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "You are not authenticated!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Token is not valid!"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/2faSetup": {
+      "post": {
+        "summary": "Setup 2FA",
+        "description": "Endpoint for generating data URL for 2FA setup",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "2FA secret",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "secret": {
+                  "type": "object",
+                  "description": "2FA secret for generating QR code",
+                  "properties": {
+                    "ascii": {
+                      "type": "string",
+                      "description": "ASCII representation of the secret"
+                    },
+                    "hex": {
+                      "type": "string",
+                      "description": "Hexadecimal representation of the secret"
+                    },
+                    "base32": {
+                      "type": "string",
+                      "description": "Base32 representation of the secret"
+                    },
+                    "otpauth_url": {
+                      "type": "string",
+                      "description": "URL for OTP authentication setup"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data URL for 2FA setup generated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "dataUrl": {
+                  "type": "string",
+                  "description": "Data URL for 2FA setup QR code"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error generating QR code"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verify": {
+      "post": {
+        "summary": "Verify 2FA token",
+        "description": "Endpoint for verifying 2FA token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "2FA token and secret",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userToken": {
+                  "type": "string",
+                  "description": "2FA token entered by the user"
+                },
+                "secret": {
+                  "type": "object",
+                  "description": "2FA secret",
+                  "properties": {
+                    "base32": {
+                      "type": "string",
+                      "description": "Base32 representation of the secret"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "2FA token verified successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "description": "Flag indicating if 2FA token is verified"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaign/{location}": {
+      "get": {
+        "summary": "Get campaign by location",
+        "description": "Get campaign ID by location from the 'Branch' table",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "description": "Location of the branch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign ID for the given location",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Campaign"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error in getCampaignByLocation:"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/branches/areas": {
+      "get": {
+        "summary": "Get unique areas from branches",
+        "description": "Get unique areas from the 'Branch' table",
+        "responses": {
+          "200": {
+            "description": "List of unique areas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "Kanton 10",
+                      "Hercegovačko-neretvanski kanton",
+                      "Bosansko-podrinjski kanton",
+                      "Srednjobosanski kanton",
+                      "Kanton Sarajevo",
+                      "Tuzlanski kanton",
+                      "Zeničko-dobojski kanton",
+                      "Republika Srpska"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching unique areas:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/branches/by-area/{area}": {
+      "get": {
+        "summary": "Get branches by area",
+        "description": "Get branches by area from the 'Branch' table",
+        "parameters": [
+          {
+            "name": "area",
+            "in": "path",
+            "description": "Area of the branch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Branches in the specified area",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Branch"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching branches by area:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaignID}/questionsPerPage": {
+      "get": {
+        "summary": "Get questions per page for a campaign",
+        "description": "Get the number of questions per page for a specific campaign",
+        "parameters": [
+          {
+            "name": "campaignID",
+            "in": "path",
+            "description": "ID of the campaign",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Questions per page for the specified campaign",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "questionsPerPage": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching questions per page:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaignID}/campaignQuestions": {
+      "get": {
+        "summary": "Get all questions for a campaign",
+        "description": "Get all questions for a specific campaign",
+        "parameters": [
+          {
+            "name": "campaignID",
+            "in": "path",
+            "description": "ID of the campaign",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of questions for the specified campaign",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example":"3"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example":"Prvo pitanje"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign questions not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Campaign questions not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching campaign questions:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/welcomeData": {
+        "get": {
+          "summary": "Get welcome message data",
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message":{
+                        "type":"string",
+                        "example":"Hello"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error:",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Upload welcome message data",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "$ref": "#/components/schemas/WelcomeMessage"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "File and message uploaded successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "File and message uploaded successfully"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string",
+                            "enum": ["Message is required", "No file uploaded", "Content-Type must be multipart/form-data"]
+                          }
+                        }
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "example": "Message is required"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },          
+            "500": {
+              "description": "Internal Server Error:",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "RefreshToken": {
-        "type": "object",
-        "properties": {
-          "refreshToken": {
-            "type": "string",
-            "example": "eyJhbGciOi...sOeF7OuJMZs"
-          }
-        }
-      },
-      "AccessToken": {
-        "type": "object",
-        "properties": {
-          "accessToken": {
-            "type": "string",
-            "example": "eyJhbGciOi...sOeF7OuJMZs"
-          }
-        }
-      },
-      "LoginRequest": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "example": "example@etf.unsa.ba"
-          },
-          "password": {
-            "type": "string",
-            "example": "pass123"
-          }
-        }
-      },
-      "LoginResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "username": {
-            "type": "string",
-            "example": "user123"
-          },
-          "email": {
-            "type": "string",
-            "example": "example@etf.unsa.ba"
-          },
-          "accessToken": {
-            "type": "string",
-            "example": "eyJhbGciOi...sOeF7OuJMZs"
-          },
-          "refreshToken": {
-            "type": "string",
-            "example": "asdsadsad...sOeF7asduJMZs"
-          }
-        }
-      },
       "User": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "number",
-            "description": "User ID"
+            "type": "string",
+            "format": "int64",
+            "example": 71
           },
           "name": {
             "type": "string",
-            "description": "User's first name"
+            "example": "ime"
           },
           "lastname": {
             "type": "string",
-            "description": "User's last name"
+            "example": "prezime"
           },
           "image": {
             "type": "string",
-            "description": "URL of user's image"
+            "example": "/"
           },
           "password": {
             "type": "string",
-            "description": "User's password (hashed)"
+            "example": "kj$sslk393vs&ls"
           },
           "email": {
             "type": "string",
-            "description": "User's email address"
+            "format": "email",
+            "example": "ime@hotmail.com"
           },
           "mobilenumber": {
             "type": "string",
-            "description": "User's mobile number"
+            "example": "062221111"
           },
           "role": {
             "type": "string",
-            "description": "User's role"
+            "example": "superAdmin"
           },
           "verified": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },      
+      "Feedback": {
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
-            "description": "Indicates if the user's account is verified"
+            "format": "int64",
+            "example": 71
+          },
+          "date": {
+            "type": "string",
+            "example": "2024-04-22T22:32:24.000Z"
+          },
+          "rating": {
+            "type": "integer",
+            "example": 3
+          },
+          "tellerPositionID": {
+            "type": "string",
+            "example": 15
+          },
+          "questionID": {
+            "type": "string",
+            "example": 28
+          },
+          "campaignID": {
+            "type": "string",
+            "example": 27
+          }
+        }
+      },      
+      "Branch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "int64",
+            "example": 19
+          },
+          "location": {
+            "type": "string",
+            "example": "Zenica"
+          },
+          "managerID": {
+            "type": "string",
+            "example": 1
+          },
+          "rating": {
+            "type": "integer",
+            "example": 4
+          },
+          "area": {
+            "type": "string",
+            "example": "Zeničko-dobojski kanton"
+          },
+          "campaignID": {
+            "type": "string",
+            "example": 2
+          }
+        }
+      },
+      "Teller": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": 1
+          },
+          "branchID": {
+            "type": "string",
+            "example": 2
+          },
+          "managerID": {
+            "type": "string",
+            "example": 6
+          },
+          "rating": {
+            "type": "integer",
+            "example": 4
+          }
+        }
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "What is your favorite color?"
+          }
+        }
+      },
+      "Campaign": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": 12
+          },
+          "name": {
+            "type": "string",
+            "example": "Graduation Gift Galore"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": null
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "example": null
+          },
+          "questionsperpage": {
+            "type": "string",
+            "example": 2
+          }
+        }
+      },
+      "CampaignQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": 1
+          },
+          "campaignID": {
+            "type": "string",
+            "example": 1
+          },
+          "questionID": {
+            "type": "string",
+            "example": 1
+          }
+        }
+      },
+      "WelcomeMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Hello"
           }
         }
       }
     }
   }
 }
+
