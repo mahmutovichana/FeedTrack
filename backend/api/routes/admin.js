@@ -85,7 +85,7 @@ router.post("/welcomeData", async (req, res) => {
   const { image, message } = req.body;
 
   if (!message) {
-    return res.status(400).json({ message: "Message is required" });
+    return res.status(400).json({ message: "Welcome message is required" });
   }
 
   if (!image) {
@@ -103,7 +103,7 @@ router.post("/welcomeData", async (req, res) => {
       await db.query('DELETE FROM "WelcomeData"');
     }
 
-    const { rows } = await db.query(
+    await db.query(
       'INSERT INTO "WelcomeData" (image, message) VALUES ($1, $2) RETURNING *',
       [image, message]
     );
@@ -122,6 +122,44 @@ router.get("/welcomeData", async (req, res) => {
     res.status(200).json(rows[0]);
   } catch (err) {
     res.status(500).json({ message: "Error while retrieving welcome data" });
+  }
+});
+
+router.post("/thankYouData", async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ message: "Thank you message is required" });
+  }
+
+  try {
+    const existingData = await db.query('SELECT * FROM "ThankYouData"');
+
+    if (existingData.rowCount !== 0) {
+      await db.query('DELETE FROM "ThankYouData"');
+    }
+
+    const { rows } = await db.query(
+      'INSERT INTO "ThankYouData" (message) VALUES ($1) RETURNING *',
+      [message]
+    );
+
+    res
+      .status(200)
+      .json({ message: "Thank you message uploaded successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error uploading thank you data" });
+  }
+});
+
+router.get("/thankYouData", async (req, res) => {
+  try {
+    const { rows } = await db.query('SELECT * FROM "ThankYouData"');
+
+    res.status(200).json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ message: "Error while retrieving thank you data" });
   }
 });
 
