@@ -48,6 +48,7 @@ const UserFeedbackInput = () => {
     const tellerPositionID = localStorage.getItem('tellerPositionID');
     const storedBranchLocation = localStorage.getItem('storedBranchLocation');
     const [sizes, setSizes] = useState([]);
+    const [answeredQuestions, setAnsweredQuestions] = useState(0);
 
     //function to fetch questions for required branchID with all relevant info
     const fetchQuestionsByBranchId = async (branchID) => {
@@ -77,6 +78,25 @@ const UserFeedbackInput = () => {
             const campaignNames = campaignOrderMap[branchID] || [];
             console.log("campaignNames: ", campaignNames);
 
+            // Definirajte funkciju za izvlačenje vrijednosti na osnovu redoslijeda iz campaignNames
+            function extractValuesBasedOnOrder(data, order) {
+                const extractedValues = [];
+                order.forEach(cname => {
+                    const matchingObject = data.find(obj => obj.cname === cname);
+                    if (matchingObject) {
+                        extractedValues.push(matchingObject.questionsperpage);
+                    }
+                });
+                return extractedValues;
+            }
+
+            // Nakon što dobijete questionData i campaignNames, pozovite funkciju
+            const extractedValues = extractValuesBasedOnOrder(questionData, campaignNames);
+
+            // Ispisivanje rezultata
+            console.log("exctracted values:",extractedValues);
+
+
             // Create an object to store the sizes of each campaign
             const campaignSizes = {};
 
@@ -91,6 +111,35 @@ const UserFeedbackInput = () => {
             });
             // Create an array of sizes in the order of campaignNames
             const sizes = campaignNames.map(cname => campaignSizes[cname] || 0);
+
+            function napraviNoviNiz(Niz1, Niz2) {
+                const NoviNiz = [];
+
+                for (let i = 0; i < Niz1.length; i++) {
+                    const broj_ponavljanja = Math.floor(Niz1[i] / Niz2[i]);
+                    const ostatak = Niz1[i] % Niz2[i];
+
+                    // Dodajemo elemente broj_ponavljanja puta
+                    for (let j = 0; j < broj_ponavljanja; j++) {
+                        NoviNiz.push(Niz2[i]);
+                    }
+
+                    // Dodajemo ostatak ako postoji
+                    if (ostatak > 0) {
+                        NoviNiz.push(ostatak);
+                    }
+                }
+
+                return NoviNiz;
+            }
+
+            // Testiranje funkcije
+            const Niz1 = [1, 4, 4];
+            const Niz2 = [3, 3, 1];
+            //const NoviNiz = napraviNoviNiz(Niz1, Niz2);
+            const NoviNiz = napraviNoviNiz(sizes, extractedValues); //expecting 4 4 2 1 1
+            console.log("NoviNiz:",NoviNiz); // Rezultat bi trebao biti [3, 3, 2, 3, 1, 1, 1, 1, 1]
+
 
             // Set the sizes state
             setSizes(sizes);
@@ -172,7 +221,7 @@ const UserFeedbackInput = () => {
         let timeLimitPerPage = questionsPerPage * 10; // For example, set 10 seconds per question
 
         // Add extra 5 seconds on last page
-        if (currentPage === Math.ceil(questions.length / pageSize)) {
+        if (currentPage === Math.ceil(sizes.length)) {
             timeLimitPerPage += 5;
         }
 
