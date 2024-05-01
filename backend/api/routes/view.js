@@ -111,7 +111,7 @@ router.get('/branchCampaign/byBranchID/:branchID', async (req, res) => {
 // Fetch all questions from CampaignQuestion table via their common campaignID foreign key
 const getQuestionsByCampaignId = async (campaignID) => {
     try {
-        const query = `SELECT Q.id, Q.name
+        const query = `SELECT Q.*
                        FROM "CampaignQuestion" AS CQ
                        JOIN "Question" AS Q ON CQ."questionID" = Q.id
                        WHERE CQ."campaignID" = $1`;

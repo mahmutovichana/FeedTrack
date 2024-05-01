@@ -103,20 +103,20 @@ const Update = (props: Props) => {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parse the response as JSON
-        } else {
-          throw new Error("Network response was not ok");
-        }
-      })
-      .then((data) => {
-        console.log("Tellers received successfully:", data);
-        setTellers(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching tellers:", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parse the response as JSON
+          } else {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then((data) => {
+          console.log("Tellers received successfully:", data);
+          setTellers(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching tellers:", error);
+        });
     // Dohvaćanje kampanja sa servera
     fetch(`${deployURLs.backendURL}/api/campaigns/`, {
       method: "GET",
@@ -124,20 +124,20 @@ const Update = (props: Props) => {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parsiranje odgovora kao JSON
-        } else {
-          throw new Error("Network response was not ok");
-        }
-      })
-      .then((data) => {
-        console.log("Campaigns received successfully:", data);
-        setCampaigns(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching campaigns:", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parsiranje odgovora kao JSON
+          } else {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then((data) => {
+          console.log("Campaigns received successfully:", data);
+          setCampaigns(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching campaigns:", error);
+        });
 
     // Dohvaćanje pitanja sa servera
     fetch(`${deployURLs.backendURL}/api/questions/`, {
@@ -146,20 +146,20 @@ const Update = (props: Props) => {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parsiranje odgovora kao JSON
-        } else {
-          throw new Error("Network response was not ok");
-        }
-      })
-      .then((data) => {
-        console.log("Questions received successfully:", data);
-        setQuestions(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching questions:", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parsiranje odgovora kao JSON
+          } else {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then((data) => {
+          console.log("Questions received successfully:", data);
+          setQuestions(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching questions:", error);
+        });
     // Dohvacanje brancheva sa servera
     fetch(`${deployURLs.backendURL}/api/branches/`, {
       method: "GET",
@@ -167,20 +167,20 @@ const Update = (props: Props) => {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parsiranje odgovora kao JSON
-        } else {
-          throw new Error("Network response was not ok");
-        }
-      })
-      .then((data) => {
-        console.log("Campaigns received successfully:", data);
-        setBranches(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching campaigns:", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parsiranje odgovora kao JSON
+          } else {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then((data) => {
+          console.log("Campaigns received successfully:", data);
+          setBranches(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching campaigns:", error);
+        });
     // Fetch managers from the backend
     fetch(`${deployURLs.backendURL}/api/users/`, {
       method: "GET",
@@ -188,20 +188,20 @@ const Update = (props: Props) => {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parse the response as JSON
-        } else {
-          throw new Error("Network response was not ok");
-        }
-      })
-      .then((data) => {
-        console.log("Managers received successfully:", data);
-        setManagers(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching managers:", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parse the response as JSON
+          } else {
+            throw new Error("Network response was not ok");
+          }
+        })
+        .then((data) => {
+          console.log("Managers received successfully:", data);
+          setManagers(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching managers:", error);
+        });
   }, []);
 
   useEffect(() => {
@@ -217,20 +217,20 @@ const Update = (props: Props) => {
           "Content-Type": "application/json",
         },
       })
-        .then((response) => {
-          if (response.ok) {
-            return response.json(); // Parsiranje odgovora kao JSON
-          } else {
-            throw new Error("Network response was not ok");
-          }
-        })
-        .then((data) => {
-          console.log("Data received successfully:", data);
-          setUsers(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+          .then((response) => {
+            if (response.ok) {
+              return response.json(); // Parsiranje odgovora kao JSON
+            } else {
+              throw new Error("Network response was not ok");
+            }
+          })
+          .then((data) => {
+            console.log("Data received successfully:", data);
+            setUsers(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+          });
     } else {
       fetch(`${deployURLs.backendURL}/api/${slugPlural}/`, {
         method: "GET",
@@ -238,20 +238,20 @@ const Update = (props: Props) => {
           "Content-Type": "application/json",
         },
       })
-        .then((response) => {
-          if (response.ok) {
-            return response.json(); // Parsiranje odgovora kao JSON
-          } else {
-            throw new Error("Network response was not ok");
-          }
-        })
-        .then((data) => {
-          console.log("Data received successfully:", data);
-          setUsers(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+          .then((response) => {
+            if (response.ok) {
+              return response.json(); // Parsiranje odgovora kao JSON
+            } else {
+              throw new Error("Network response was not ok");
+            }
+          })
+          .then((data) => {
+            console.log("Data received successfully:", data);
+            setUsers(data);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+          });
     }
   }, []);
 
@@ -339,6 +339,8 @@ const Update = (props: Props) => {
         return "role";
       case "questionsperpage":
         return "questionsperpage";
+      case "answerLevel":
+        return "answerLevel";
       default:
         return "";
     }
@@ -383,7 +385,7 @@ const Update = (props: Props) => {
         } else if (column.field === "lastname" && value.length < 2) {
           // Ovde je promenjeno
           currentErrors[column.field] =
-            "Last name must be at least 2 characters long";
+              "Last name must be at least 2 characters long";
         }
       }
     });
@@ -410,16 +412,16 @@ const Update = (props: Props) => {
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => {
-        if (response.ok) {
-          console.log("Data sent successfully");
-          props.setOpen(false);
-          props.toggleRefreshData();
-        } else {
-          console.error("Error sending data:", response.statusText);
-        }
-      })
-      .catch((error) => console.error("Error sending data:", error));
+        .then((response) => {
+          if (response.ok) {
+            console.log("Data sent successfully");
+            props.setOpen(false);
+            props.toggleRefreshData();
+          } else {
+            console.error("Error sending data:", response.statusText);
+          }
+        })
+        .catch((error) => console.error("Error sending data:", error));
   };
 
   const handleChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -487,146 +489,145 @@ const Update = (props: Props) => {
   };
 
   return (
-    <div className="update">
-      <div className="modal">
-        <span className="close" onClick={() => props.setOpen(false)}>X</span>
-        <h1>Update {props.slug}</h1>
-        <Box sx={{ minWidth: 120 }}>
-          <FormControl fullWidth>
-            <Select
-              value={selectedId || ""}
-              onChange={handleUserChange}
-              displayEmpty
-            >
-              <MenuItem value="" disabled>
-                Select {props.slug}
-              </MenuItem>
-              {users.map((user) => (
-                <MenuItem key={user.id} value={user.id.toString()}>
-                  {getColumnValue(user, props.slug)}
+      <div className="update">
+        <div className="modal">
+          <span className="close" onClick={() => props.setOpen(false)}>X</span>
+          <h1>Update {props.slug}</h1>
+          <Box sx={{ minWidth: 120 }}>
+            <FormControl fullWidth>
+              <Select
+                  value={selectedId || ""}
+                  onChange={handleUserChange}
+                  displayEmpty
+              >
+                <MenuItem value="" disabled>
+                  Select {props.slug}
                 </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-        <form onSubmit={handleSubmit}>
-          {props.columns
-            .filter((item) => item.field !== "id" && item.field !== "rating" && item.field !== "img" && item.field !== "verified")
-            .map((column) => (
-              <div className="item" key={column.field}>
-                <label className={errors[column.field] ? "error-label" : ""}>
-                  {column.headerName}
-                </label>
-                {/* Provjera da li je polje "campaign" */}
-                {column.field === "campaign" ? (
-                  <div>
+                {users.map((user) => (
+                    <MenuItem key={user.id} value={user.id.toString()}>
+                      {getColumnValue(user, props.slug)}
+                    </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <form onSubmit={handleSubmit}>
+            {props.columns
+                .filter((item) => item.field !== "id" && item.field !== "rating" && item.field !== "img" && item.field !== "verified")
+                .map((column) => (
+                    <div className="item" key={column.field}>
+                      <label className={errors[column.field] ? "error-label" : ""}>
+                        {column.headerName}
+                      </label>
+                      {/* Provjera da li je polje "campaign" */}
+                      {column.field === "campaign" ? (
+                          <div>
 
-                    <FormControl fullWidth>
-                      <Select
-                        value={formData.campaignID || ""}
-                        onChange={handleCampaignChange}
-                      //placeholder
-                      >
-                        <MenuItem value="" disabled>
-                          Select {column.headerName}
-                        </MenuItem>
-                        {campaigns.map((campaign) => (
-                          <MenuItem key={campaign.id} value={campaign.id.toString()}>
-                            {campaign.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </div>
-                ) : column.field === "teller ID" ? (
-                  <Select
-                    value={formData.tellerPositionID || ""}
-                    onChange={handleTellerChange}
-                  //placeholder="Select Teller"
-                  >
-                    <MenuItem value="" disabled>
-                      Select {column.headerName}
-                    </MenuItem>
-                    {tellers.map((teller) => (
-                      <MenuItem key={teller.id} value={teller.id.toString()}>
-                        {teller.id}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "manager" ? (
-                  <Select
-                    value={formData.managerID || ""}
-                    onChange={handleManagerChange}
-                  //placeholder="Select Manager"
-                  >
-                    <MenuItem value="" disabled>
-                      Select {column.headerName}
-                    </MenuItem>
-                    {filteredManagers.map((manager) => (
-                      <MenuItem key={manager.id} value={manager.id.toString()}>
-                        {manager.name} {manager.lastname}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "branch" ? (
-                  <Select
-                    value={formData.branchID || ""}
-                    onChange={handleBranchChange}
-                  //placeholder="Select Branch"
-                  >
-                    <MenuItem value="" disabled>
-                      Select {column.headerName}
-                    </MenuItem>
-                    {branches.map((branch) => (
-                      <MenuItem key={branch.id} value={branch.id.toString()}>
-                        {branch.location}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : column.field === "question" ? (
-                  <Select
-                    value={formData.questionID || ""}
-                    onChange={handleQuestionChange}
-                  //placeholder="Select Question"
-                  >
-                    <MenuItem value="" disabled>
-                      Select {column.headerName}
-                    </MenuItem>
-                    {questions.map((question) => (
-                      <MenuItem key={question.id} value={question.id.toString()}>
-                        {question.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                ) : (
-                  // Ako nije polje "campaign", prikaži običan input
-                  <div>
+                            <FormControl fullWidth>
+                              <Select
+                                  value={formData.campaignID || ""}
+                                  onChange={handleCampaignChange}
+                                  //placeholder
+                              >
+                                <MenuItem value="" disabled>
+                                  Select {column.headerName}
+                                </MenuItem>
+                                {campaigns.map((campaign) => (
+                                    <MenuItem key={campaign.id} value={campaign.id.toString()}>
+                                      {campaign.name}
+                                    </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </div>
+                      ) : column.field === "teller ID" ? (
+                          <Select
+                              value={formData.tellerPositionID || ""}
+                              onChange={handleTellerChange}
+                              //placeholder="Select Teller"
+                          >
+                            <MenuItem value="" disabled>
+                              Select {column.headerName}
+                            </MenuItem>
+                            {tellers.map((teller) => (
+                                <MenuItem key={teller.id} value={teller.id.toString()}>
+                                  {teller.id}
+                                </MenuItem>
+                            ))}
+                          </Select>
+                      ) : column.field === "manager" ? (
+                          <Select
+                              value={formData.managerID || ""}
+                              onChange={handleManagerChange}
+                              //placeholder="Select Manager"
+                          >
+                            <MenuItem value="" disabled>
+                              Select {column.headerName}
+                            </MenuItem>
+                            {filteredManagers.map((manager) => (
+                                <MenuItem key={manager.id} value={manager.id.toString()}>
+                                  {manager.name} {manager.lastname}
+                                </MenuItem>
+                            ))}
+                          </Select>
+                      ) : column.field === "branch" ? (
+                          <Select
+                              value={formData.branchID || ""}
+                              onChange={handleBranchChange}
+                              //placeholder="Select Branch"
+                          >
+                            <MenuItem value="" disabled>
+                              Select {column.headerName}
+                            </MenuItem>
+                            {branches.map((branch) => (
+                                <MenuItem key={branch.id} value={branch.id.toString()}>
+                                  {branch.location}
+                                </MenuItem>
+                            ))}
+                          </Select>
+                      ) : column.field === "question" ? (
+                          <Select
+                              value={formData.questionID || ""}
+                              onChange={handleQuestionChange}
+                              //placeholder="Select Question"
+                          >
+                            <MenuItem value="" disabled>
+                              Select {column.headerName}
+                            </MenuItem>
+                            {questions.map((question) => (
+                                <MenuItem key={question.id} value={question.id.toString()}>
+                                  {question.name}
+                                </MenuItem>
+                            ))}
+                          </Select>
+                      ) : (
+                          // Ako nije polje "campaign", prikaži običan input
+                          <div>
 
-                    <input
-                      type={
-                        column.field.toLowerCase().includes("date")
-                          ? "date"
-                          : column.type
-                      }
-                      name={column.field}
-                      value={formData[column.field] || ''}
-                      placeholder={column.field}
-                      onChange={handleChange2}
-                      required
-                    />
-                    {errors[column.field] && (
-                      <span className="error">{errors[column.field]}</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          <button type="submit">Send</button>
-        </form>
+                            <input
+                                type={
+                                  column.field.toLowerCase().includes("date")
+                                      ? "date"
+                                      : column.type
+                                }
+                                name={column.field}
+                                value={formData[column.field] || ''}
+                                placeholder={column.field}
+                                onChange={handleChange2}
+                                required
+                            />
+                            {errors[column.field] && (
+                                <span className="error">{errors[column.field]}</span>
+                            )}
+                          </div>
+                      )}
+                    </div>
+                ))}
+            <button type="submit">Send</button>
+          </form>
+        </div>
       </div>
-    </div>
   );
 };
 
 export default Update;
-

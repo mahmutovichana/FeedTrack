@@ -83,7 +83,8 @@ const UserFeedbackInput = () => {
                     "cname": "Default Campaign",
                     "qname": "How would you rate our service?",
                     "branchID": branchID,
-                    "questionsperpage": "1"
+                    "questionsperpage": "1",
+                    "answerLevel": "3"
                 };
                 questionData.push(newQuestion);
             }
@@ -91,7 +92,7 @@ const UserFeedbackInput = () => {
             const campaignOrderMapString = localStorage.getItem('campaignOrderMap');
             const campaignOrderMap = campaignOrderMapString ? JSON.parse(campaignOrderMapString) : {};
             const campaignNames = campaignOrderMap[branchID] || [];
-            console.log("campaignNames: ", campaignNames);
+            //console.log("campaignNames: ", campaignNames);
 
             // If campaignNames is empty, we add the campaign names from questionData
             if (campaignNames.length === 0 && questionData.length > 0) {
@@ -122,7 +123,7 @@ const UserFeedbackInput = () => {
             const extractedValues = extractValuesBasedOnOrder(questionData, campaignNames);
 
             // Ispisivanje rezultata
-            console.log("exctracted values:",extractedValues);
+            //console.log("exctracted values:",extractedValues);
 
 
             // Create an object to store the sizes of each campaign
@@ -166,7 +167,7 @@ const UserFeedbackInput = () => {
             const Niz2 = [3, 3, 1];
             //const NoviNiz = napraviNoviNiz(Niz1, Niz2);
             const NoviNiz = napraviNoviNiz(sizes, extractedValues); //expecting 4 4 2 1 1
-            console.log("NoviNiz:",NoviNiz); // Rezultat bi trebao biti [3, 3, 2, 3, 1, 1, 1, 1, 1]
+            //console.log("NoviNiz:",NoviNiz); // Rezultat bi trebao biti [3, 3, 2, 3, 1, 1, 1, 1, 1]
 
             // Initializing the arrays startIndex and endIndex
             const startIndex = [0];
@@ -178,12 +179,12 @@ const UserFeedbackInput = () => {
                 endIndex[i] = parseInt(endIndex[i - 1]) + parseInt(NoviNiz[i]);
             }
 
-            console.log("startIndex:", startIndex);
-            console.log("endIndex:", endIndex);
+            //console.log("startIndex:", startIndex);
+            //console.log("endIndex:", endIndex);
 
             // Set the sizes state
             setPages(NoviNiz);
-            console.log("sizes:", sizes);
+            //console.log("sizes:", sizes);
             setStartIndexes(startIndex);
             setEndIndexes(endIndex);
 
@@ -196,7 +197,7 @@ const UserFeedbackInput = () => {
             questionData.sort(sortByDesiredOrder);
 
             // Printing the sorted array of objects
-            console.log("sorted:", questionData);
+            //console.log("sorted:", questionData);
 
             questionData = questionData.flat();
             setQuestions(questionData);
@@ -273,7 +274,7 @@ const UserFeedbackInput = () => {
         setRemainingTime(timeLimitPerPage);
         const interval = setInterval(() => {
             setRemainingTime(prevTime => {
-                console.log("Remaining time:", prevTime); // Log remaining time to console
+                //console.log("Remaining time:", prevTime); // Log remaining time to console
                 return prevTime - 1;
             });
         }, 1000);
@@ -387,7 +388,7 @@ const UserFeedbackInput = () => {
     const renderQuestions = () => {
         const startIndex = startIndexes[currentPage - 1];
         const endIndex = endIndexes[currentPage - 1] + 1;
-        console.log("start:", startIndex, " end:", endIndex);
+        //console.log("start:", startIndex, " end:", endIndex);
         return questions.slice(startIndex, endIndex).map(question => (
             <FeedbackContainer key={question.questionID} question={question} onFeedbackChange={handleFeedbackChange} />
         ));
@@ -441,19 +442,45 @@ const FeedbackContainer = ({question, onFeedbackChange}) => {
     return (
         <div className="feedback-container">
             <h3>{question.qname}</h3>
-            <SmileyFeedback onClick={handleSmileyClick} />
+            <SmileyFeedback onClick={handleSmileyClick} answerLevel={question.answerLevel} />
         </div>
     );
 };
 
-const SmileyFeedback = ({ onClick }) => {
-    const smileys = [
-        { level: 1, color: "red", symbol: "😡" },
-        { level: 2, color: "orange", symbol: "😐" },
-        { level: 3, color: "yellow", symbol: "😊" },
-        { level: 4, color: "lightgreen", symbol: "😃" },
-        { level: 5, color: "green", symbol: "😍" },
-    ];
+const SmileyFeedback = ({ onClick, answerLevel }) => {
+    let smileys = [];
+    switch (answerLevel) {
+        case "2":
+            smileys = [
+                { level: 1, color: "red", symbol: "X", className: "negation" },
+                { level: 5, color: "green", symbol: "✓", className: "confirmation" },
+            ];
+            break;
+        case "3":
+            smileys = [
+                { level: 1, color: "red", symbol: "🙁" },
+                { level: 3, color: "orange", symbol: "😐" },
+                { level: 5, color: "yellow", symbol: "😊" },
+            ];
+            break;
+        case "4":
+            smileys = [
+                { level: 1, color: "red", symbol: "🙁" },
+                { level: 2.33, color: "orange", symbol: "😐" },
+                { level: 3.66, color: "yellow", symbol: "😊" },
+                { level: 5, color: "lightgreen", symbol: "😃" },
+            ];
+            break;
+        default:
+            // Default smileys if answerLevel is not specified or invalid
+            smileys = [
+                { level: 1, color: "red", symbol: "😡" },
+                { level: 2, color: "orange", symbol: "😐" },
+                { level: 3, color: "yellow", symbol: "😊" },
+                { level: 4, color: "lightgreen", symbol: "😃" },
+                { level: 5, color: "green", symbol: "😍" },
+            ];
+    }
 
     const [clickedIndex, setClickedIndex] = useState(null);
 
