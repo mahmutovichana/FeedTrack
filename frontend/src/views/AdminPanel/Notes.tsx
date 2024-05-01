@@ -34,15 +34,15 @@ const customStyles = {
 // For styling dropdown list for teasers (display label with image in dropdown list)
 const CustomOption = (props) => (
   <components.Option {...props}>
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'left' }}>
       {props.data.image && (
         <img
           src={props.data.image}
           alt={`Preview for ${props.data.label}`}
-          style={{ width: '100px', height: '70px', marginRight: '10px' }}
+          style={{ width: '100px', height: '70px', marginBottom: '5px' }}
         />
       )}
-      <span>{props.data.label}</span>
+      <span style={{ marginLeft: '10px' }}>{props.data.label}</span>
     </div>
   </components.Option>
 );
@@ -52,6 +52,7 @@ const Notes = () => {
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [thankYouMessage, setThankYouMessage] = useState("");
   const [teaserLink, setTeaserLink] = useState("");
+  const [teaserName, setTeaserName] = useState("");
   const [teaserData, setTeaserData] = useState([]);
   const [selectedTeaser, setSelectedTeaser] = useState(0);
   const [teaserFile, setTeaserFile] = useState(null);
@@ -93,7 +94,7 @@ const Notes = () => {
   useEffect(() => {
     setOptions(teaserData.map((teaser, index) => ({
       value: index,
-      label: `Teaser ${index + 1}`,
+      label: teaser.name || `Teaser ${index + 1}`,
       image: teaser.image,
     })));
   }, [teaserData]);
@@ -103,9 +104,11 @@ const Notes = () => {
   };
 
   const handleTeaserLinkChange = (e) => {
-    console.log("Previous teaserLink value:", teaserLink);
     setTeaserLink(e.target.value);
-    console.log("New teaserLink value:", e.target.value);
+  };
+
+  const handleTeaserNameChange = (e) => {
+    setTeaserName(e.target.value);
   };
 
   const handleTeaserUpload = async () => {
@@ -143,7 +146,7 @@ const Notes = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ image: base64, teaser: teaserLink }),
+        body: JSON.stringify({ image: base64, teaser: teaserLink, name: teaserName }),
       });
       const data = await response.json();
       console.log(data);
@@ -177,6 +180,7 @@ const Notes = () => {
         if (response.status === 204) {
           toast.success("Teaser deleted successfully!");
           setShowTeaserDelete(false);
+          setSelectedTeaser(0);
           fetchTeaserData();
         } else {
           toast.error("Error deleting teaser!");
@@ -254,13 +258,15 @@ const Notes = () => {
     }
   };
 
-  // when updating teaser, populate teaser link input field with existing value
+  // when updating teaser, populate teaser link and name input field with existing value
   useEffect(() => {
   if (showTeaserUpdate) {
     setTeaserLink(teaserData[selectedTeaser]?.teaser);
+    setTeaserName(teaserData[selectedTeaser]?.name);
   }
   else{
     setTeaserLink("");
+    setTeaserName("");
   }
 }, [selectedTeaser, showTeaserUpdate]);
 
@@ -288,12 +294,23 @@ const Notes = () => {
         <br />
         {(showTeaserUpload || showTeaserUpdate) && ( // Only show the upload section when showTeaserUpload or showTeaserUpdate is true
           <>
+          <label>
+              Teaser name:{" "}
+              <input
+                type="text"
+                id="teaser-name"
+                placeholder="Teaser name"
+                value={teaserName}
+                onChange={handleTeaserNameChange}
+              />
+            </label>
+            <br />
             <label>
-              Teaser Link:{" "}
+              Teaser link:{" "}
               <input
                 type="text"
                 id="teaser-link"
-                placeholder="Teaser Link"
+                placeholder="Teaser link"
                 value={teaserLink}
                 onChange={handleTeaserLinkChange}
               />
