@@ -74,6 +74,12 @@ const UserFeedbackInput = () => {
             let questionData = await Promise.all(questionDataPromise);
             //console.log("Question data:",questionData);
 
+            // if there are no questions
+            if(questionData.length === 0) {
+                console.log("There are no questions in campaigns related to this branchID");
+                navigate('/tellerSetup');
+            }
+
             const campaignOrderMapString = localStorage.getItem('campaignOrderMap');
             const campaignOrderMap = campaignOrderMapString ? JSON.parse(campaignOrderMapString) : {};
             const campaignNames = campaignOrderMap[branchID] || [];
@@ -214,7 +220,7 @@ const UserFeedbackInput = () => {
     //thankYouData.image = "FeedTrack logo";
 
     useEffect(() => {
-        console.log("upad");
+        console.log("I'm in");
         /*
         * Inside of this useEffect thankYouData should be fetched
         */
