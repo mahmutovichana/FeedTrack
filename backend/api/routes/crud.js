@@ -93,6 +93,7 @@ const questionRouter = setupRoutes(genericCRUD, "Question");
 const campaignRouter = setupRoutes(genericCRUD, "Campaign");
 const campaignQuestionRouter = setupRoutes(genericCRUD, "CampaignQuestion");
 const branchCampaignRouter = setupRoutes(genericCRUD, "BranchCampaign");
+const teaserDataRouter = setupRoutes(genericCRUD, "TeaserData");
 
 // Adding the routes to the app
 router.use("/users", userRouter);
@@ -104,5 +105,6 @@ router.use("/questions", questionRouter);
 router.use("/campaigns", campaignRouter);
 router.use("/campaignQuestions", campaignQuestionRouter);
 router.use("/branchCampaigns", branchCampaignRouter);
+router.use("/teaserData", teaserDataRouter);
 
 module.exports = router;

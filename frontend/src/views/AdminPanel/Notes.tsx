@@ -1,14 +1,64 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./../../styles/AdminPanel/notes.scss";
 import { deployURLs } from "../../../public/constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import imageCompression from "browser-image-compression";
+import Select from 'react-select';
+import { components } from 'react-select';
+
+// For styling dropdown list for teasers (display label with image in dropdown list)
+const customStyles = {
+  dropdownIndicator: (provided, state) => ({
+    ...provided,
+    width: '50px', // Adjust the width of the dropdown indicator
+    height: '30px', // Adjust the height of the dropdown indicator
+  }),
+  menu: (provided, state) => ({
+    ...provided,
+    height: '200px', // Adjust the height of the dropdown menu
+    width: '200px', // Adjust the width of dropdown the menu
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    borderBottom: '1px solid #ccc',
+    color: state.isSelected ? 'white' : 'black',
+    backgroundColor: state.isSelected ? '#1E90FF' : 'white',
+    '&:hover': {
+      backgroundColor: '#1E90FF',
+      color: 'white',
+    },
+  }),
+};
+
+// For styling dropdown list for teasers (display label with image in dropdown list)
+const CustomOption = (props) => (
+  <components.Option {...props}>
+    <div>
+      {props.data.image && (
+        <img
+          src={props.data.image}
+          alt={`Preview for ${props.data.label}`}
+          style={{ width: '100px', height: '70px', marginRight: '10px' }}
+        />
+      )}
+      <span>{props.data.label}</span>
+    </div>
+  </components.Option>
+);
 
 const Notes = () => {
   const [file, setFile] = useState(null);
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [thankYouMessage, setThankYouMessage] = useState("");
+  const [teaserLink, setTeaserLink] = useState("");
+  const [teaserData, setTeaserData] = useState([]);
+  const [selectedTeaser, setSelectedTeaser] = useState(0);
+  const [teaserFile, setTeaserFile] = useState(null);
+  const [options, setOptions] = useState([]);
+  const [showTeaserUpload, setShowTeaserUpload] = useState(false);
+  const [showTeaserUpdate, setShowTeaserUpdate] = useState(false);
+  const [showTeaserDelete, setShowTeaserDelete] = useState(false);
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -23,8 +73,128 @@ const Notes = () => {
     });
   };
 
+  const fetchTeaserData = async () => {
+    try {
+      const response = await fetch(`${deployURLs.backendURL}/api/teaserData`);
+      if (!response.ok) {
+        throw new Error(`Error fetching teaser data: ${response.status}`);
+      }
+      const data = await response.json();
+      setTeaserData(data);
+    } catch (error) {
+      console.error('Error fetching teaser data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeaserData();
+  }, []);
+
+  useEffect(() => {
+    setOptions(teaserData.map((teaser, index) => ({
+      value: index,
+      label: `Teaser ${index + 1}`,
+      image: teaser.image,
+    })));
+  }, [teaserData]);
+
+  const handleTeaserSelection = (selectedOption) => {
+    setSelectedTeaser(selectedOption.value);
+  };
+
+  const handleTeaserLinkChange = (e) => {
+    console.log("Previous teaserLink value:", teaserLink);
+    setTeaserLink(e.target.value);
+    console.log("New teaserLink value:", e.target.value);
+  };
+
+  const handleTeaserUpload = async () => {
+    if (!teaserLink) {
+      toast.error("Please provide a link for teaser video.");
+      return;
+    }
+    let compressedFile;
+    try {
+      compressedFile = await imageCompression(teaserFile, {
+        maxWidthOrHeight: 200,
+      });
+    } catch (err) {
+      console.log(compressedFile);
+    }
+    try {
+      let base64;
+      if(compressedFile){
+        base64 = await convertToBase64(compressedFile);
+      }
+      else{
+        base64 = "NoImgURL";
+      }
+      let url, method;
+      if (showTeaserUpdate) {
+        url = `${deployURLs.backendURL}/api/teaserData/${teaserData[selectedTeaser].id}`;
+        method = "PUT";
+      } else {
+        url = `${deployURLs.backendURL}/api/teaserData`;
+        method = "POST";
+      } 
+      console.log("selected teaser: " + selectedTeaser);
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image: base64, teaser: teaserLink }),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        if(showTeaserUpload){
+          toast.success("Successfully uploaded teaser!");
+        }
+        else{
+          toast.success("Successfully updated teaser!");
+        }
+        setTeaserFile(null);
+        setTeaserLink("");
+        setShowTeaserUpload(false);
+        setShowTeaserUpdate(false);
+        fetchTeaserData();
+      } else toast.error("Error: " + data.message);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const handleDeleteTeaser = async () => {
+    try {
+      const response = await fetch(
+        `${deployURLs.backendURL}/api/teaserData/${teaserData[selectedTeaser]?.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (response.ok) {
+        if (response.status === 204) {
+          toast.success("Teaser deleted successfully!");
+          setShowTeaserDelete(false);
+          fetchTeaserData();
+        } else {
+          toast.error("Error deleting teaser!");
+        }
+      } else {
+        toast.error("Error deleting teaser!");
+      }
+    } catch (error) {
+      console.error("Error deleting teaser:", error);
+    }
+};
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+  };
+
+  const handleTeaserFileChange = (e) => {
+    setTeaserFile(e.target.files[0]);
   };
 
   const handleWelcomeDataUpload = async () => {
@@ -84,8 +254,91 @@ const Notes = () => {
     }
   };
 
+  // when updating teaser, populate teaser link input field with existing value
+  useEffect(() => {
+  if (showTeaserUpdate) {
+    setTeaserLink(teaserData[selectedTeaser]?.teaser);
+  }
+  else{
+    setTeaserLink("");
+  }
+}, [selectedTeaser, showTeaserUpdate]);
+
   return (
     <div className="notes">
+      <div className="teaser-screen">
+        <h1>Teaser Screen Selection</h1>
+        <label>Select Teaser:</label>
+        <div className="teaserDisplay">
+          <Select
+            options={options}
+            value={options.find((option) => option.value === selectedTeaser)}
+            onChange={handleTeaserSelection}
+            styles={customStyles}
+            components={{ Option: CustomOption }}
+          />
+          {selectedTeaser !== null && (
+            <img
+              src={options[selectedTeaser]?.image}
+              alt={`Preview for Teaser ${selectedTeaser + 1}`}
+              style={{ width: '160px', height: '120px', marginLeft: '10px' }}
+            />
+          )}
+        </div>
+        <br />
+        {(showTeaserUpload || showTeaserUpdate) && ( // Only show the upload section when showTeaserUpload or showTeaserUpdate is true
+          <>
+            <label>
+              Teaser Link:{" "}
+              <input
+                type="text"
+                id="teaser-link"
+                placeholder="Teaser Link"
+                value={teaserLink}
+                onChange={handleTeaserLinkChange}
+              />
+            </label>
+            <br />
+            <label>
+              Upload Preview Image:{" "}
+              <input
+                type="file"
+                id="file"
+                accept=".jpeg, .png, .jpg"
+                onChange={handleTeaserFileChange}
+              />
+            </label>
+            <br />
+            <div className="teaser-buttons-container">
+              <button onClick={handleTeaserUpload}>Upload</button>
+              <button onClick={() => {setShowTeaserUpload(false); setShowTeaserUpdate(false);}}>Cancel</button>
+            </div>
+          </>
+        )}
+        {(showTeaserDelete) && ( // Only show the delete section when showTeaserDelete is true
+          <>
+            <label>
+              Are you sure?
+            </label>
+            <br />
+            <div className="teaser-buttons-container">
+              <button onClick={handleDeleteTeaser}>Yes</button>
+              <button onClick={() => {setShowTeaserDelete(false);}}>No</button>
+            </div>
+          </>
+        )}
+        <div className="teaser-buttons-container">
+          {(!showTeaserUpload && !showTeaserUpdate && !showTeaserDelete) && (
+            <>
+              <button onClick={() => setShowTeaserUpload(true)}>Add a teaser</button>
+              <button onClick={() => setShowTeaserUpdate(true)}>Update teaser</button>
+              <button onClick={() => setShowTeaserDelete(true)}>Delete teaser</button>
+            </>
+          )}
+        </div>
+      </div>
+      <br />
+      <br />
       <h1>Welcome screen notes</h1>
       <label>
         Welcome message:{" "}
