@@ -1,71 +1,94 @@
 .welcomeScreenContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
-    padding: 20px;
+    justify-content: center;
+    z-index: 1;
   }
-  
-  .welcomeScreenContainer .info {
-    margin-bottom: 20px;
-    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
-    text-align: center;
+
+  .video-background {
+    position: absolute;
     top: 0;
-    margin-left: 50%;
-    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
   }
-  
-  .welcomeScreenContainer .logo {
-    margin-top: 75px;
-    margin-bottom: 30px;
-    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
+
+  .video-iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .welcome-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
+    opacity: 0;
+    animation: fadeInOut 5s infinite; /* Koristimo fadeInOut animaciju i činimo je beskonačnom */
+    z-index: 2; /* Postavi z-index na 2 da bi bio iznad video pozadine */
   }
   
-  .welcomeScreenContainer .logo-image {
-    width: 150px;
-  }
-  
-  @keyframes pulse {
+  @keyframes fadeInOut {
     0% {
-      transform: scale(1);
+      opacity: 0; /* Tekst je nevidljiv na početku animacije */
     }
-    50% {
-      transform: scale(1.1);
+    10% {
+      opacity: 1; /* Tekst postaje vidljiv */
+    }
+    90% {
+      opacity: 1; /* Tekst ostaje vidljiv */
     }
     100% {
-      transform: scale(1);
+      opacity: 0; /* Tekst postaje nevidljiv na kraju animacije */
     }
   }
   
-  .welcomeScreenContainer button {
-    padding: 10px 20px;
+  .welcome-content.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(-20px); /* Dodajemo klizeću transformaciju */
+  }
+  
+  .logo-image {
+    max-width: 200px;
+    height: auto;
+  }
+
+  .goToFeedback-button {
+    position: absolute; /* Postavljamo na apsolutnu poziciju */
+    bottom: 20%; /* Pomjeramo 25% od dna stranice */
+    left: 50%; /* Postavljamo na sredinu horizontalno */
+    transform: translate(-50%, 0); /* Koristimo transformaciju za fino centriranje */
+    padding: 20px 30px;
+    font-size: large;
     background-color: #007bff;
-    color: #ffffff;
+    color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
   }
   
-  .welcomeScreenContainer button:hover {
-    background-color: #0056b3;
+  .info {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%); /* Centriranje horizontalno */
+    text-align: center; /* Centriranje teksta */
+    color: black;
+    z-index: 4;
   }
   
-  /* Dodatni stil za responzivnost */
-  @media screen and (max-width: 768px) {
-    .welcomeScreenContainer {
-      padding: 10px;
-    }
-  
-    .welcomeScreenContainer .logo {
-      margin-bottom: 20px;
-    }
-  
-    .welcomeScreenContainer .logo-image {
-      width: 120px;
-    }
-
-  }
-  
+}
