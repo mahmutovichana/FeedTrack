@@ -48,7 +48,8 @@ const UserFeedbackInput = () => {
     const tellerPositionID = localStorage.getItem('tellerPositionID');
     const storedBranchLocation = localStorage.getItem('storedBranchLocation');
     const [pages, setPages] = useState([]);
-    const [answeredQuestions, setAnsweredQuestions] = useState(0);
+    const [startIndexes, setStartIndexes] = useState([]);
+    const [endIndexes, setEndIndexes] = useState([]);
 
     //function to fetch questions for required branchID with all relevant info
     const fetchQuestionsByBranchId = async (branchID) => {
@@ -77,6 +78,19 @@ const UserFeedbackInput = () => {
             const campaignOrderMap = campaignOrderMapString ? JSON.parse(campaignOrderMapString) : {};
             const campaignNames = campaignOrderMap[branchID] || [];
             console.log("campaignNames: ", campaignNames);
+
+            // If campaignNames is empty, we add the campaign names from questionData
+            if (campaignNames.length === 0 && questionData.length > 0) {
+                // We add first cname to campaignNames
+                campaignNames.push(questionData[0].cname);
+
+                // We iterare through remaining elements of questionData to find different cnames and add them to campaignNames
+                questionData.forEach((item, index) => {
+                    if (index !== 0 && !campaignNames.includes(item.cname)) {
+                        campaignNames.push(item.cname);
+                    }
+                });
+            }
 
             // Definirajte funkciju za izvlačenje vrijednosti na osnovu redoslijeda iz campaignNames
             function extractValuesBasedOnOrder(data, order) {
@@ -156,6 +170,8 @@ const UserFeedbackInput = () => {
             // Set the sizes state
             setPages(NoviNiz);
             console.log("sizes:", sizes);
+            setStartIndexes(startIndex);
+            setEndIndexes(endIndex);
 
             // Function to sort objects based on the desired order array
             const sortByDesiredOrder = (a, b) => {
@@ -223,14 +239,12 @@ const UserFeedbackInput = () => {
 
     }, [currentPage, pageSize]);
 
-
-
     useEffect(() => {
         if (timer) clearInterval(timer); // Reset previous timer
 
         // Define time limit based on number of questions per page
-        const questionsPerPage = pageSize;
-        let timeLimitPerPage = questionsPerPage * 10; // For example, set 10 seconds per question
+        const questionsPerPage = pages[currentPage - 1]; // Updated to use pageSize from pages array
+        let timeLimitPerPage = questionsPerPage * 5; // For example, set 5 seconds per question
 
         // Add extra 5 seconds on last page
         if (currentPage === Math.ceil(pages.length)) {
@@ -253,7 +267,8 @@ const UserFeedbackInput = () => {
         setTimer(interval);
 
         return () => clearInterval(interval); // Reset timer when component unmounts or when user submits answers
-    }, [currentPage, pageSize, questions.length]);
+    }, [currentPage, pageSize, pages]);
+
 
     useEffect(() => {
         // Check if remaining time has expired and redirect user if so
@@ -295,14 +310,14 @@ const UserFeedbackInput = () => {
         }
         setFeedbacks(updatedFeedbacks);
 
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, questions.length);
+        const startIndex = startIndexes[currentPage - 1];
+        const endIndex = endIndexes[currentPage - 1] + 1;
         const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.questionID));
 
-        if (allQuestionsAnswered && currentPage < Math.ceil((questions.length) / pageSize)) {
+        if (allQuestionsAnswered && currentPage < (pages.length)) {
             handlePageChange(currentPage + 1);
         }
-        if (allQuestionsAnswered && currentPage === Math.ceil((questions.length) / pageSize)) {
+        if (allQuestionsAnswered && currentPage === (pages.length)) {
             handleSubmit(updatedFeedbacks);
         }
     };
@@ -356,8 +371,9 @@ const UserFeedbackInput = () => {
     };
 
     const renderQuestions = () => {
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, questions.length);
+        const startIndex = startIndexes[currentPage - 1];
+        const endIndex = endIndexes[currentPage - 1] + 1;
+        console.log("start:", startIndex, " end:", endIndex);
         return questions.slice(startIndex, endIndex).map(question => (
             <FeedbackContainer key={question.questionID} question={question} onFeedbackChange={handleFeedbackChange} />
         ));
