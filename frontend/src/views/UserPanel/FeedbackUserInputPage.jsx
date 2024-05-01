@@ -47,7 +47,7 @@ const UserFeedbackInput = () => {
     const branchID = localStorage.branchPositionID;
     const tellerPositionID = localStorage.getItem('tellerPositionID');
     const storedBranchLocation = localStorage.getItem('storedBranchLocation');
-    const [sizes, setSizes] = useState([]);
+    const [pages, setPages] = useState([]);
     const [answeredQuestions, setAnsweredQuestions] = useState(0);
 
     //function to fetch questions for required branchID with all relevant info
@@ -140,9 +140,21 @@ const UserFeedbackInput = () => {
             const NoviNiz = napraviNoviNiz(sizes, extractedValues); //expecting 4 4 2 1 1
             console.log("NoviNiz:",NoviNiz); // Rezultat bi trebao biti [3, 3, 2, 3, 1, 1, 1, 1, 1]
 
+            // Initializing the arrays startIndex and endIndex
+            const startIndex = [0];
+            const endIndex = [NoviNiz[0] - 1];
+
+            // Filling the arrays startIndex and endIndex
+            for (let i = 1; i < NoviNiz.length; i++) {
+                startIndex[i] = parseInt(startIndex[i - 1]) + parseInt(NoviNiz[i - 1]);
+                endIndex[i] = parseInt(endIndex[i - 1]) + parseInt(NoviNiz[i]);
+            }
+
+            console.log("startIndex:", startIndex);
+            console.log("endIndex:", endIndex);
 
             // Set the sizes state
-            setSizes(sizes);
+            setPages(NoviNiz);
             console.log("sizes:", sizes);
 
             // Function to sort objects based on the desired order array
@@ -221,7 +233,7 @@ const UserFeedbackInput = () => {
         let timeLimitPerPage = questionsPerPage * 10; // For example, set 10 seconds per question
 
         // Add extra 5 seconds on last page
-        if (currentPage === Math.ceil(sizes.length)) {
+        if (currentPage === Math.ceil(pages.length)) {
             timeLimitPerPage += 5;
         }
 
