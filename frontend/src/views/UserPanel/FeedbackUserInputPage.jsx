@@ -259,7 +259,7 @@ const UserFeedbackInput = () => {
 
         // Define time limit based on number of questions per page
         const questionsPerPage = pages[currentPage - 1]; // Updated to use pageSize from pages array
-        let timeLimitPerPage = questionsPerPage * 6; // For example, set 6 seconds per question
+        let timeLimitPerPage = questionsPerPage * 4; // For example, set 6 seconds per question
 
         // Add extra 5 seconds on last page
         if (currentPage === Math.ceil(pages.length)) {
@@ -274,7 +274,7 @@ const UserFeedbackInput = () => {
         setRemainingTime(timeLimitPerPage);
         const interval = setInterval(() => {
             setRemainingTime(prevTime => {
-                //console.log("Remaining time:", prevTime); // Log remaining time to console
+                console.log("Remaining time:", prevTime); // Log remaining time to console
                 return prevTime - 1;
             });
         }, 1000);
@@ -466,8 +466,8 @@ const SmileyFeedback = ({ onClick, answerLevel }) => {
         case "4":
             smileys = [
                 { level: 1, color: "red", symbol: "🙁" },
-                { level: 2.33, color: "orange", symbol: "😐" },
-                { level: 3.66, color: "yellow", symbol: "😊" },
+                { level: 2, color: "orange", symbol: "😐" },
+                { level: 4, color: "yellow", symbol: "😊" },
                 { level: 5, color: "lightgreen", symbol: "😃" },
             ];
             break;
