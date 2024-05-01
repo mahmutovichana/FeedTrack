@@ -77,7 +77,15 @@ const UserFeedbackInput = () => {
             // if there are no questions
             if(questionData.length === 0) {
                 console.log("There are no questions in campaigns related to this branchID");
-                navigate('/tellerSetup');
+                const newQuestion = {
+                    "campaignID": "0",
+                    "questionID": "0",
+                    "cname": "Default Campaign",
+                    "qname": "How would you rate our service?",
+                    "branchID": branchID,
+                    "questionsperpage": "1"
+                };
+                questionData.push(newQuestion);
             }
 
             const campaignOrderMapString = localStorage.getItem('campaignOrderMap');
