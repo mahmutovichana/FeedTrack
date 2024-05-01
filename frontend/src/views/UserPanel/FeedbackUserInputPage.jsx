@@ -258,7 +258,7 @@ const UserFeedbackInput = () => {
 
         // Define time limit based on number of questions per page
         const questionsPerPage = pages[currentPage - 1]; // Updated to use pageSize from pages array
-        let timeLimitPerPage = questionsPerPage * 5; // For example, set 5 seconds per question
+        let timeLimitPerPage = questionsPerPage * 6; // For example, set 6 seconds per question
 
         // Add extra 5 seconds on last page
         if (currentPage === Math.ceil(pages.length)) {
