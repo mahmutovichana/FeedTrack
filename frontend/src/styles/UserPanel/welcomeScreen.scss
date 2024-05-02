@@ -32,7 +32,6 @@
   }
 
   .welcome-content {
-    color: white;
     font-size: larger;
     position: absolute;
     top: 50%;
@@ -40,40 +39,62 @@
     transform: translate(-50%, -50%);
     text-align: center;
     opacity: 0;
-    animation: fadeInOut 5s infinite; /* Koristimo fadeInOut animaciju i činimo je beskonačnom */
-    z-index: 2; /* Postavi z-index na 2 da bi bio iznad video pozadine */
+    animation: fadeInOut 5s infinite;
+    /* Koristimo fadeInOut animaciju i činimo je beskonačnom */
+    z-index: 2;
+    /* Postavi z-index na 2 da bi bio iznad video pozadine */
   }
-  
+
+  h1 {
+    color: white;
+    background-color: #4E02FF;
+    /* Teget plava */
+    border-radius: 10px;
+    padding: 10px;
+  }
+
   @keyframes fadeInOut {
     0% {
-      opacity: 0; /* Tekst je nevidljiv na početku animacije */
+      opacity: 0;
+      /* Tekst je nevidljiv na početku animacije */
     }
+
     10% {
-      opacity: 1; /* Tekst postaje vidljiv */
+      opacity: 1;
+      /* Tekst postaje vidljiv */
     }
+
     90% {
-      opacity: 1; /* Tekst ostaje vidljiv */
+      opacity: 1;
+      /* Tekst ostaje vidljiv */
     }
+
     100% {
-      opacity: 0; /* Tekst postaje nevidljiv na kraju animacije */
+      opacity: 0;
+      /* Tekst postaje nevidljiv na kraju animacije */
     }
   }
-  
+
   .welcome-content.show {
     opacity: 1;
-    transform: translate(-50%, -50%) translateY(-20px); /* Dodajemo klizeću transformaciju */
+    transform: translate(-50%, -50%) translateY(-20px);
+    /* Dodajemo klizeću transformaciju */
   }
-  
+
   .logo-image {
     max-width: 200px;
     height: auto;
   }
 
   .goToFeedback-button {
-    position: absolute; /* Postavljamo na apsolutnu poziciju */
-    bottom: 20%; /* Pomjeramo 25% od dna stranice */
-    left: 50%; /* Postavljamo na sredinu horizontalno */
-    transform: translate(-50%, 0); /* Koristimo transformaciju za fino centriranje */
+    position: absolute;
+    /* Postavljamo na apsolutnu poziciju */
+    bottom: 20%;
+    /* Pomjeramo 25% od dna stranice */
+    left: 50%;
+    /* Postavljamo na sredinu horizontalno */
+    transform: translate(-50%, 0);
+    /* Koristimo transformaciju za fino centriranje */
     padding: 20px 30px;
     font-size: large;
     background-color: #007bff;
@@ -83,15 +104,17 @@
     cursor: pointer;
     font-family: 'Montserrat';
   }
-  
+
   .info {
     position: absolute;
     bottom: 20px;
     left: 50%;
-    transform: translateX(-50%); /* Centriranje horizontalno */
-    text-align: center; /* Centriranje teksta */
+    transform: translateX(-50%);
+    /* Centriranje horizontalno */
+    text-align: center;
+    /* Centriranje teksta */
     color: black;
     z-index: 4;
   }
-  
+
 }
