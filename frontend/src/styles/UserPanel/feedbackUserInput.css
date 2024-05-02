@@ -74,7 +74,6 @@
   width: 100%;
   height: 100%;
   background-color: rgba(255, 105, 180, 1); /* Roza boja s prozirnošću 1 (nepostojeca) */
-
   z-index: 9999; /* Visok z-index kako bi bio iznad ostalog sadržaja */
   padding: 20px;
   box-sizing: border-box; /* Dodano kako bi padding bio uračunat u dimenzije */
@@ -96,6 +95,30 @@
 .thankYouScreenContainer .logo-image {
   width: 150px;
 }
+
+.thankYouScreenContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('ty1.png'); /* Dodajemo pozadinu */
+  background-size: cover; /* Omogućuje da se slika popuni cijeli ekran */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /* Postavljamo visok z-index kako bi bili sigurni da će biti iznad ostalog sadržaja */
+}
+/*
+.logo {
+  text-align: center;
+}
+
+.logo-image {
+  max-width: 200px;
+  height: auto;
+}
+*/
 
 /* Dodatni stil za responzivnost */
 @media screen and (max-width: 768px) {

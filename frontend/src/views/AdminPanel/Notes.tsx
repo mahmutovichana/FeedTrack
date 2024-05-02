@@ -242,7 +242,7 @@ const handleFileChange = (e, setData) => {
       const data = await response.json();
       console.log(data);
       if (response.ok) {
-        toast.success("Successfully changed welcome notes!");
+      toast.success("Successfully changed welcome notes!");
         setFile(null);
         setWelcomeMessage("");
       } else toast.error("Error: " + data.message);
@@ -273,7 +273,6 @@ const handleFileChange = (e, setData) => {
       console.error(err.message);
     }
   };
-
   const handleSelectButton = async () => {
     localStorage.setItem('teaserVideo', teaserData[selectedTeaser].teaser);
     toast.success("Teaser selected!");
