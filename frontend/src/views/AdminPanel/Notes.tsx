@@ -159,6 +159,7 @@ const Notes = () => {
         }
         setTeaserFile(null);
         setTeaserLink("");
+        setTeaserName("");
         setShowTeaserUpload(false);
         setShowTeaserUpdate(false);
         fetchTeaserData();
@@ -258,6 +259,11 @@ const Notes = () => {
     }
   };
 
+  const handleSelectButton = async () => {
+    localStorage.setItem('teaserVideo', teaserData[selectedTeaser].teaser);
+    toast.success("Teaser selected!");
+  };
+
   // when updating teaser, populate teaser link and name input field with existing value
   useEffect(() => {
   if (showTeaserUpdate) {
@@ -291,6 +297,14 @@ const Notes = () => {
             />
           )}
         </div>
+        <br />
+        {(!showTeaserUpload && !showTeaserUpdate && !showTeaserDelete) && (
+          <div className="centerButton">
+            <button onClick={handleSelectButton}>
+              Select this teaser
+            </button>
+          </div>
+        )}
         <br />
         {(showTeaserUpload || showTeaserUpdate) && ( // Only show the upload section when showTeaserUpload or showTeaserUpdate is true
           <>

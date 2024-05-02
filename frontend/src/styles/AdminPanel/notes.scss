@@ -34,4 +34,10 @@
     .teaserDisplay img:hover {
       transform: scale(1.05);
     }
+
+    .centerButton{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }

@@ -9,6 +9,7 @@ const WelcomeScreen = () => {
   const [selectedTellerID, setSelectedTellerID] = useState("");
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [teaserVideo, setTeaserVideo] = useState("");
   const videoRef = useRef(null);
   const navigate = useNavigate();
 
@@ -26,6 +27,7 @@ const WelcomeScreen = () => {
 
     setBranchLocation(localStorage.getItem("storedBranchLocation"));
     setSelectedTellerID(localStorage.getItem("tellerPositionID"));
+    setTeaserVideo(localStorage.getItem("teaserVideo"));
   }, []);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ const WelcomeScreen = () => {
           <video
             ref={videoRef}
             className="video-iframe"
-            src="teaser1.mp4" 
+            src={teaserVideo}
             autoPlay
             loop
             onLoadedData={handleVideoLoad}
