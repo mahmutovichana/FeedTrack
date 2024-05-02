@@ -1,57 +1,61 @@
 .teller-setup-container {
-    max-width: 800px; /* Povećajte širinu kontejnera */
-    margin: 0 auto; /* Centrirajte kontejner */
-    text-align: center;
-  
-    #root{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  margin: 12%;
+  margin-bottom: 0;
+  padding: 0;
+  text-align: center;
 
-  
   .logo {
-    width: 250px; /* Uvećajte veličinu loga */
-    margin-bottom: 40px; /* Povećajte razmak ispod loga */
+    width: 250px;
+    /* Uvećajte veličinu loga */
+    margin-bottom: 40px;
+    /* Povećajte razmak ispod loga */
   }
-  
+
   .teller-setup-container h2 {
-    margin-bottom: 30px; /* Povećajte razmak ispod naslova */
-    font-size: 28px; /* Povećajte veličinu fonta naslova */
+    margin-bottom: 30px;
+    /* Povećajte razmak ispod naslova */
+    font-size: 28px;
+    /* Povećajte veličinu fonta naslova */
   }
-  
+
   .form-group {
-    margin-bottom: 30px; /* Povećajte razmak između form grupa */
+    margin-bottom: 30px;
+    /* Povećajte razmak između form grupa */
     text-align: left;
   }
-  
+
   .form-group label {
     display: block;
-    margin-bottom: 10px; /* Povećajte razmak ispod labela */
+    margin-bottom: 10px;
+    /* Povećajte razmak ispod labela */
     font-weight: bold;
   }
-  
+
   .form-group select {
     width: 100%;
-    padding: 15px; /* Povećajte padding za select */
+    padding: 15px;
+    /* Povećajte padding za select */
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #fff;
-    font-size: 18px; /* Povećajte veličinu fonta */
+    font-size: 18px;
+    /* Povećajte veličinu fonta */
   }
-  
+
   .submit-button {
     display: block;
     width: 100%;
-    padding: 15px; /* Povećajte padding za button */
+    padding: 15px;
+    /* Povećajte padding za button */
     border: none;
     border-radius: 5px;
     background-color: #007bff;
     color: #fff;
-    font-size: 18px; /* Povećajte veličinu fonta */
+    font-size: 18px;
+    /* Povećajte veličinu fonta */
     cursor: pointer;
   }
-  
+
   .submit-button:hover {
     background-color: #0056b3;
   }
