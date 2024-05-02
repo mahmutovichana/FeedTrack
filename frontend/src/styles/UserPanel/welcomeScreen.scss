@@ -32,6 +32,8 @@
   }
 
   .welcome-content {
+    color: white;
+    font-size: larger;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -79,6 +81,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-family: 'Montserrat';
   }
   
   .info {

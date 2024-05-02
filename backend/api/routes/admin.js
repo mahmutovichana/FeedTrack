@@ -81,85 +81,96 @@ router.get(
   }
 );
 
-router.post("/welcomeData", async (req, res) => {
+router.post("/:dataType", async (req, res) => {
+  const { dataType } = req.params;
   const { image, message } = req.body;
+  const dataTables = {
+    welcomeData: "WelcomeData",
+    thankYouData: "ThankYouData"
+  };
 
-  if (!message) {
-    return res.status(400).json({ message: "Welcome message is required" });
-  }
-
-  if (!image) {
-    return res.status(400).json({ message: "Image is required" });
-  }
-
-  if (!isBase64(image, { mimeRequired: true })) {
-    return res.status(400).json({ message: "File needs to be image" });
+  if (!dataTables[dataType] || (!message && !image) || (image && !isBase64(image, { mimeRequired: true }))) {
+    return res.status(400).json({ message: (!message && !image) ? "Message or image is required" : (image && !isBase64(image, { mimeRequired: true })) ? "File needs to be an image" : "Invalid data" });
   }
 
   try {
-    const existingData = await db.query('SELECT * FROM "WelcomeData"');
+    console.log("usla u try");
+    // Provjeravamo da li postoji red u bazi
+    const existingData = await db.query(`SELECT * FROM "${dataTables[dataType]}"`);
 
-    if (existingData.rowCount !== 0) {
-      await db.query('DELETE FROM "WelcomeData"');
+    let query = '';
+    let values = [];
+
+    // Ako ne postoji red, izvršavamo INSERT
+    if (existingData.rowCount === 0) {
+      console.log("saznala da nema nista u bazi");
+      query = `INSERT INTO "${dataTables[dataType]}" (message, image) VALUES ($1, $2) RETURNING *`;
+      values = [message || null, image || null];
+    } else {
+      // Ako postoji red, izvršavamo UPDATE
+      if (message && image) {
+        query = `UPDATE "${dataTables[dataType]}" SET message = $1, image = $2 RETURNING *`;
+        values = [message, image];
+      } else if (message) {
+        query = `UPDATE "${dataTables[dataType]}" SET message = $1 RETURNING *`;
+        values = [message];
+      } else if (image) {
+        query = `UPDATE "${dataTables[dataType]}" SET image = $1 RETURNING *`;
+        values = [image];
+      } else {
+        return res.status(400).json({ message: "Either message or image is required" });
+      }
     }
-
-    await db.query(
-      'INSERT INTO "WelcomeData" (image, message) VALUES ($1, $2) RETURNING *',
-      [image, message]
-    );
-
-    res.status(200).json({ message: "File and message uploaded successfully" });
+    console.log(query);
+    const newData = await db.query(query, values);
+    res.status(200).json({ message: "Data uploaded successfully", data: newData.rows });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Error uploading welcome data" });
+    console.error(err);
+    return res.status(500).json({ message: `Error uploading ${dataType} data` });
   }
 });
 
-router.get("/welcomeData", async (req, res) => {
+router.get("/:dataType", async (req, res) => {
+  const { dataType } = req.params;
+
+  const dataTables = {
+    welcomeData: "WelcomeData",
+    thankYouData: "ThankYouData"
+  };
+
+  if (!dataTables[dataType]) {
+    return res.status(400).json({ message: "Invalid data type" });
+  }
+
   try {
-    const { rows } = await db.query('SELECT * FROM "WelcomeData"');
+    const { rows } = await db.query(`SELECT * FROM "${dataTables[dataType]}"`);
 
     res.status(200).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ message: "Error while retrieving welcome data" });
+    console.error(err);
+    res.status(500).json({ message: `Error while retrieving ${dataType} data` });
   }
 });
 
-router.post("/thankYouData", async (req, res) => {
-  const { message } = req.body;
+router.delete("/:dataType", async (req, res) => {
+  const { dataType } = req.params;
 
-  if (!message) {
-    return res.status(400).json({ message: "Thank you message is required" });
+  const dataTables = {
+    welcomeData: "WelcomeData",
+    thankYouData: "ThankYouData"
+  };
+
+  if (!dataTables[dataType]) {
+    return res.status(400).json({ message: "Invalid data type" });
   }
 
   try {
-    const existingData = await db.query('SELECT * FROM "ThankYouData"');
-
-    if (existingData.rowCount !== 0) {
-      await db.query('DELETE FROM "ThankYouData"');
-    }
-
-    const { rows } = await db.query(
-      'INSERT INTO "ThankYouData" (message) VALUES ($1) RETURNING *',
-      [message]
-    );
-
-    res
-      .status(200)
-      .json({ message: "Thank you message uploaded successfully" });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Error uploading thank you data" });
-  }
-});
-
-router.get("/thankYouData", async (req, res) => {
-  try {
-    const { rows } = await db.query('SELECT * FROM "ThankYouData"');
+    const { rows } = await db.query(`DELETE FROM "${dataTables[dataType]}"`);
 
     res.status(200).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ message: "Error while retrieving thank you data" });
+    console.error(err);
+    res.status(500).json({ message: `Error while deleting ${dataType} data` });
   }
 });
 
