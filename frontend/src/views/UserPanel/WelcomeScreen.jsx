@@ -34,24 +34,6 @@ const WelcomeScreen = () => {
     }
   }, [videoLoaded]);
 
-  /* useEffect(() => {
-    // Prvo čekanje prije pokretanja ciklusa
-    setTimeout(() => {
-      setShowContent(true);
-    }, 7000);
-
-    const showContentInterval = setInterval(() => {
-      setShowContent(false);
-      setTimeout(() => {
-        setShowContent(true);
-      }, 7330); // Prikaži sadržaj 4 sekunde
-    }, 11230); // Ciklus čekanja 7 sekundi + prikaz 4 sekunde
-    
-    return () => {
-      clearInterval(showContentInterval);
-    };
-  }, []); */  
-
   const handleVideoLoad = () => {
     setVideoLoaded(true);
   };
@@ -67,7 +49,7 @@ const WelcomeScreen = () => {
           <video
             ref={videoRef}
             className="video-iframe"
-            src="teaser7.mp4" 
+            src={localStorage.getItem("teaserVideo")} 
             autoPlay
             loop
             onLoadedData={handleVideoLoad}

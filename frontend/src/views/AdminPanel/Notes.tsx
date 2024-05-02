@@ -131,6 +131,11 @@ const Notes = () => {
       toast.error("Please provide a link for teaser video.");
       return;
     }
+    const videoRegex = /^[^\\/:*?"<>|]+\.(mp4|avi|mov|mkv|flv|wmv|mpg|mpeg|webm)$/i;
+    if (!videoRegex.test(teaserLink)) {
+      toast.error("Please provide a valid video file name (\\ : / * ? \" < > | symbols are forbidden) with a supported extension (.mp4 .avi .mov .mkv .flv .wmv .mpg .mpeg .webm).");
+      return;
+  }
     let compressedFile;
     try {
       compressedFile = await imageCompression(teaserFile, {
