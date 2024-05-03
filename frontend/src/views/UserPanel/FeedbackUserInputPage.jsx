@@ -59,7 +59,7 @@ const UserFeedbackInput = () => {
                 headers: {
                     'Authorization': `Bearer ${localStorage.token}`
                 }
-        });
+            });
             const data = await response.json();
             return data; // Return the questions for the branch ID
         } catch (error) {
@@ -75,7 +75,7 @@ const UserFeedbackInput = () => {
             //console.log("Question data:",questionData);
 
             // if there are no questions
-            if(questionData.length === 0) {
+            if (questionData.length === 0) {
                 console.log("There are no questions in campaigns related to this branchID");
                 const newQuestion = {
                     "campaignID": "0",
@@ -404,7 +404,7 @@ const UserFeedbackInput = () => {
         const endIndex = endIndexes[currentPage - 1] + 1;
         //console.log("start:", startIndex, " end:", endIndex);
         return questions.slice(startIndex, endIndex).map(question => (
-            <FeedbackContainer key={question.questionID} question={question} onFeedbackChange={handleFeedbackChange} />
+            <FeedbackContainer class="feedback-container" key={question.questionID} question={question} onFeedbackChange={handleFeedbackChange} />
         ));
     };
 
@@ -415,18 +415,11 @@ const UserFeedbackInput = () => {
                     <h3>Branch: {branchLocation}</h3>
                     <h3>Teller ID: {tellerPositionID}</h3>
                 </div>
-                <div className="logo">
-                    <img src={welcomeData.image} alt="FeedTrack logo" className="logo-image" />
-                </div>
+            
                 <div className="feedback-section">{renderQuestions()}</div>
                 {showThankYouMessage && (
-                    <div className="thankYouScreenContainer">
+                    <div className="thankYouScreenContainer" style={{ backgroundImage: `url(${thankYouData.image})` }}>
                         <div className="logo">
-                            <img
-                                src={thankYouData.image}
-                                className="logo-image"
-                                alt="FeedTrack logo"
-                            />
                             <h1>{thankYouData.message}</h1>
                         </div>
                     </div>

@@ -1,19 +1,18 @@
+.feedbackUserInputContainer {
+  background-image: url("ty3.png");
+}
+
 .feedbackUserInputContainer .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   height: 100vh;
   padding: 20px;
 }
 
 .feedbackUserInputContainer .info {
-  margin-bottom: 20px;
-  filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
   text-align: center;
   top: 0;
-  margin-left: 50%;
-  position: fixed;
 }
 
 .feedbackUserInputContainer .logo {
@@ -53,9 +52,18 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.feedback-container {
+  background-color: rgba(255, 255, 255, 0.87); /* poluprozirna pozadina */
+  border-radius: 10px; /* Zaobljeni rubovi */
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sjenčanje */
 }
 
 .feedbackUserInputContainer button {
@@ -74,12 +82,14 @@
 
 .feedbackUserInputContainer .negation::before {
   content: "X";
-  color: red; /* Crvena boja za negaciju */
+  color: red;
+  /* Crvena boja za negaciju */
 }
 
 .feedbackUserInputContainer .confirmation::before {
   content: "✓";
-  color: green; /* Zelena boja za potvrdu */
+  color: green;
+  /* Zelena boja za potvrdu */
 }
 
 .thankYouScreenContainer {
@@ -87,22 +97,22 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: fixed; /* Promijenjeno u fixed */
+  position: fixed;
+  /* Promijenjeno u fixed */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 105, 180, 1); /* Roza boja s prozirnošću 1 (nepostojeca) */
-  z-index: 9999; /* Visok z-index kako bi bio iznad ostalog sadržaja */
+  background-color: rgba(255, 105, 180, 1);
+  /* Roza boja s prozirnošću 1 (nepostojeca) */
+  z-index: 9999;
+  /* Visok z-index kako bi bio iznad ostalog sadržaja */
   padding: 20px;
-  box-sizing: border-box; /* Dodano kako bi padding bio uračunat u dimenzije */
+  box-sizing: border-box;
+  /* Dodano kako bi padding bio uračunat u dimenzije */
 }
 
-.thankYouScreenContainer .info {
-  margin-bottom: 20px;
-  filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2));
-  text-align: center;
-}
+
 
 .thankYouScreenContainer .logo {
   margin-top: 75px;
@@ -121,23 +131,16 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('ty1.png'); /* Dodajemo pozadinu */
-  background-size: cover; /* Omogućuje da se slika popuni cijeli ekran */
+  background-image: url('ty1.png');
+  /* Dodajemo pozadinu */
+  background-size: cover;
+  /* Omogućuje da se slika popuni cijeli ekran */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999; /* Postavljamo visok z-index kako bi bili sigurni da će biti iznad ostalog sadržaja */
+  z-index: 999;
+  /* Postavljamo visok z-index kako bi bili sigurni da će biti iznad ostalog sadržaja */
 }
-/*
-.logo {
-  text-align: center;
-}
-
-.logo-image {
-  max-width: 200px;
-  height: auto;
-}
-*/
 
 /* Dodatni stil za responzivnost */
 @media screen and (max-width: 768px) {
@@ -157,6 +160,7 @@
     margin: 0 8px;
     font-size: 1.5em;
   }
+
   .thankYouScreenContainer {
     padding: 10px;
   }
