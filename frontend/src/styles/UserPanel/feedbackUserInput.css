@@ -46,7 +46,16 @@
 }
 
 .feedbackUserInputContainer .smiley-feedback span.clicked {
-  animation: pulse 1s infinite;
+  animation: rotate 1s infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .feedbackUserInputContainer button {
@@ -61,6 +70,16 @@
 
 .feedbackUserInputContainer button:hover {
   background-color: #0056b3;
+}
+
+.feedbackUserInputContainer .negation::before {
+  content: "X";
+  color: red; /* Crvena boja za negaciju */
+}
+
+.feedbackUserInputContainer .confirmation::before {
+  content: "✓";
+  color: green; /* Zelena boja za potvrdu */
 }
 
 .thankYouScreenContainer {

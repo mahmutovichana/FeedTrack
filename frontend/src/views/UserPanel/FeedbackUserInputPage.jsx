@@ -45,45 +45,23 @@ const UserFeedbackInput = () => {
 
     // Using values stored in localStorage
     const branchID = localStorage.branchPositionID;
-    const tellerPositionID = localStorage.getItem("tellerPositionID");
-    const storedBranchLocation = localStorage.getItem("storedBranchLocation");
+    const tellerPositionID = localStorage.getItem('tellerPositionID');
+    const storedBranchLocation = localStorage.getItem('storedBranchLocation');
+    const [pages, setPages] = useState([]);
+    const [startIndexes, setStartIndexes] = useState([]);
+    const [endIndexes, setEndIndexes] = useState([]);
 
-    let campaignIds; // ids of all campaigns current branch is associated with
-
-    // Function to fetch campaign ID for a single campaign name
-    const fetchCampaignId = async (name) => {
+    //function to fetch questions for required branchID with all relevant info
+    const fetchQuestionsByBranchId = async (branchID) => {
         try {
-            const response = await fetch(
-                `${deployURLs.backendURL}/api/campaign/view/name/${name}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.token}`,
-                    },
+            const response = await fetch(`${deployURLs.backendURL}/api/branchCampaigns/view/${branchID}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.token}`
                 }
             );
             const data = await response.json();
-            return data.id; // Return the campaign ID
-        } catch (error) {
-            console.error("Problem fetching campaign ids:", error);
-            return null;
-        }
-    };
-
-    // Function to fetch questions for a campaign via campaign ID
-    const fetchQuestionsByCampaignId = async (campaignId) => {
-        try {
-            const response = await fetch(
-                `${deployURLs.backendURL}/api/campaignQuestion/byCampaignID/${campaignId}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.token}`,
-                    },
-                }
-            );
-            const data = await response.json();
-            return data; // Return the questions for the campaign ID
+            return data; // Return the questions for the branch ID
         } catch (error) {
             console.error("Problem fetching questions:", error);
             return null;
@@ -91,46 +69,144 @@ const UserFeedbackInput = () => {
     };
 
     async function fetchQuestionsFromDatabase() {
-        const campaignOrderMapString = localStorage.getItem("campaignOrderMap");
-        const campaignOrderMap = campaignOrderMapString
-            ? JSON.parse(campaignOrderMapString)
-            : {};
-        const campaignNames = campaignOrderMap[branchID] || [];
-        // Create an array to store promises for fetching campaign IDs
-        const fetchPromises = campaignNames.map((name) => fetchCampaignId(name));
-        // Execute all fetch requests concurrently using Promise.all
-        campaignIds = await Promise.all(fetchPromises);
-        console.log("idevi kampanja: " + campaignIds);
-        // Check if campaignIds array is empty - means order of campaigns for the branch
-        // wasn't defined, but we should fetch questions from that branch's campaigns anyway
-        if (campaignIds.length === 0) {
-            try {
-                const response = await fetch(
-                    `${deployURLs.backendURL}/api/branchCampaign/byBranchID/${branchID}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${localStorage.token}`,
-                        },
-                    }
-                );
-                const data = await response.json();
-                // Extract array of IDs from response object
-                campaignIds = data.map((item) => item.id);
-            } catch (error) {
-                console.error("Problem fetching campaign IDs:", error);
+        try {
+            const questionDataPromise = await fetchQuestionsByBranchId(branchID);
+            let questionData = await Promise.all(questionDataPromise);
+            //console.log("Question data:",questionData);
+
+            // if there are no questions
+            if(questionData.length === 0) {
+                console.log("There are no questions in campaigns related to this branchID");
+                const newQuestion = {
+                    "campaignID": "0",
+                    "questionID": "0",
+                    "cname": "Default Campaign",
+                    "qname": "How would you rate our service?",
+                    "branchID": branchID,
+                    "questionsperpage": "1",
+                    "answerLevel": "3"
+                };
+                questionData.push(newQuestion);
             }
+
+            const campaignOrderMapString = localStorage.getItem('campaignOrderMap');
+            const campaignOrderMap = campaignOrderMapString ? JSON.parse(campaignOrderMapString) : {};
+            const campaignNames = campaignOrderMap[branchID] || [];
+            //console.log("campaignNames: ", campaignNames);
+
+            // If campaignNames is empty, we add the campaign names from questionData
+            if (campaignNames.length === 0 && questionData.length > 0) {
+                // We add first cname to campaignNames
+                campaignNames.push(questionData[0].cname);
+
+                // We iterare through remaining elements of questionData to find different cnames and add them to campaignNames
+                questionData.forEach((item, index) => {
+                    if (index !== 0 && !campaignNames.includes(item.cname)) {
+                        campaignNames.push(item.cname);
+                    }
+                });
+            }
+
+            // Definirajte funkciju za izvlačenje vrijednosti na osnovu redoslijeda iz campaignNames
+            function extractValuesBasedOnOrder(data, order) {
+                const extractedValues = [];
+                order.forEach(cname => {
+                    const matchingObject = data.find(obj => obj.cname === cname);
+                    if (matchingObject) {
+                        extractedValues.push(matchingObject.questionsperpage);
+                    }
+                });
+                return extractedValues;
+            }
+
+            // Nakon što dobijete questionData i campaignNames, pozovite funkciju
+            const extractedValues = extractValuesBasedOnOrder(questionData, campaignNames);
+
+            // Ispisivanje rezultata
+            //console.log("exctracted values:",extractedValues);
+
+
+            // Create an object to store the sizes of each campaign
+            const campaignSizes = {};
+
+            // Count the number of questions for each campaign
+            questionData.forEach(question => {
+                const cname = question.cname;
+                if (campaignSizes[cname] === undefined) {
+                    campaignSizes[cname] = 1;
+                } else {
+                    campaignSizes[cname]++;
+                }
+            });
+            // Create an array of sizes in the order of campaignNames
+            const sizes = campaignNames.map(cname => campaignSizes[cname] || 0);
+
+            function napraviNoviNiz(Niz1, Niz2) {
+                const NoviNiz = [];
+
+                for (let i = 0; i < Niz1.length; i++) {
+                    const broj_ponavljanja = Math.floor(Niz1[i] / Niz2[i]);
+                    const ostatak = Niz1[i] % Niz2[i];
+
+                    // Dodajemo elemente broj_ponavljanja puta
+                    for (let j = 0; j < broj_ponavljanja; j++) {
+                        NoviNiz.push(Niz2[i]);
+                    }
+
+                    // Dodajemo ostatak ako postoji
+                    if (ostatak > 0) {
+                        NoviNiz.push(ostatak);
+                    }
+                }
+
+                return NoviNiz;
+            }
+
+            // Testiranje funkcije
+            const Niz1 = [1, 4, 4];
+            const Niz2 = [3, 3, 1];
+            //const NoviNiz = napraviNoviNiz(Niz1, Niz2);
+            const NoviNiz = napraviNoviNiz(sizes, extractedValues); //expecting 4 4 2 1 1
+            //console.log("NoviNiz:",NoviNiz); // Rezultat bi trebao biti [3, 3, 2, 3, 1, 1, 1, 1, 1]
+
+            // Initializing the arrays startIndex and endIndex
+            const startIndex = [0];
+            const endIndex = [NoviNiz[0] - 1];
+
+            // Filling the arrays startIndex and endIndex
+            for (let i = 1; i < NoviNiz.length; i++) {
+                startIndex[i] = parseInt(startIndex[i - 1]) + parseInt(NoviNiz[i - 1]);
+                endIndex[i] = parseInt(endIndex[i - 1]) + parseInt(NoviNiz[i]);
+            }
+
+            //console.log("startIndex:", startIndex);
+            //console.log("endIndex:", endIndex);
+
+            // Set the sizes state
+            setPages(NoviNiz);
+            //console.log("sizes:", sizes);
+            setStartIndexes(startIndex);
+            setEndIndexes(endIndex);
+
+            // Function to sort objects based on the desired order array
+            const sortByDesiredOrder = (a, b) => {
+                return campaignNames.indexOf(a.cname) - campaignNames.indexOf(b.cname);
+            };
+
+            // Sorting the array of objects
+            questionData.sort(sortByDesiredOrder);
+
+            // Printing the sorted array of objects
+            //console.log("sorted:", questionData);
+
+            questionData = questionData.flat();
+            setQuestions(questionData);
+            //console.log("questions by each campaign: " + JSON.stringify(questionData));
+        } catch (error) {
+            console.error("Problem fetching questions:", error);
         }
-        const questionPromises = campaignIds.map((campaignId) =>
-            fetchQuestionsByCampaignId(campaignId)
-        );
-        let questionsByCampaign = await Promise.all(questionPromises);
-        questionsByCampaign = questionsByCampaign.flat();
-        setQuestions(questionsByCampaign);
-        console.log(
-            "questions by each campaign: " + JSON.stringify(questionsByCampaign)
-        );
     }
+
     /*
           this is only for demonstration purposes new route for
           thankYouData needs to be made and page for editing that data also
@@ -151,9 +227,7 @@ const UserFeedbackInput = () => {
     //thankYouData.image = "FeedTrack logo";
 
     useEffect(() => {
-        /*
-         * Inside of this useEffect thankYouData should be fetched
-         */
+        console.log("I'm in");
         localStorage.setItem("pageSize", pageSize.toString());
         fetch(`${deployURLs.backendURL}/api/welcomeData`, {
             method: "GET",
@@ -167,7 +241,6 @@ const UserFeedbackInput = () => {
             });
         setBranchLocation(storedBranchLocation);
         setSelectedTellerID(tellerPositionID);
-
         fetch(`${deployURLs.backendURL}/api/thankYouData`, {
             method: "GET",
         })
@@ -178,18 +251,20 @@ const UserFeedbackInput = () => {
             .catch(() => {
                 setThankYouData({ ...thankYouData, message: "Hello World!" });
             });
+        // Fetch questions from database
         fetchQuestionsFromDatabase();
+
     }, [currentPage, pageSize]);
 
     useEffect(() => {
         if (timer) clearInterval(timer); // Reset previous timer
 
         // Define time limit based on number of questions per page
-        const questionsPerPage = pageSize;
-        let timeLimitPerPage = questionsPerPage * 10; // For example, set 10 seconds per question
+        const questionsPerPage = pages[currentPage - 1]; // Updated to use pageSize from pages array
+        let timeLimitPerPage = questionsPerPage * 4; // For example, set 6 seconds per question
 
         // Add extra 5 seconds on last page
-        if (currentPage === Math.ceil(questions.length / pageSize)) {
+        if (currentPage === Math.ceil(pages.length)) {
             timeLimitPerPage += 5;
         }
 
@@ -209,7 +284,8 @@ const UserFeedbackInput = () => {
         setTimer(interval);
 
         return () => clearInterval(interval); // Reset timer when component unmounts or when user submits answers
-    }, [currentPage, pageSize, questions.length]);
+    }, [currentPage, pageSize, pages]);
+
 
     useEffect(() => {
         // Check if remaining time has expired and redirect user if so
@@ -262,23 +338,14 @@ const UserFeedbackInput = () => {
             }
         }
         setFeedbacks(updatedFeedbacks);
+        const startIndex = startIndexes[currentPage - 1];
+        const endIndex = endIndexes[currentPage - 1] + 1;
+        const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.questionID));
 
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, questions.length);
-        const allQuestionsAnswered = questions
-            .slice(startIndex, endIndex)
-            .every((q) => updatedFeedbacks.some((f) => f.questionID === q.id));
-
-        if (
-            allQuestionsAnswered &&
-            currentPage < Math.ceil(questions.length / pageSize)
-        ) {
+        if (allQuestionsAnswered && currentPage < (pages.length)) {
             handlePageChange(currentPage + 1);
         }
-        if (
-            allQuestionsAnswered &&
-            currentPage === Math.ceil(questions.length / pageSize)
-        ) {
+        if (allQuestionsAnswered && currentPage === (pages.length)) {
             handleSubmit(updatedFeedbacks);
         }
     };
@@ -320,11 +387,9 @@ const UserFeedbackInput = () => {
                     console.error("Failed to submit feedback:", response.statusText);
                 }
             });
-            // Optionally, reset feedbacks state after successful submission
-            // setFeedbacks([]);/*
             const timeout = setTimeout(() => {
-                navigate("/welcomeScreen"); // Zamijenite '/redirectedPage' sa putanjom na koju želite preusmjeriti korisnika
-            }, 5000); // 10000 milisekundi = 10 sekundi*/
+                navigate('/welcomeScreen');
+            }, 5000); // 1000 miliseconds = 1 second*/
         } catch (error) {
             console.error("Error submitting feedbacks:", error);
         }
@@ -335,17 +400,12 @@ const UserFeedbackInput = () => {
     };
 
     const renderQuestions = () => {
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, questions.length);
-        return questions
-            .slice(startIndex, endIndex)
-            .map((question) => (
-                <FeedbackContainer
-                    key={question.id}
-                    question={question}
-                    onFeedbackChange={handleFeedbackChange}
-                />
-            ));
+        const startIndex = startIndexes[currentPage - 1];
+        const endIndex = endIndexes[currentPage - 1] + 1;
+        //console.log("start:", startIndex, " end:", endIndex);
+        return questions.slice(startIndex, endIndex).map(question => (
+            <FeedbackContainer key={question.questionID} question={question} onFeedbackChange={handleFeedbackChange} />
+        ));
     };
 
     return (
@@ -382,25 +442,51 @@ const FeedbackContainer = ({ question, onFeedbackChange }) => {
 
     const handleSmileyClick = (level) => {
         setRating(level);
-        onFeedbackChange(question.id, level);
+        onFeedbackChange(question.questionID, level);
     };
 
     return (
         <div className="feedback-container">
-            <h3>{question.name}</h3>
-            <SmileyFeedback onClick={handleSmileyClick} />
+            <h3>{question.qname}</h3>
+            <SmileyFeedback onClick={handleSmileyClick} answerLevel={question.answerLevel} />
         </div>
     );
 };
 
-const SmileyFeedback = ({ onClick }) => {
-    const smileys = [
-        { level: 1, color: "red", symbol: "😡" },
-        { level: 2, color: "orange", symbol: "😐" },
-        { level: 3, color: "yellow", symbol: "😊" },
-        { level: 4, color: "lightgreen", symbol: "😃" },
-        { level: 5, color: "green", symbol: "😍" },
-    ];
+const SmileyFeedback = ({ onClick, answerLevel }) => {
+    let smileys = [];
+    switch (answerLevel) {
+        case "2":
+            smileys = [
+                { level: 1, color: "red", symbol: "X", className: "negation" },
+                { level: 5, color: "green", symbol: "✓", className: "confirmation" },
+            ];
+            break;
+        case "3":
+            smileys = [
+                { level: 1, color: "red", symbol: "🙁" },
+                { level: 3, color: "orange", symbol: "😐" },
+                { level: 5, color: "yellow", symbol: "😊" },
+            ];
+            break;
+        case "4":
+            smileys = [
+                { level: 1, color: "red", symbol: "🙁" },
+                { level: 2, color: "orange", symbol: "😐" },
+                { level: 4, color: "yellow", symbol: "😊" },
+                { level: 5, color: "lightgreen", symbol: "😃" },
+            ];
+            break;
+        default:
+            // Default smileys if answerLevel is not specified or invalid
+            smileys = [
+                { level: 1, color: "red", symbol: "😡" },
+                { level: 2, color: "orange", symbol: "😐" },
+                { level: 3, color: "yellow", symbol: "😊" },
+                { level: 4, color: "lightgreen", symbol: "😃" },
+                { level: 5, color: "green", symbol: "😍" },
+            ];
+    }
 
     const [clickedIndex, setClickedIndex] = useState(null);
 

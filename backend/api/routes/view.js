@@ -7,6 +7,11 @@ router.get('/campaign/view/:id', async (req, res) => {
     catch (error) { handleError(res, error); }
 });
 
+router.get('/branchCampaigns/view/:id', async (req, res) => {
+    try { res.json(await getBranchCampaignsById(req.params.id)); }
+    catch (error) { handleError(res, error); }
+});
+
 router.get('/branch/view', async (req, res) => {
     try { res.json(await getView("branch_view")); }
     catch (error) { handleError(res, error); }
@@ -51,6 +56,19 @@ const getTestById = async (id) => {
     }
 };
 
+const getBranchCampaignsById = async (id) => {
+    try {
+        const query = `SELECT * FROM "branchcampaigns_view" WHERE "branchID" = $1`;
+        console.log("getById query:", query, "id:", id);
+        const { rows } = await db.query(query, [id]);
+        return rows;
+    } catch (error) {
+        // Handle any errors that might occur during the database query
+        console.error("Error in getBranchCampaignsById:", error);
+        throw error; // Rethrow the error to be handled by the calling code
+    }
+};
+
 const getCampaignByLocation = async (location) => {
     try {
         const query = `SELECT "campaignID" FROM "Branch" WHERE location = $1`;
@@ -81,7 +99,7 @@ const getCampaignsByBranchId = async (branchID) => {
         const { rows } = await db.query(query, [branchID]);
         return rows;
     } catch (error) {
-        throw error; 
+        throw error;
     }
 };
 
@@ -93,14 +111,14 @@ router.get('/branchCampaign/byBranchID/:branchID', async (req, res) => {
 // Fetch all questions from CampaignQuestion table via their common campaignID foreign key
 const getQuestionsByCampaignId = async (campaignID) => {
     try {
-        const query = `SELECT Q.id, Q.name
+        const query = `SELECT Q.*
                        FROM "CampaignQuestion" AS CQ
                        JOIN "Question" AS Q ON CQ."questionID" = Q.id
                        WHERE CQ."campaignID" = $1`;
         const { rows } = await db.query(query, [campaignID]);
         return rows;
     } catch (error) {
-        throw error; 
+        throw error;
     }
 };
 
@@ -134,7 +152,7 @@ const getCampaignIdsByQuestionId = async (campaignID) => {
         const { rows } = await db.query(query, [campaignID]);
         return rows;
     } catch (error) {
-        throw error; 
+        throw error;
     }
 };
 
