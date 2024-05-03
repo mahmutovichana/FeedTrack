@@ -228,62 +228,6 @@ const Notes = () => {
     setTeaserFile(e.target.files[0]);
   };
 
-  const handleWelcomeDataUpload = async () => {
-    let compressedFile;
-
-    try {
-      compressedFile = await imageCompression(file, {
-        maxWidthOrHeight: 200,
-      });
-    } catch (err) {
-      toast.error("Error: File is required");
-      return;
-    }
-
-    try {
-      const base64 = await convertToBase64(compressedFile);
-
-      const response = await fetch(`${deployURLs.backendURL}/api/welcomeData`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image: base64, message: welcomeMessage }),
-      });
-      const data = await response.json();
-      console.log(data);
-      if (response.ok) {
-        toast.success("Successfully changed welcome notes!");
-        setFile(null);
-        setWelcomeMessage("");
-      } else toast.error("Error: " + data.message);
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  const handleThankYouDataUpload = async () => {
-    try {
-      const response = await fetch(
-        `${deployURLs.backendURL}/api/thankYouData`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message: thankYouMessage }),
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-      if (response.ok) {
-        toast.success("Successfully changed thank you notes!");
-        setThankYouMessage("");
-      } else toast.error("Error: " + data.message);
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
   const handleSelectButton = async () => {
     localStorage.setItem('teaserVideo', teaserData[selectedTeaser].teaser);
     toast.success("Teaser selected!");
@@ -535,7 +479,7 @@ const Notes = () => {
         {welcomeData.image && <img src={welcomeData.image} alt="Welcome background" />}
         <h3>Thank You data</h3>
         {thankYouData.message && <p>Thank you message: {thankYouData.message}</p>}
-        {thankYouData.image && <img src={thankYouData.image} alt="Thank you background" />}
+        {thankYouData.image && <img className="currentDataImg" src={thankYouData.image} alt="Thank you background"/>}
       </div>
       <ToastContainer />
     </div>
