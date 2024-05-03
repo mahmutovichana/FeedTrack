@@ -62,6 +62,7 @@ const Notes = () => {
   const [showTeaserDelete, setShowTeaserDelete] = useState(false);
   const [welcomeData, setWelcomeData] = useState({ image: null, message: "" });
   const [thankYouData, setThankYouData] = useState({ image: null, message: "" });
+  const [teaserImage, setTeaserImage] = useState("");
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -90,9 +91,14 @@ const Notes = () => {
   };
 
   useEffect(() => {
-    fetchTeaserData();
-    fetchData("welcomeData", setWelcomeData);
-    fetchData("thankYouData", setThankYouData);
+    const fetch = async () => {
+      await fetchTeaserData();
+      await fetchData("welcomeData", setWelcomeData);
+      await fetchData("thankYouData", setThankYouData);
+      const teaserImage = await retrieveTeaserImage();
+      setTeaserImage(teaserImage);
+    };
+    fetch();
   }, []);
 
   useEffect(() => {
@@ -320,6 +326,28 @@ const Notes = () => {
     }
   };
 
+  const retrieveTeaserImage = async () => {
+    try {
+      const response = await fetch(`${deployURLs.backendURL}/api/teaserData/getImage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ teaser: localStorage.getItem("teaserVideo")}),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        return responseData[0].image;
+      } else {
+        toast.error("Error: " + responseData.message);
+      }
+    } catch (err) {
+      console.error("Error:", err.message);
+    }
+  };
+
   // when updating teaser, populate teaser link and name input field with existing value
   useEffect(() => {
     if (showTeaserUpdate) {
@@ -501,7 +529,7 @@ const Notes = () => {
       <div>
         <h2>Current data</h2>
         <h3>Teaser Screen</h3>
-        {teaserLink && <img src={teaserLink} alt="Teaser Screen" />}
+        {teaserImage && <img className="currentDataImg" src={teaserImage} alt="Teaser Screen" />}
         <h3>Welcome data</h3>
         {welcomeData.message && <p>Welcome message: {welcomeData.message}</p>}
         {welcomeData.image && <img src={welcomeData.image} alt="Welcome background" />}
