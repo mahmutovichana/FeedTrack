@@ -50,3 +50,25 @@ button {
 * {
   font-family: 'Montserrat';
 }
+
+.number-of-answers-label {
+  color: white;
+  margin-left: 10px;
+  margin-top: -20px;
+}
+
+.number-of-answers-select {
+  color: white;
+  background-color: transparent;
+  border: 1px solid white;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.number-of-answers-select option {
+  color: black;
+}
+
+.questionInput{
+  margin-bottom: 25px;
+}

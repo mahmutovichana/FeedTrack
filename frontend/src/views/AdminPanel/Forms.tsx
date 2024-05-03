@@ -16,11 +16,11 @@ const Forms = () => {
     [key: string]: any;
   }
 
-  const [questions, setQuestions] = useState([{ text: '' }]);
+  const [questions, setQuestions] = useState([{ text: '', answerLevel: 5 }]);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
 
   const handleAddQuestion = () => {
-    setQuestions([...questions, { text: '' }]);
+    setQuestions([...questions, { text: '', answerLevel: 5 }]);
   };
 
   const handleQuestionChange = (index, newText) => {
@@ -29,8 +29,14 @@ const Forms = () => {
     setQuestions(updatedQuestions);
   };
 
+  const handleAnswerLevelChange = (index, newValue) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index].answerLevel = newValue;
+    setQuestions(updatedQuestions);
+  };
+
   const handleSubmit = async () => {
-    
+
     const questionTexts = new Set<string>();
     setErrorMessages([]);
 
@@ -38,14 +44,14 @@ const Forms = () => {
       console.error('Please select a campaign.');
       return;
     }
-  
+
     for (const question of questions) {
       if (question.text.trim() === '') {
         console.error('All questions must be filled in.');
         return;
       }
     }
-  
+
     // check if all provided questions are unique
     for (const question of questions) {
       if (questionTexts.has(question.text)) {
@@ -54,7 +60,7 @@ const Forms = () => {
       }
       questionTexts.add(question.text);
     }
-  
+
     // if the questions are unique, we add them to the server
     for (const question of questions) {
       try {
@@ -66,18 +72,18 @@ const Forms = () => {
           },
           body: JSON.stringify({ name: question.text })
         });
-  
+
         if (!response.ok) {
           throw new Error(`Error checking if the question exists: ${response.status}`);
         }
-  
+
         const existingQuestion = await response.json();
-  
+
         if (existingQuestion.question) {
           toast.error(`The question "${question.text}" already exists in the database.`);
           continue; // we continue if the question already exists
         }
-  
+
         // if the question does not exist in the database, then we add it
         const questionResponse = await fetch(`${deployURLs.backendURL}/api/questions`, {
           method: 'POST',
@@ -85,16 +91,17 @@ const Forms = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            name: question.text
+            name: question.text,
+            answerLevel: question.answerLevel
           })
         });
-  
+
         if (!questionResponse.ok) {
           throw new Error(`Error adding question "${question.text}" to the database: ${questionResponse.status}`);
         }
-  
+
         const questionData = await questionResponse.json();
-  
+
         // after adding the question, we add the relation between the question and its campaign
         const campaignQuestionResponse = await fetch(`${deployURLs.backendURL}/api/campaignQuestions`, {
           method: 'POST',
@@ -106,7 +113,7 @@ const Forms = () => {
             questionID: questionData.id
           })
         });
-  
+
         if (!campaignQuestionResponse.ok) {
           throw new Error(`Error adding question "${question.text}" to the campaign: ${campaignQuestionResponse.status}`);
         }
@@ -117,7 +124,7 @@ const Forms = () => {
       }
     }
   };
-  
+
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
 
@@ -129,20 +136,20 @@ const Forms = () => {
         'Content-Type': 'application/json'
       }
     })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Network response was not ok');
-        }
-      })
-      .then(data => {
-        console.log('Data received successfully:', data);
-        setCampaigns(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Network response was not ok');
+          }
+        })
+        .then(data => {
+          console.log('Data received successfully:', data);
+          setCampaigns(data);
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
 
   }, []);
 
@@ -151,7 +158,7 @@ const Forms = () => {
     setSelectedCampaign(selectedCampaignValue);
     console.log("ovo je selectedCampaign: " + selectedCampaignValue);
   };
-  
+
 
   const handleRemoveQuestion = (index) => {
     const updatedQuestions = [...questions];
@@ -160,55 +167,68 @@ const Forms = () => {
   };
 
   return (
-    <div className='formsContainer'>
-      <h1>Create New Question Set</h1>
-      <Box sx={{ minWidth: 120 }}>
-        <FormControl fullWidth>
-          <Select
-            value={selectedCampaign || ""}
-            onChange={handleUserChange}
-            displayEmpty
-          >
-            <MenuItem value="" disabled>Select campaign</MenuItem>
-            {campaigns.map((campaign) => (
-              <MenuItem key={campaign.id} value={campaign.id}>
-                {campaign.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      {questions.map((question, index) => (
-        <div key={index} className="questionInput">
-          <input
-            type="text"
-            placeholder={`Enter question ${index + 1}`}
-            value={question.text}
-            onChange={(e) => handleQuestionChange(index, e.target.value)}
-          />
-          <img
-            src="/delete.svg"
-            alt="Delete"
-            onClick={() => handleRemoveQuestion(index)}
-            style={{ cursor: 'pointer', marginLeft: '5px' }}
-          />
-        </div>
-      ))}
-      <button onClick={handleAddQuestion}>Add Question</button>
-      <button onClick={handleSubmit}>Submit</button>
-      {!selectedCampaign && (
-        <p style={{ color: 'red' }}>Please select a campaign.</p>
-      )}
-      {questions.some(question => question.text.trim() === '') && (
-        <p style={{ color: 'red' }}>All questions must be filled in!</p>
-      )}
-      {errorMessages.map((errorMessage, index) => (
-        <p key={index} style={{ color: 'red' }}>{errorMessage}</p>
-      ))}
-      <ToastContainer />
-    </div>
+      <div className='formsContainer'>
+        <h1>Create New Question Set</h1>
+        <Box sx={{ minWidth: 120 }}>
+          <FormControl fullWidth>
+            <Select
+                value={selectedCampaign || ""}
+                onChange={handleUserChange}
+                displayEmpty
+            >
+              <MenuItem value="" disabled>Select campaign</MenuItem>
+              {campaigns.map((campaign) => (
+                  <MenuItem key={campaign.id} value={campaign.id}>
+                    {campaign.name}
+                  </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        {questions.map((question, index) => (
+            <div key={index} className="questionInput">
+              <input
+                  type="text"
+                  placeholder={`Enter question ${index + 1}`}
+                  value={question.text}
+                  onChange={(e) => handleQuestionChange(index, e.target.value)}
+              />
+              <FormControl>
+                <label className="number-of-answers-label">Number of answers</label> {/* Label for the dropdown list */}
+                <Select
+                    value={question.answerLevel}
+                    onChange={(e) => handleAnswerLevelChange(index, e.target.value)}
+                    className="number-of-answers-select" // Apply CSS class to the Select component
+                >
+                  <MenuItem value={2}>2 (1-2)</MenuItem>
+                  <MenuItem value={3}>3 (1-3)</MenuItem>
+                  <MenuItem value={4}>4 (1-4)</MenuItem>
+                  <MenuItem value={5}>5 (1-5)</MenuItem>
+                </Select>
+              </FormControl>
+              <img
+                  src="/delete.svg"
+                  alt="Delete"
+                  onClick={() => handleRemoveQuestion(index)}
+                  style={{ cursor: 'pointer', marginLeft: '5px' }}
+              />
+            </div>
+        ))}
+        <button onClick={handleAddQuestion}>Add Question</button>
+        <button onClick={handleSubmit}>Submit</button>
+        {!selectedCampaign && (
+            <p style={{ color: 'red' }}>Please select a campaign.</p>
+        )}
+        {questions.some(question => question.text.trim() === '') && (
+            <p style={{ color: 'red' }}>All questions must be filled in!</p>
+        )}
+        {errorMessages.map((errorMessage, index) => (
+            <p key={index} style={{ color: 'red' }}>{errorMessage}</p>
+        ))}
+        <ToastContainer />
+      </div>
   );
-  
+
 };
 
 export default Forms;
