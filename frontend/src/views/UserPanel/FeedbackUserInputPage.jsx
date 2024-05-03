@@ -59,7 +59,7 @@ const UserFeedbackInput = () => {
                 headers: {
                     'Authorization': `Bearer ${localStorage.token}`
                 }
-            );
+        });
             const data = await response.json();
             return data; // Return the questions for the branch ID
         } catch (error) {
