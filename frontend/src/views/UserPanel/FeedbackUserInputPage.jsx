@@ -24,15 +24,15 @@ function formatDate(timestamp) {
 
 const UserFeedbackInput = () => {
     const [pageSize, setPageSize] = useState(() => {
-        const storedPageSize = localStorage.getItem('pageSize');
+        const storedPageSize = localStorage.getItem("pageSize");
         return storedPageSize ? parseInt(storedPageSize) : 5;
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [feedbacks, setFeedbacks] = useState([]);
     const [questions, setQuestions] = useState([]);
     const [welcomeData, setWelcomeData] = useState({});
-    const [branchLocation, setBranchLocation] = useState('');
-    const [selectedTellerID, setSelectedTellerID] = useState('');
+    const [branchLocation, setBranchLocation] = useState("");
+    const [selectedTellerID, setSelectedTellerID] = useState("");
     const navigate = useNavigate();
     const [thankYouData, setThankYouData] = useState({});
 
@@ -59,7 +59,7 @@ const UserFeedbackInput = () => {
                 headers: {
                     'Authorization': `Bearer ${localStorage.token}`
                 }
-            });
+        });
             const data = await response.json();
             return data; // Return the questions for the branch ID
         } catch (error) {
@@ -208,31 +208,27 @@ const UserFeedbackInput = () => {
     }
 
     /*
-        this is only for demonstration purposes new route for
-        thankYouData needs to be made and page for editing that data also
-        */
+          this is only for demonstration purposes new route for
+          thankYouData needs to be made and page for editing that data also
+          */
     /*
-    fetch(`${deployURLs.backendURL}/api/welcomeData`, {
-        method: "GET",
-    })
-        .then((res) => res.json())
-        .then(({ image, message }) => {
-            //just the idea
-            //setThankYouData({ image, message });
-        })
-        .catch(() => {
-            setThankYouData({ ...thankYouData, message: "Thank you!" });
-        });*/
-
-
+      fetch(`${deployURLs.backendURL}/api/welcomeData`, {
+          method: "GET",
+      })
+          .then((res) => res.json())
+          .then(({ image, message }) => {
+              //just the idea
+              //setThankYouData({ image, message });
+          })
+          .catch(() => {
+              setThankYouData({ ...thankYouData, message: "Thank you!" });
+          });*/
 
     //thankYouData.image = "FeedTrack logo";
 
     useEffect(() => {
         console.log("I'm in");
-        /*
-        * Inside of this useEffect thankYouData should be fetched
-        */
+        localStorage.setItem("pageSize", pageSize.toString());
         fetch(`${deployURLs.backendURL}/api/welcomeData`, {
             method: "GET",
         })
@@ -245,10 +241,16 @@ const UserFeedbackInput = () => {
             });
         setBranchLocation(storedBranchLocation);
         setSelectedTellerID(tellerPositionID);
-        //this is hardcoded for now to have difference beside welcomeData
-        setThankYouData({ image: "FeedTrack logo", message: "Thank you!" });
-        localStorage.setItem("pageSize", pageSize.toString());
-
+        fetch(`${deployURLs.backendURL}/api/thankYouData`, {
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then(({ image, message }) => {
+                setThankYouData({ image, message });
+            })
+            .catch(() => {
+                setThankYouData({ ...thankYouData, message: "Hello World!" });
+            });
         // Fetch questions from database
         fetchQuestionsFromDatabase();
 
@@ -273,7 +275,7 @@ const UserFeedbackInput = () => {
 
         setRemainingTime(timeLimitPerPage);
         const interval = setInterval(() => {
-            setRemainingTime(prevTime => {
+            setRemainingTime((prevTime) => {
                 console.log("Remaining time:", prevTime); // Log remaining time to console
                 return prevTime - 1;
             });
@@ -290,41 +292,52 @@ const UserFeedbackInput = () => {
         if (remainingTime === 0) {
             clearInterval(timer); // Stop the timer
             // Redirect user to another page here
-            navigate('/welcomeScreen');
+            navigate("/welcomeScreen");
         }
     }, [remainingTime]);
 
     const handleFeedbackChange = async (questionID, level) => {
         const updatedFeedbacks = [...feedbacks];
-        const index = updatedFeedbacks.findIndex(item => item.questionID === questionID);
+        const index = updatedFeedbacks.findIndex(
+            (item) => item.questionID === questionID
+        );
         if (index !== -1) {
             updatedFeedbacks[index].rating = level;
         } else {
             try {
-
-                const response = await fetch(`${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.token}`
+                const response = await fetch(
+                    `${deployURLs.backendURL}/api/campaignQuestion/byQuestionID/${questionID}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${localStorage.token}`,
+                        },
                     }
-                });
+                );
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.length > 0) {
                         const questionCampaignID = data[0].campaignID;
-                        updatedFeedbacks.push({ questionID, rating: level, tellerPositionID, campaignID: questionCampaignID, date: formatDate(Date.now()) });
+                        updatedFeedbacks.push({
+                            questionID,
+                            rating: level,
+                            tellerPositionID,
+                            campaignID: questionCampaignID,
+                            date: formatDate(Date.now()),
+                        });
                     } else {
                         console.error(`No campaign found for question ID ${questionID}.`);
                     }
                 } else {
-                    console.error(`Failed to fetch campaign ID for question ID ${questionID}.`);
+                    console.error(
+                        `Failed to fetch campaign ID for question ID ${questionID}.`
+                    );
                 }
             } catch (error) {
                 console.error("Problem fetching campaign ID:", error);
             }
         }
         setFeedbacks(updatedFeedbacks);
-
         const startIndex = startIndexes[currentPage - 1];
         const endIndex = endIndexes[currentPage - 1] + 1;
         const allQuestionsAnswered = questions.slice(startIndex, endIndex).every(q => updatedFeedbacks.some(f => f.questionID === q.questionID));
@@ -339,9 +352,8 @@ const UserFeedbackInput = () => {
 
     const handleSubmit = async (updatedFeedbacks) => {
         try {
-
             // Log data being sent to console
-            updatedFeedbacks.forEach(feedback => {
+            updatedFeedbacks.forEach((feedback) => {
                 console.log("Data to be sent:", feedback);
             });
 
@@ -349,15 +361,18 @@ const UserFeedbackInput = () => {
             const allPromises = [];
 
             // Iterate over each feedback and create a promise for each request
-            updatedFeedbacks.forEach(feedback => {
-                const promise = fetch(`${deployURLs.backendURL}/api/feedbacks/insertFeedback`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.token}`
-                    },
-                    body: JSON.stringify(feedback)
-                });
+            updatedFeedbacks.forEach((feedback) => {
+                const promise = fetch(
+                    `${deployURLs.backendURL}/api/feedbacks/insertFeedback`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.token}`,
+                        },
+                        body: JSON.stringify(feedback),
+                    }
+                );
                 allPromises.push(promise); // Add the promise to the array
             });
             setShowThankYouMessage(true); // Show Thank You message after successful submission
@@ -366,7 +381,7 @@ const UserFeedbackInput = () => {
             const responses = await Promise.all(allPromises);
 
             // Check responses and handle errors if necessary
-            responses.forEach(response => {
+            responses.forEach((response) => {
                 if (!response.ok) {
                     // Handle error for failed request
                     console.error("Failed to submit feedback:", response.statusText);
@@ -375,7 +390,6 @@ const UserFeedbackInput = () => {
             const timeout = setTimeout(() => {
                 navigate('/welcomeScreen');
             }, 5000); // 1000 miliseconds = 1 second*/
-
         } catch (error) {
             console.error("Error submitting feedbacks:", error);
         }
@@ -395,27 +409,18 @@ const UserFeedbackInput = () => {
     };
 
     return (
-        <div className='feedbackUserInputContainer'>
+        <div className="feedbackUserInputContainer">
             <div className="container">
-                <div className='info'>
+                <div className="info">
                     <h3>Branch: {branchLocation}</h3>
                     <h3>Teller ID: {tellerPositionID}</h3>
                 </div>
                 <div className="logo">
-                    <img
-                        src={welcomeData.image}
-                        className="logo-image"
-                        alt="FeedTrack logo"
-                    />
+                    <img src={welcomeData.image} alt="FeedTrack logo" className="logo-image" />
                 </div>
-                <div className="feedback-section">
-                    {renderQuestions()}
-                </div>
+                <div className="feedback-section">{renderQuestions()}</div>
                 {showThankYouMessage && (
                     <div className="thankYouScreenContainer">
-                        <div className={"info"}>
-                            <h1>Thank you!</h1>
-                        </div>
                         <div className="logo">
                             <img
                                 src={thankYouData.image}
@@ -426,12 +431,13 @@ const UserFeedbackInput = () => {
                         </div>
                     </div>
                 )}
+
             </div>
         </div>
     );
 };
 
-const FeedbackContainer = ({question, onFeedbackChange}) => {
+const FeedbackContainer = ({ question, onFeedbackChange }) => {
     const [rating, setRating] = useState(null);
 
     const handleSmileyClick = (level) => {

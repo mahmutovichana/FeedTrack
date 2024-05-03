@@ -14,6 +14,7 @@ const adminRouter = require("./routes/admin");
 const branchesRouter = require("./routes/tables/branch");
 const campaignsRouter = require("./routes/tables/campaign");
 const feedbacksRouter = require("./routes/tables/feedback");
+const teaserDataRouter = require("./routes/tables/teaserData");
 const viewsRouter = require("./routes/view");
 
 app.use(
@@ -49,6 +50,7 @@ app.use("/api", branchesRouter);
 app.use("/api", campaignsRouter);
 app.use("/api", viewsRouter);
 app.use("/api", feedbacksRouter);
+app.use("/api", teaserDataRouter);
 
 const PORT = 5432;
 
