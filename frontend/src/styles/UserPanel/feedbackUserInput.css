@@ -1,6 +1,6 @@
-/* .feedbackUserInputContainer {
+.feedbackUserInputContainer {
   background-image: url("ty3.png");
-} */
+}
 
 .feedbackUserInputContainer .container {
   display: flex;
