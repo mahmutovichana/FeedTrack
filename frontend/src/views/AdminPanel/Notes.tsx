@@ -135,7 +135,7 @@ const Notes = () => {
     if (!videoRegex.test(teaserLink)) {
       toast.error("Please provide a valid video file name (\\ : / * ? \" < > | symbols are forbidden) with a supported extension (.mp4 .avi .mov .mkv .flv .wmv .mpg .mpeg .webm).");
       return;
-  }
+    }
     let compressedFile;
     try {
       compressedFile = await imageCompression(teaserFile, {
@@ -146,10 +146,10 @@ const Notes = () => {
     }
     try {
       let base64;
-      if(compressedFile){
+      if (compressedFile) {
         base64 = await convertToBase64(compressedFile);
       }
-      else{
+      else {
         base64 = "NoImgURL";
       }
       let url, method;
@@ -159,7 +159,7 @@ const Notes = () => {
       } else {
         url = `${deployURLs.backendURL}/api/teaserData`;
         method = "POST";
-      } 
+      }
       console.log("selected teaser: " + selectedTeaser);
       const response = await fetch(url, {
         method: method,
@@ -171,10 +171,10 @@ const Notes = () => {
       const data = await response.json();
       console.log(data);
       if (response.ok) {
-        if(showTeaserUpload){
+        if (showTeaserUpload) {
           toast.success("Successfully uploaded teaser!");
         }
-        else{
+        else {
           toast.success("Successfully updated teaser!");
         }
         setTeaserFile(null);
@@ -212,11 +212,11 @@ const Notes = () => {
     } catch (error) {
       console.error("Error deleting teaser:", error);
     }
-};
+  };
 
-const handleFileChange = (e, setData) => {
-  setData({ ...setData, image: e.target.files[0] });
-};
+  const handleFileChange = (e, setData) => {
+    setData({ ...setData, image: e.target.files[0] });
+  };
 
   const handleTeaserFileChange = (e) => {
     setTeaserFile(e.target.files[0]);
@@ -247,7 +247,7 @@ const handleFileChange = (e, setData) => {
       const data = await response.json();
       console.log(data);
       if (response.ok) {
-      toast.success("Successfully changed welcome notes!");
+        toast.success("Successfully changed welcome notes!");
         setFile(null);
         setWelcomeMessage("");
       } else toast.error("Error: " + data.message);
@@ -322,15 +322,15 @@ const handleFileChange = (e, setData) => {
 
   // when updating teaser, populate teaser link and name input field with existing value
   useEffect(() => {
-  if (showTeaserUpdate) {
-    setTeaserLink(teaserData[selectedTeaser]?.teaser);
-    setTeaserName(teaserData[selectedTeaser]?.name);
-  }
-  else{
-    setTeaserLink("");
-    setTeaserName("");
-  }
-}, [selectedTeaser, showTeaserUpdate]);
+    if (showTeaserUpdate) {
+      setTeaserLink(teaserData[selectedTeaser]?.teaser);
+      setTeaserName(teaserData[selectedTeaser]?.name);
+    }
+    else {
+      setTeaserLink("");
+      setTeaserName("");
+    }
+  }, [selectedTeaser, showTeaserUpdate]);
 
   return (
     <div className="notes">
@@ -364,7 +364,7 @@ const handleFileChange = (e, setData) => {
         <br />
         {(showTeaserUpload || showTeaserUpdate) && ( // Only show the upload section when showTeaserUpload or showTeaserUpdate is true
           <>
-          <label>
+            <label>
               Teaser name:{" "}
               <input
                 type="text"
@@ -398,7 +398,7 @@ const handleFileChange = (e, setData) => {
             <br />
             <div className="teaser-buttons-container">
               <button onClick={handleTeaserUpload}>Upload</button>
-              <button onClick={() => {setShowTeaserUpload(false); setShowTeaserUpdate(false);}}>Cancel</button>
+              <button onClick={() => { setShowTeaserUpload(false); setShowTeaserUpdate(false); }}>Cancel</button>
             </div>
           </>
         )}
@@ -410,7 +410,7 @@ const handleFileChange = (e, setData) => {
             <br />
             <div className="teaser-buttons-container">
               <button onClick={handleDeleteTeaser}>Yes</button>
-              <button onClick={() => {setShowTeaserDelete(false);}}>No</button>
+              <button onClick={() => { setShowTeaserDelete(false); }}>No</button>
             </div>
           </>
         )}
@@ -436,26 +436,32 @@ const handleFileChange = (e, setData) => {
             value={welcomeData.message}
             onChange={(e) => setWelcomeData({ ...welcomeData, message: e.target.value })}
           />
-          {welcomeData.message && (
-            <button onClick={() => setWelcomeData({ ...welcomeData, message: "" })}>X</button>
-          )}
+          {welcomeData.message && (<img
+            src="/delete.svg"
+            alt="Delete"
+            onClick={() => setWelcomeData({ ...welcomeData, message: "" })}
+            style={{ cursor: 'pointer', marginLeft: '5px' }}
+          />)}
         </label>
         <br />
         <label>
-          Upload image:{" "}
+          Image:{" "}
           <input
             type="file"
             accept=".jpeg, .png, .jpg, .svg"
             onChange={(e) => handleFileChange(e, setWelcomeData)}
           />
-          {welcomeData.image && (
-            <button onClick={() => setWelcomeData({ ...welcomeData, image: null })}>X</button>
-          )}
+          {welcomeData.image && (<img
+            src="/delete.svg"
+            alt="Delete"
+            onClick={() => setWelcomeData({ ...welcomeData, image: null })}
+            style={{ cursor: 'pointer', marginLeft: '5px' }}
+          />)}
         </label>
         <br />
         <button onClick={() => handleDataUpload("welcomeData", welcomeData, setWelcomeData)}>Upload</button>
       </div>
-      <div>
+      <div className="thank-you-screen">
         <h1>Thank you screen notes</h1>
         <label>
           Thank you message:{" "}
@@ -465,27 +471,37 @@ const handleFileChange = (e, setData) => {
             value={thankYouData.message}
             onChange={(e) => setThankYouData({ ...thankYouData, message: e.target.value })}
           />
-          {thankYouData.message && (
-            <button onClick={() => setThankYouData({ ...thankYouData, message: "" })}>X</button>
-          )}
+          {thankYouData.message && (<img
+            src="/delete.svg"
+            alt="Delete"
+            onClick={() => setThankYouData({ ...thankYouData, message: "" })}
+            style={{ cursor: 'pointer', marginLeft: '5px' }}
+          />)}
         </label>
         <br />
         <label>
-          Upload image:{" "}
+          Image:{" "}
           <input
             type="file"
             accept=".jpeg, .png, .jpg"
             onChange={(e) => handleFileChange(e, setThankYouData)}
           />
-          {thankYouData.image && (
-            <button onClick={() => setThankYouData({ ...thankYouData, image: null })}>X</button>
-          )}
+          {thankYouData.image && (<img
+            src="/delete.svg"
+            alt="Delete"
+            onClick={() => setThankYouData({ ...thankYouData, image: null })}
+            style={{ cursor: 'pointer', marginLeft: '5px' }}
+          />)}
         </label>
         <br />
         <button onClick={() => handleDataUpload("thankYouData", thankYouData, setThankYouData)}>Upload</button>
+      
       </div>
+    
       <div>
         <h2>Current data</h2>
+        <h3>Teaser Screen</h3>
+        {teaserLink && <img src={teaserLink} alt="Teaser Screen" />}
         <h3>Welcome data</h3>
         {welcomeData.message && <p>Welcome message: {welcomeData.message}</p>}
         {welcomeData.image && <img src={welcomeData.image} alt="Welcome background" />}
