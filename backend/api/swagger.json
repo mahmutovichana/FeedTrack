@@ -2056,109 +2056,112 @@
             }
           }
         }
-      },
-      "/api/welcomeData": {
-        "get": {
-          "summary": "Get welcome message data",
-          "responses": {
-            "200": {
-              "description": "Successful response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message":{
-                        "type":"string",
-                        "example":"Hello"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Internal Server Error:",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "properties": {
-                      "error": {
-                        "type": "string",
-                        "example": "Internal server error"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "post": {
-          "summary": "Upload welcome message data",
-          "requestBody": {
-            "required": true,
+      }
+    },
+    "/api/welcomeData": {
+      "get": {
+        "summary": "Get welcome message data",
+        "responses": {
+          "200": {
+            "description": "Successful response",
             "content": {
-              "multipart/form-data": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WelcomeMessage"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "File and message uploaded successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "properties": {
-                      "error": {
-                        "type": "string",
-                        "example": "File and message uploaded successfully"
-                      }
+          "500": {
+            "description": "Internal Server Error:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
                     }
                   }
                 }
               }
-            },
-            "400": {
-              "description": "Bad request",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "oneOf": [
-                      {
-                        "type": "object",
-                        "properties": {
-                          "message": {
-                            "type": "string",
-                            "enum": ["Message is required", "No file uploaded", "Content-Type must be multipart/form-data"]
-                          }
-                        }
-                      },
-                      {
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "example": "Message is required"
-                        }
-                      }
-                    ]
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload welcome message data",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "message": {
+                    "type": "string"
                   }
                 }
               }
-            },          
-            "500": {
-              "description": "Internal Server Error:",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "properties": {
-                      "error": {
-                        "type": "string",
-                        "example": "Internal server error"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File and message uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "File and message uploaded successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "enum": ["Message is required", "No file uploaded", "Content-Type must be multipart/form-data", "Invalid file type"]
+                        }
                       }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "Message is required"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error:",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
                     }
                   }
                 }
@@ -2167,7 +2170,96 @@
           }
         }
       }
-    }
+    },
+    "/api/teaserData/getImage": {
+      "post": {
+        "summary": "Get teaser image by teaser link",
+        "description": "Retrieve teaser's display image by its teaser link",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "teaser": {
+                    "type": "string",
+                    "description": "Teaser link"
+                  }
+                },
+                "required": ["teaser"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Teaser image retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeaserData"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/feedbacks/insertFeedback": {
+      "post": {
+        "summary": "Insert feedback",
+        "description": "Insert feedback into the database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Feedback"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback inserted successfully"
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }           
   },
   "components": {
     "schemas": {
@@ -2355,9 +2447,26 @@
       "WelcomeMessage": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "example":"3"
+          },
+          "image": {
+            "type": "string",
+            "example":"image.jpg"
+          },
           "message": {
             "type": "string",
-            "example": "Hello"
+            "example": "Default welcome message"
+          }
+        }
+      },
+      "TeaserData": {
+        "type": "object",
+        "properties": {
+          "teaser": {
+            "type": "string",
+            "example": "teaser_link_here"
           }
         }
       }
