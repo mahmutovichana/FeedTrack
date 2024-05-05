@@ -7,7 +7,7 @@ router.get('/campaigns/:campaignID/questionsPerPage', async (req, res) => {
     try {
         const { campaignID } = req.params;
         // fetch questions per page for the specified campaign
-        const query = 'SELECT questionsperpage FROM "Campaign" WHERE id = $1';
+        const query = 'SELECT questionsperpage FROM "campaign" WHERE id = $1';
         const { rows } = await db.query(query, [campaignID]);
         if (rows.length === 0) {
             throw new Error('Campaign not found');
@@ -25,10 +25,10 @@ router.get('/campaigns/:campaignID/campaignQuestions', async (req, res) => {
     try {
         const { campaignID } = req.params;
         const query = `
-            SELECT "Question".id, "Question".name
-            FROM "CampaignQuestion"
-            JOIN "Question" ON "CampaignQuestion"."questionID" = "Question".id
-            WHERE "CampaignQuestion"."campaignID" = $1
+            SELECT "question".id, "question".name
+            FROM "campaignQuestion"
+            JOIN "question" ON "campaignQuestion"."questionID" = "question".id
+            WHERE "campaignQuestion"."campaignID" = $1
         `;
         const { rows } = await db.query(query, [campaignID]);
         const questions = rows.map(row => ({

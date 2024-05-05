@@ -84,16 +84,16 @@ function setupRoutes(genericModel, tableName) {
 }
 
 // Setup routes for each table
-const userRouter = setupRoutes(genericCRUD, "Person");
-const feedbackRouter = setupRoutes(genericCRUD, "Feedback");
-const branchRouter = setupRoutes(genericCRUD, "Branch");
-const tellerRouter = setupRoutes(genericCRUD, "Teller");
-const dummyRouter = setupRoutes(genericCRUD, "Dummy"); // only for testing
-const questionRouter = setupRoutes(genericCRUD, "Question");
-const campaignRouter = setupRoutes(genericCRUD, "Campaign");
-const campaignQuestionRouter = setupRoutes(genericCRUD, "CampaignQuestion");
-const branchCampaignRouter = setupRoutes(genericCRUD, "BranchCampaign");
-const teaserDataRouter = setupRoutes(genericCRUD, "TeaserData");
+const userRouter = setupRoutes(genericCRUD, "person");
+const feedbackRouter = setupRoutes(genericCRUD, "feedback");
+const branchRouter = setupRoutes(genericCRUD, "branch");
+const tellerRouter = setupRoutes(genericCRUD, "teller");
+const dummyRouter = setupRoutes(genericCRUD, "dummy"); // only for testing
+const questionRouter = setupRoutes(genericCRUD, "question");
+const campaignRouter = setupRoutes(genericCRUD, "campaign");
+const campaignQuestionRouter = setupRoutes(genericCRUD, "campaignQuestion");
+const branchCampaignRouter = setupRoutes(genericCRUD, "branchCampaign");
+const teaserDataRouter = setupRoutes(genericCRUD, "teaserData");
 
 // Adding the routes to the app
 router.use("/users", userRouter);

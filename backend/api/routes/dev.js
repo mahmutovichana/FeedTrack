@@ -2,7 +2,7 @@ const router = require("express").Router();
 const db = require("../db");
 
 router.get("/tables", async (req, res) => {
-    const tables = ['"Branch"', '"Feedback"', '"Person"', '"Report"', '"Teller"'];
+    const tables = ['"branch"', '"feedback"', '"person"', '"report"', '"teller"'];
     const sql = tables.map((name) => `SELECT * FROM ${name}`).join(";");
     const result = await db.query(sql);
 
@@ -34,7 +34,7 @@ router.get("/tables", async (req, res) => {
 // Route for getting the maximum user ID from the database
 router.get("/getMaxUserId", async (req, res) => {
     try {
-        const result = await db.query('SELECT MAX(id) AS maxId FROM "Person"');
+        const result = await db.query('SELECT MAX(id) AS maxId FROM "person"');
         const maxId = parseInt(result.rows[0].maxid) || -1;
         res.json({ maxId });
     } catch (error) {

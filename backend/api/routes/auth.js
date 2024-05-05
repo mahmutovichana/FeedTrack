@@ -12,7 +12,7 @@ let refreshTokens = [];
 router.post("/login", async (req, res) => {
   let { email, number, password } = req.body;
   if (!email && !number) return res.status(400).json({ message: "Email or mobile number is required!" });
-  const query = (email != " ") ? 'SELECT * FROM "Person" WHERE "email" = $1' : 'SELECT * FROM "Person" WHERE "mobilenumber" = $1';
+  const query = (email != " ") ? 'SELECT * FROM "person" WHERE "email" = $1' : 'SELECT * FROM "person" WHERE "mobilenumber" = $1';
   const queryValues = (email != " ") ? [email] : [number];
   const result = await db.query(query, queryValues);
   if (result.rowCount === 0) return res.status(400).json({ message: "Email or mobile number incorrect!" });
@@ -39,7 +39,7 @@ router.post("/googleAddUser", async (req, res) => {
     if (!emailRegex.test(email))
       return res.status(400).json({ message: "Invalid email address" });
 
-    const existingUser = await db.query('SELECT * FROM "Person" WHERE email = $1',[email]);
+    const existingUser = await db.query('SELECT * FROM "person" WHERE email = $1',[email]);
 
     if (existingUser.rows.length > 0) {
       const token = generateUserJwtToken(JSON.stringify(existingUser.rows[0])).token;
@@ -56,7 +56,7 @@ router.post("/googleAddUser", async (req, res) => {
     console.log("this is verified: " + verified);
 
     const newUser = await db.query(
-      'INSERT INTO "Person" ("id", "name", "lastname", "image", "password", "email", "mobilenumber", "role", "verified") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+      'INSERT INTO "person" ("id", "name", "lastname", "image", "password", "email", "mobilenumber", "role", "verified") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
       [id, name, lastname, image, hashedPassword, email, mobilenumber, role || "superAdmin", verified]);
 
     console.log("OVO JE REZULTAT: " + newUser.rows[0]);

@@ -6,7 +6,7 @@ const db = require("./../../db");
 const insertFeedback = async (feedbackData) => {
     try {
         const query = `
-            INSERT INTO "Feedback" 
+            INSERT INTO "feedback" 
                 ("id", "date", "rating", "tellerPositionID", "questionID", "campaignID")
             VALUES 
                 (NEXTVAL('feedback_id_seq'), $1, $2, $3, $4, $5)

@@ -5,7 +5,7 @@ const db = require("./../../db");
 // Route for getting all unique values for areas from branches
 router.get('/branches/areas', async (req, res) => {
     try {
-        const query = 'SELECT DISTINCT area FROM "Branch"';
+        const query = 'SELECT DISTINCT area FROM "branch"';
         const { rows } = await db.query(query);
         const areas = rows.map(row => row.area);
         res.json(areas);
@@ -19,7 +19,7 @@ router.get('/branches/areas', async (req, res) => {
 router.get('/branches/by-area/:area', async (req, res) => {
     try {
         const { area } = req.params;
-        const query = 'SELECT * FROM "Branch" WHERE area = $1';
+        const query = 'SELECT * FROM "branch" WHERE area = $1';
         const { rows } = await db.query(query, [area]);
         res.json(rows);
     } catch (error) {

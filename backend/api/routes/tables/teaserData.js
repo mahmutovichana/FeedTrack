@@ -7,8 +7,8 @@ const getTeaserImage = async (teaserLink) => {
     try {
         const query = `
             SELECT * 
-            FROM "TeaserData" 
-            WHERE "TeaserData".teaser = $1
+            FROM "teaserData" 
+            WHERE "teaserData".teaser = $1
         `;
         const { rows } = await db.query(query, [teaserLink]);
         return rows;

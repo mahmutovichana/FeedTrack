@@ -1803,7 +1803,7 @@
     "/api/campaign/{location}": {
       "get": {
         "summary": "Get campaign by location",
-        "description": "Get campaign ID by location from the 'Branch' table",
+        "description": "Get campaign ID by location from the 'branch' table",
         "parameters": [
           {
             "name": "location",
@@ -1850,7 +1850,7 @@
     "/api/branches/areas": {
       "get": {
         "summary": "Get unique areas from branches",
-        "description": "Get unique areas from the 'Branch' table",
+        "description": "Get unique areas from the 'branch' table",
         "responses": {
           "200": {
             "description": "List of unique areas",
@@ -1896,7 +1896,7 @@
     "/api/branches/by-area/{area}": {
       "get": {
         "summary": "Get branches by area",
-        "description": "Get branches by area from the 'Branch' table",
+        "description": "Get branches by area from the 'branch' table",
         "parameters": [
           {
             "name": "area",

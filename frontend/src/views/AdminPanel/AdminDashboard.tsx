@@ -23,7 +23,9 @@ const AdminDashboardPage = () => {
   });
   return (
     <div className="home">
-      <div className="box box1">
+
+      <iframe id="lookerDashboard" src="https://lookerstudio.google.com/embed/reporting/0d38b52c-a24b-4bce-aed1-c5c65c9a9a54/page/qlD" frameBorder="0" allowFullScreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+      {/* <div className="box box1">
         <TopBox />
       </div>
       <div className="box box2">
@@ -49,7 +51,7 @@ const AdminDashboardPage = () => {
       </div>
       <div className="box box9">
         <BarChartBox {...barChartBoxRevenue} />
-      </div>
+      </div> */}
     </div>
   );
 };
