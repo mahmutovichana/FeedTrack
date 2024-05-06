@@ -18,16 +18,16 @@ const teaserDataRouter = require("./routes/tables/teaserData");
 const viewsRouter = require("./routes/view");
 
 app.use(
-  "/api-docs",
-  (req, res, next) => {
-    req.swaggerDoc = swaggerJson;
-    next();
-  },
-  swaggerUI.serveFiles(),
-  swaggerUI.setup(null, {
-    customCss: swagger.customCss,
-    customCssUrl: swagger.cssUrl,
-  })
+    "/api-docs",
+    (req, res, next) => {
+        req.swaggerDoc = swaggerJson;
+        next();
+    },
+    swaggerUI.serveFiles(),
+    swaggerUI.setup(null, {
+        customCss: swagger.customCss,
+        customCssUrl: swagger.cssUrl,
+    })
 );
 
 app.use(express.json());

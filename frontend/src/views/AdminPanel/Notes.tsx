@@ -171,6 +171,7 @@ const Notes = () => {
         method: method,
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${localStorage.token}`,
         },
         body: JSON.stringify({ image: base64, teaser: teaserLink, name: teaserName }),
       });
@@ -253,6 +254,7 @@ const Notes = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${localStorage.token}`,
         },
         body: JSON.stringify({ image: base64, message: data.message }),
       });
@@ -276,6 +278,7 @@ const Notes = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${localStorage.token}`,
         },
         body: JSON.stringify({ teaser: localStorage.getItem("teaserVideo")}),
       });
