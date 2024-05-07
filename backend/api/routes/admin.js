@@ -85,8 +85,8 @@ router.post("/:dataType", async (req, res) => {
   const { dataType } = req.params;
   const { image, message } = req.body;
   const dataTables = {
-    welcomeData: "welcomeData",
-    thankYouData: "thankYouData"
+    welcomeData: "welcomedata",
+    thankYouData: "thankyoudata"
   };
 
   if (!dataTables[dataType] || (!message && !image) || (image && !isBase64(image, { mimeRequired: true }))) {
@@ -134,8 +134,8 @@ router.get("/:dataType", async (req, res) => {
   const { dataType } = req.params;
 
   const dataTables = {
-    welcomeData: "welcomeData",
-    thankYouData: "thankYouData"
+    welcomeData: "welcomedata",
+    thankYouData: "thankyoudata"
   };
 
   if (!dataTables[dataType]) {
@@ -156,8 +156,8 @@ router.delete("/:dataType", async (req, res) => {
   const { dataType } = req.params;
 
   const dataTables = {
-    welcomeData: "welcomeData",
-    thankYouData: "thankYouData"
+    welcomeData: "welcomedata",
+    thankYouData: "thankyoudata"
   };
 
   if (!dataTables[dataType]) {

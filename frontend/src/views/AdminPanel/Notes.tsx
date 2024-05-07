@@ -93,8 +93,8 @@ const Notes = () => {
   useEffect(() => {
     const fetch = async () => {
       await fetchTeaserData();
-      await fetchData("welcomeData", setWelcomeData);
-      await fetchData("thankYouData", setThankYouData);
+      await fetchData("welcomedata", setWelcomeData);
+      await fetchData("thankyoudata", setThankYouData);
       const teaserImage = await retrieveTeaserImage();
       setTeaserImage(teaserImage);
     };
@@ -431,7 +431,7 @@ const Notes = () => {
           />)}
         </label>
         <br />
-        <button onClick={() => handleDataUpload("welcomeData", welcomeData, setWelcomeData)}>Upload</button>
+        <button onClick={() => handleDataUpload("welcomedata", welcomeData, setWelcomeData)}>Upload</button>
       </div>
       <div className="thank-you-screen">
         <h1>Thank you screen notes</h1>
@@ -466,7 +466,7 @@ const Notes = () => {
           />)}
         </label>
         <br />
-        <button onClick={() => handleDataUpload("thankYouData", thankYouData, setThankYouData)}>Upload</button>
+        <button onClick={() => handleDataUpload("thankyoudata", thankYouData, setThankYouData)}>Upload</button>
       
       </div>
     
