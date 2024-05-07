@@ -91,9 +91,9 @@ const tellerRouter = setupRoutes(genericCRUD, "teller");
 const dummyRouter = setupRoutes(genericCRUD, "dummy"); // only for testing
 const questionRouter = setupRoutes(genericCRUD, "question");
 const campaignRouter = setupRoutes(genericCRUD, "campaign");
-const campaignQuestionRouter = setupRoutes(genericCRUD, "campaignQuestion");
-const branchCampaignRouter = setupRoutes(genericCRUD, "branchCampaign");
-const teaserDataRouter = setupRoutes(genericCRUD, "teaserData");
+const campaignQuestionRouter = setupRoutes(genericCRUD, "campaignquestion");
+const branchCampaignRouter = setupRoutes(genericCRUD, "branchcampaign");
+const teaserDataRouter = setupRoutes(genericCRUD, "teaserdata");
 
 // Adding the routes to the app
 router.use("/users", userRouter);

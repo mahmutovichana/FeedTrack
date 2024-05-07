@@ -93,7 +93,7 @@ router.get('/campaign/byName/:location', async (req, res) => {
 const getCampaignsByBranchId = async (branchID) => {
     try {
         const query = `SELECT bc."branchID", bc."campaignID", c.*
-                       FROM "branchCampaign" bc
+                       FROM "branchcampaign" bc
                        JOIN "campaign" c ON bc."campaignID" = c.id
                        WHERE bc."branchID" = $1`;
         const { rows } = await db.query(query, [branchID]);
@@ -112,8 +112,8 @@ router.get('/branchCampaign/byBranchID/:branchID', async (req, res) => {
 const getQuestionsByCampaignId = async (campaignID) => {
     try {
         const query = `SELECT Q.*
-                       FROM "CampaignQuestion" AS CQ
-                       JOIN "Question" AS Q ON CQ."questionID" = Q.id
+                       FROM "campaignquestion" AS CQ
+                       JOIN "question" AS Q ON CQ."questionID" = Q.id
                        WHERE CQ."campaignID" = $1`;
         const { rows } = await db.query(query, [campaignID]);
         return rows;
@@ -147,7 +147,7 @@ router.get('/campaign/view/name/:name', async (req, res) => {
 const getCampaignIdsByQuestionId = async (campaignID) => {
     try {
         const query = `SELECT CQ."campaignID"
-                       FROM "campaignQuestion" AS CQ
+                       FROM "campaignquestion" AS CQ
                        WHERE CQ."questionID" = $1`;
         const { rows } = await db.query(query, [campaignID]);
         return rows;

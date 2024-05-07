@@ -27,8 +27,8 @@ router.get('/campaigns/:campaignID/campaignQuestions', async (req, res) => {
         const query = `
             SELECT "question".id, "question".name
             FROM "campaignQuestion"
-            JOIN "question" ON "campaignQuestion"."questionID" = "question".id
-            WHERE "campaignQuestion"."campaignID" = $1
+            JOIN "question" ON "campaignquestion"."questionID" = "question".id
+            WHERE "campaignquestion"."campaignID" = $1
         `;
         const { rows } = await db.query(query, [campaignID]);
         const questions = rows.map(row => ({
