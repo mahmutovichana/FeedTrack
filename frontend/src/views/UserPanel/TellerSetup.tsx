@@ -39,10 +39,6 @@ const TellerSetup = () => {
             .then(response => response.json())
             .then(data => setTellers(data))
             .catch(error => console.error('Error fetching tellers:', error));
-
-
-            
-
     }, []);
 
     const handleBranchLocationChange = (event) => {
