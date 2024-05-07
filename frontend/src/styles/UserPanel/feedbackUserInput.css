@@ -11,8 +11,22 @@
 }
 
 .feedbackUserInputContainer .info {
+  display: flex;
   text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   top: 0;
+}
+
+.feedbackUserInputContainer .info h3 {
+  width: fit-content;
+  border-radius: 10px;
+  padding: 1%;
+  background-color: #4E02FF;
+  color: white;
+  margin: 0;
+  margin-bottom: 2%;
 }
 
 .feedbackUserInputContainer .logo {
@@ -112,7 +126,13 @@
   /* Dodano kako bi padding bio uračunat u dimenzije */
 }
 
-
+h1 {
+  color: white;
+  background-color: #4E02FF;
+  /* Teget plava */
+  border-radius: 10px;
+  padding: 10px;
+}
 
 .thankYouScreenContainer .logo {
   margin-top: 75px;
