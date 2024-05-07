@@ -1,10 +1,17 @@
 @import "../../styles/AdminPanel/variables.scss";
 
 .home {
-  display: grid;
+  /* display: grid;
   gap: 20px;
   grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(180px, auto);
+  grid-auto-rows: minmax(180px, auto); */
+
+  height: 100%;
+
+  #lookerDashboard {
+    width:100%;
+    height: 100%;
+  }
 
   .box {
     padding: 20px;

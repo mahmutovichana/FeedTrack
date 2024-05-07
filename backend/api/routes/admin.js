@@ -32,7 +32,7 @@ router.post(
     }
 
     const existingUser = await db.query(
-      'SELECT * FROM "Person" WHERE email = $1',
+      'SELECT * FROM "person" WHERE email = $1',
       [email]
     );
 
@@ -47,11 +47,11 @@ router.post(
     newAdminInfo.password = await bcrypt.hash(password, 10);
 
     try {
-      const maxId = await db.query('SELECT MAX(id) AS maxId FROM "Person"');
+      const maxId = await db.query('SELECT MAX(id) AS maxId FROM "person"');
       const newId = parseInt(maxId.rows[0].maxid) + 1;
 
       const result = await db.query(
-        'INSERT INTO "Person" ("id", "name", "lastName", "image", "password", "email", "mobileNumber", "role") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        'INSERT INTO "person" ("id", "name", "lastName", "image", "password", "email", "mobileNumber", "role") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
         [newId, ...newAdminInfo]
       );
     } catch (err) {
@@ -70,7 +70,7 @@ router.get(
   // authenticateToken,
   // authRole("branchAdmin", "tellerAdmin"),
   async (req, res) => {
-    const query = `SELECT * FROM "Person" WHERE role = 'user'`;
+    const query = `SELECT * FROM "person" WHERE role = 'user'`;
     try {
       const { rows } = await db.query(query);
       res.status(200).json(rows);
@@ -85,8 +85,8 @@ router.post("/:dataType", async (req, res) => {
   const { dataType } = req.params;
   const { image, message } = req.body;
   const dataTables = {
-    welcomeData: "WelcomeData",
-    thankYouData: "ThankYouData"
+    welcomeData: "welcomeData",
+    thankYouData: "thankYouData"
   };
 
   if (!dataTables[dataType] || (!message && !image) || (image && !isBase64(image, { mimeRequired: true }))) {
@@ -134,8 +134,8 @@ router.get("/:dataType", async (req, res) => {
   const { dataType } = req.params;
 
   const dataTables = {
-    welcomeData: "WelcomeData",
-    thankYouData: "ThankYouData"
+    welcomeData: "welcomeData",
+    thankYouData: "thankYouData"
   };
 
   if (!dataTables[dataType]) {
@@ -156,8 +156,8 @@ router.delete("/:dataType", async (req, res) => {
   const { dataType } = req.params;
 
   const dataTables = {
-    welcomeData: "WelcomeData",
-    thankYouData: "ThankYouData"
+    welcomeData: "welcomeData",
+    thankYouData: "thankYouData"
   };
 
   if (!dataTables[dataType]) {

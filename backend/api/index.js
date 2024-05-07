@@ -16,6 +16,7 @@ const campaignsRouter = require("./routes/tables/campaign");
 const feedbacksRouter = require("./routes/tables/feedback");
 const teaserDataRouter = require("./routes/tables/teaserData");
 const viewsRouter = require("./routes/view");
+const lookerRouter = require("./routes/looker");
 
 app.use(
   "/api-docs",
@@ -51,6 +52,7 @@ app.use("/api", campaignsRouter);
 app.use("/api", viewsRouter);
 app.use("/api", feedbacksRouter);
 app.use("/api", teaserDataRouter);
+app.use("/api", lookerRouter);
 
 const PORT = 5432;
 
