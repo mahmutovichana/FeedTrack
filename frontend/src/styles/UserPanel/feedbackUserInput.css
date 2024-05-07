@@ -126,7 +126,7 @@
   /* Dodano kako bi padding bio uračunat u dimenzije */
 }
 
-h1 {
+.thankYouScreenContainer h1 {
   color: white;
   background-color: #4E02FF;
   /* Teget plava */
