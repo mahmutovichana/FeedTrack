@@ -7,8 +7,8 @@ const getTeaserImage = async (teaserLink) => {
     try {
         const query = `
             SELECT * 
-            FROM "teaserData" 
-            WHERE "teaserData".teaser = $1
+            FROM "teaserdata" 
+            WHERE "teaserdata".teaser = $1
         `;
         const { rows } = await db.query(query, [teaserLink]);
         return rows;
@@ -20,7 +20,7 @@ const getTeaserImage = async (teaserLink) => {
 router.post('/teaserData/getImage', async (req, res) => {
     try {
         try { res.json(await getTeaserImage(req.body.teaser)); }
-        catch (error) { handleError(res, error); }
+        catch (error) { throw error; }
     } catch (error) {
         throw error;
     }

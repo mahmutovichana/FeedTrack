@@ -33,18 +33,18 @@ const customStyles = {
 
 // For styling dropdown list for teasers (display label with image in dropdown list)
 const CustomOption = (props) => (
-  <components.Option {...props}>
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'left' }}>
-      {props.data.image && (
-        <img
-          src={props.data.image}
-          alt={`Preview for ${props.data.label}`}
-          style={{ width: '100px', height: '70px', marginBottom: '5px' }}
-        />
-      )}
-      <span style={{ marginLeft: '10px' }}>{props.data.label}</span>
-    </div>
-  </components.Option>
+    <components.Option {...props}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'left' }}>
+        {props.data.image && (
+            <img
+                src={props.data.image}
+                alt={`Preview for ${props.data.label}`}
+                style={{ width: '100px', height: '70px', marginBottom: '5px' }}
+            />
+        )}
+        <span style={{ marginLeft: '10px' }}>{props.data.label}</span>
+      </div>
+    </components.Option>
 );
 
 const Notes = () => {
@@ -79,7 +79,10 @@ const Notes = () => {
 
   const fetchTeaserData = async () => {
     try {
-      const response = await fetch(`${deployURLs.backendURL}/api/teaserData`);
+      const response = await fetch(`${deployURLs.backendURL}/api/teaserData`, {method: "GET", headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${localStorage.token}`,
+        }});
       if (!response.ok) {
         throw new Error(`Error fetching teaser data: ${response.status}`);
       }
@@ -93,8 +96,8 @@ const Notes = () => {
   useEffect(() => {
     const fetch = async () => {
       await fetchTeaserData();
-      await fetchData("welcomedata", setWelcomeData);
-      await fetchData("thankyoudata", setThankYouData);
+      await fetchData("welcomeData", setWelcomeData);
+      await fetchData("thankYouData", setThankYouData);
       const teaserImage = await retrieveTeaserImage();
       setTeaserImage(teaserImage);
     };
@@ -111,7 +114,10 @@ const Notes = () => {
 
   const fetchData = async (dataType, setData) => {
     try {
-      const response = await fetch(`${deployURLs.backendURL}/api/${dataType}`, { method: "GET" });
+      const response = await fetch(`${deployURLs.backendURL}/api/${dataType}`, { method: "GET",  headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${localStorage.token}`,
+        }});
       const data = await response.json();
       console.log(data);
       setData(data);
@@ -199,10 +205,14 @@ const Notes = () => {
   const handleDeleteTeaser = async () => {
     try {
       const response = await fetch(
-        `${deployURLs.backendURL}/api/teaserData/${teaserData[selectedTeaser]?.id}`,
-        {
-          method: "DELETE",
-        }
+          `${deployURLs.backendURL}/api/teaserData/${teaserData[selectedTeaser]?.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': `Bearer ${localStorage.token}`,
+            }
+          }
       );
       if (response.ok) {
         if (response.status === 204) {
@@ -237,7 +247,10 @@ const Notes = () => {
   const handleDataUpload = async (dataType, data, setFunction) => {
     try {
       if (!data.image && !data.message) {
-        const response = await fetch(`${deployURLs.backendURL}/api/${dataType}`, { method: "DELETE" });
+        const response = await fetch(`${deployURLs.backendURL}/api/${dataType}`, { method: "DELETE", headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${localStorage.token}`,
+          }});
         if (response.ok) {
           toast.success(`Successfully deleted ${dataType} data!`);
           setFunction({ image: null, message: "" });
@@ -308,184 +321,184 @@ const Notes = () => {
   }, [selectedTeaser, showTeaserUpdate]);
 
   return (
-    <div className="notes">
-      <div className="teaser-screen">
-        <h1>Teaser Screen Selection</h1>
-        <label>Select Teaser:</label>
-        <div className="teaserDisplay">
-          <Select
-            options={options}
-            value={options.find((option) => option.value === selectedTeaser)}
-            onChange={handleTeaserSelection}
-            styles={customStyles}
-            components={{ Option: CustomOption }}
-          />
-          {selectedTeaser !== null && (
-            <img
-              src={options[selectedTeaser]?.image}
-              alt={`Preview for Teaser ${selectedTeaser + 1}`}
-              style={{ width: '160px', height: '120px', marginLeft: '10px' }}
+      <div className="notes">
+        <div className="teaser-screen">
+          <h1>Teaser Screen Selection</h1>
+          <label>Select Teaser:</label>
+          <div className="teaserDisplay">
+            <Select
+                options={options}
+                value={options.find((option) => option.value === selectedTeaser)}
+                onChange={handleTeaserSelection}
+                styles={customStyles}
+                components={{ Option: CustomOption }}
             />
-          )}
-        </div>
-        <br />
-        {(!showTeaserUpload && !showTeaserUpdate && !showTeaserDelete) && (
-          <div className="centerButton">
-            <button onClick={handleSelectButton}>
-              Select this teaser
-            </button>
+            {selectedTeaser !== null && (
+                <img
+                    src={options[selectedTeaser]?.image}
+                    alt={`Preview for Teaser ${selectedTeaser + 1}`}
+                    style={{ width: '160px', height: '120px', marginLeft: '10px' }}
+                />
+            )}
           </div>
-        )}
-        <br />
-        {(showTeaserUpload || showTeaserUpdate) && ( // Only show the upload section when showTeaserUpload or showTeaserUpdate is true
-          <>
-            <label>
-              Teaser name:{" "}
-              <input
-                type="text"
-                id="teaser-name"
-                placeholder="Teaser name"
-                value={teaserName}
-                onChange={handleTeaserNameChange}
-              />
-            </label>
-            <br />
-            <label>
-              Teaser link:{" "}
-              <input
-                type="text"
-                id="teaser-link"
-                placeholder="Teaser link"
-                value={teaserLink}
-                onChange={handleTeaserLinkChange}
-              />
-            </label>
-            <br />
-            <label>
-              Upload Preview Image:{" "}
-              <input
-                type="file"
-                id="file"
-                accept=".jpeg, .png, .jpg"
-                onChange={handleTeaserFileChange}
-              />
-            </label>
-            <br />
-            <div className="teaser-buttons-container">
-              <button onClick={handleTeaserUpload}>Upload</button>
-              <button onClick={() => { setShowTeaserUpload(false); setShowTeaserUpdate(false); }}>Cancel</button>
-            </div>
-          </>
-        )}
-        {(showTeaserDelete) && ( // Only show the delete section when showTeaserDelete is true
-          <>
-            <label>
-              Are you sure?
-            </label>
-            <br />
-            <div className="teaser-buttons-container">
-              <button onClick={handleDeleteTeaser}>Yes</button>
-              <button onClick={() => { setShowTeaserDelete(false); }}>No</button>
-            </div>
-          </>
-        )}
-        <div className="teaser-buttons-container">
+          <br />
           {(!showTeaserUpload && !showTeaserUpdate && !showTeaserDelete) && (
-            <>
-              <button onClick={() => setShowTeaserUpload(true)}>Add a teaser</button>
-              <button onClick={() => setShowTeaserUpdate(true)}>Update teaser</button>
-              <button onClick={() => setShowTeaserDelete(true)}>Delete teaser</button>
-            </>
+              <div className="centerButton">
+                <button onClick={handleSelectButton}>
+                  Select this teaser
+                </button>
+              </div>
           )}
+          <br />
+          {(showTeaserUpload || showTeaserUpdate) && ( // Only show the upload section when showTeaserUpload or showTeaserUpdate is true
+              <>
+                <label>
+                  Teaser name:{" "}
+                  <input
+                      type="text"
+                      id="teaser-name"
+                      placeholder="Teaser name"
+                      value={teaserName}
+                      onChange={handleTeaserNameChange}
+                  />
+                </label>
+                <br />
+                <label>
+                  Teaser link:{" "}
+                  <input
+                      type="text"
+                      id="teaser-link"
+                      placeholder="Teaser link"
+                      value={teaserLink}
+                      onChange={handleTeaserLinkChange}
+                  />
+                </label>
+                <br />
+                <label>
+                  Upload Preview Image:{" "}
+                  <input
+                      type="file"
+                      id="file"
+                      accept=".jpeg, .png, .jpg"
+                      onChange={handleTeaserFileChange}
+                  />
+                </label>
+                <br />
+                <div className="teaser-buttons-container">
+                  <button onClick={handleTeaserUpload}>Upload</button>
+                  <button onClick={() => { setShowTeaserUpload(false); setShowTeaserUpdate(false); }}>Cancel</button>
+                </div>
+              </>
+          )}
+          {(showTeaserDelete) && ( // Only show the delete section when showTeaserDelete is true
+              <>
+                <label>
+                  Are you sure?
+                </label>
+                <br />
+                <div className="teaser-buttons-container">
+                  <button onClick={handleDeleteTeaser}>Yes</button>
+                  <button onClick={() => { setShowTeaserDelete(false); }}>No</button>
+                </div>
+              </>
+          )}
+          <div className="teaser-buttons-container">
+            {(!showTeaserUpload && !showTeaserUpdate && !showTeaserDelete) && (
+                <>
+                  <button onClick={() => setShowTeaserUpload(true)}>Add a teaser</button>
+                  <button onClick={() => setShowTeaserUpdate(true)}>Update teaser</button>
+                  <button onClick={() => setShowTeaserDelete(true)}>Delete teaser</button>
+                </>
+            )}
+          </div>
         </div>
-      </div>
-      <br />
-      <br />
-      <div>
-        <h1>Welcome screen notes</h1>
-        <label>
-          Welcome message:{" "}
-          <input
-            type="text"
-            placeholder="Message"
-            value={welcomeData.message}
-            onChange={(e) => setWelcomeData({ ...welcomeData, message: e.target.value })}
-          />
-          {welcomeData.message && (<img
-            src="/delete.svg"
-            alt="Delete"
-            onClick={() => setWelcomeData({ ...welcomeData, message: "" })}
-            style={{ cursor: 'pointer', marginLeft: '5px' }}
-          />)}
-        </label>
         <br />
-        <label>
-          Image:{" "}
-          <input
-            type="file"
-            accept=".jpeg, .png, .jpg, .svg"
-            onChange={(e) => handleFileChange(e, setWelcomeData)}
-          />
-          {welcomeData.image && (<img
-            src="/delete.svg"
-            alt="Delete"
-            onClick={() => setWelcomeData({ ...welcomeData, image: null })}
-            style={{ cursor: 'pointer', marginLeft: '5px' }}
-          />)}
-        </label>
         <br />
-        <button onClick={() => handleDataUpload("welcomedata", welcomeData, setWelcomeData)}>Upload</button>
+        <div>
+          <h1>Welcome screen notes</h1>
+          <label>
+            Welcome message:{" "}
+            <input
+                type="text"
+                placeholder="Message"
+                value={welcomeData.message}
+                onChange={(e) => setWelcomeData({ ...welcomeData, message: e.target.value })}
+            />
+            {welcomeData.message && (<img
+                src="/delete.svg"
+                alt="Delete"
+                onClick={() => setWelcomeData({ ...welcomeData, message: "" })}
+                style={{ cursor: 'pointer', marginLeft: '5px' }}
+            />)}
+          </label>
+          <br />
+          <label>
+            Image:{" "}
+            <input
+                type="file"
+                accept=".jpeg, .png, .jpg, .svg"
+                onChange={(e) => handleFileChange(e, setWelcomeData)}
+            />
+            {welcomeData.image && (<img
+                src="/delete.svg"
+                alt="Delete"
+                onClick={() => setWelcomeData({ ...welcomeData, image: null })}
+                style={{ cursor: 'pointer', marginLeft: '5px' }}
+            />)}
+          </label>
+          <br />
+          <button onClick={() => handleDataUpload("welcomeData", welcomeData, setWelcomeData)}>Upload</button>
+        </div>
+        <div className="thank-you-screen">
+          <h1>Thank you screen notes</h1>
+          <label>
+            Thank you message:{" "}
+            <input
+                type="text"
+                placeholder="Message"
+                value={thankYouData.message}
+                onChange={(e) => setThankYouData({ ...thankYouData, message: e.target.value })}
+            />
+            {thankYouData.message && (<img
+                src="/delete.svg"
+                alt="Delete"
+                onClick={() => setThankYouData({ ...thankYouData, message: "" })}
+                style={{ cursor: 'pointer', marginLeft: '5px' }}
+            />)}
+          </label>
+          <br />
+          <label>
+            Image:{" "}
+            <input
+                type="file"
+                accept=".jpeg, .png, .jpg"
+                onChange={(e) => handleFileChange(e, setThankYouData)}
+            />
+            {thankYouData.image && (<img
+                src="/delete.svg"
+                alt="Delete"
+                onClick={() => setThankYouData({ ...thankYouData, image: null })}
+                style={{ cursor: 'pointer', marginLeft: '5px' }}
+            />)}
+          </label>
+          <br />
+          <button onClick={() => handleDataUpload("thankYouData", thankYouData, setThankYouData)}>Upload</button>
+
+        </div>
+
+        <div>
+          <h2>Current data</h2>
+          <h3>Teaser Screen</h3>
+          {teaserImage && <img className="currentDataImg" src={teaserImage} alt="Teaser Screen" />}
+          <h3>Welcome data</h3>
+          {welcomeData.message && <p>Welcome message: {welcomeData.message}</p>}
+          {welcomeData.image && <img src={welcomeData.image} alt="Welcome background" />}
+          <h3>Thank You data</h3>
+          {thankYouData.message && <p>Thank you message: {thankYouData.message}</p>}
+          {thankYouData.image && <img className="currentDataImg" src={thankYouData.image} alt="Thank you background"/>}
+        </div>
+        <ToastContainer />
       </div>
-      <div className="thank-you-screen">
-        <h1>Thank you screen notes</h1>
-        <label>
-          Thank you message:{" "}
-          <input
-            type="text"
-            placeholder="Message"
-            value={thankYouData.message}
-            onChange={(e) => setThankYouData({ ...thankYouData, message: e.target.value })}
-          />
-          {thankYouData.message && (<img
-            src="/delete.svg"
-            alt="Delete"
-            onClick={() => setThankYouData({ ...thankYouData, message: "" })}
-            style={{ cursor: 'pointer', marginLeft: '5px' }}
-          />)}
-        </label>
-        <br />
-        <label>
-          Image:{" "}
-          <input
-            type="file"
-            accept=".jpeg, .png, .jpg"
-            onChange={(e) => handleFileChange(e, setThankYouData)}
-          />
-          {thankYouData.image && (<img
-            src="/delete.svg"
-            alt="Delete"
-            onClick={() => setThankYouData({ ...thankYouData, image: null })}
-            style={{ cursor: 'pointer', marginLeft: '5px' }}
-          />)}
-        </label>
-        <br />
-        <button onClick={() => handleDataUpload("thankyoudata", thankYouData, setThankYouData)}>Upload</button>
-      
-      </div>
-    
-      <div>
-        <h2>Current data</h2>
-        <h3>Teaser Screen</h3>
-        {teaserImage && <img className="currentDataImg" src={teaserImage} alt="Teaser Screen" />}
-        <h3>Welcome data</h3>
-        {welcomeData.message && <p>Welcome message: {welcomeData.message}</p>}
-        {welcomeData.image && <img src={welcomeData.image} alt="Welcome background" />}
-        <h3>Thank You data</h3>
-        {thankYouData.message && <p>Thank you message: {thankYouData.message}</p>}
-        {thankYouData.image && <img className="currentDataImg" src={thankYouData.image} alt="Thank you background"/>}
-      </div>
-      <ToastContainer />
-    </div>
   );
 };
 
