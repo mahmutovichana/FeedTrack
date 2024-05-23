@@ -190,9 +190,10 @@ const Add = (props: Props) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // check if admin is superAdmin
+  
+    // check data from localStorage
     let isSuperAdmin = false;
+    let isBranchAdmin = false;
     const userDataString = localStorage.getItem("user");
     if (!userDataString) {
       console.error("User data not found in localStorage");
@@ -200,20 +201,22 @@ const Add = (props: Props) => {
       const userData = JSON.parse(userDataString);
       if (userData && userData.role) {
         isSuperAdmin = userData.role === "superAdmin";
+        isBranchAdmin = userData.role === "branchAdmin";
       } else {
         console.error("Role not found in user data");
       }
     }
-
-    // Provjera validnosti podataka
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\d{4,15}$/;
     let validRoles;
     if (isSuperAdmin) {
       validRoles = ["superAdmin", "tellerAdmin", "branchAdmin", "user"];
+    } else if (isBranchAdmin) {
+      validRoles = ["tellerAdmin", "user"];
     } else {
       validRoles = ["user"];
     }
+    // Provjera validnosti podataka
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\d{4,15}$/;
     const currentErrors: { [key: string]: string } = {};
 
     props.columns.forEach((column) => {
