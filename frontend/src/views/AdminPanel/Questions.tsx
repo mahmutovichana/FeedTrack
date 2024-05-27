@@ -168,7 +168,6 @@ const Questions = () => {
                 <h1>Questions</h1>
                 {isValidAdmin && (
                     <>
-                        <button onClick={() => setOpenAdd(true)}>Add</button>
                         <button onClick={() => setOpenUpdate(true)}>Update</button>
                     </>
                 )}
